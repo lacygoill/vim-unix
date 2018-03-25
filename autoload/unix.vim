@@ -28,33 +28,6 @@ fu! unix#chmod(flags) abort "{{{1
     " executed non silently.
 endfu
 
-fu! unix#trash_put() abort "{{{1
-    if !executable('trash-put')
-        return s:trash_cli_not_installed()
-    endif
-
-    let file = expand('%:p')
-    if empty(file)
-        return ''
-    endif
-
-    " first try to unload the buffer
-    bd!
-    " if it's still loaded, stop
-    if bufloaded(file)
-        return ''
-    endif
-
-    " now, try to put the file in a trash can
-    call system('trash-put '.file)
-    if v:shell_error
-        call system('')
-        return 'echoerr '.string('Failed to delete '.file)
-    endif
-
-    return ''
-endfu
-
 fu! unix#grep(prg, pat, bang) abort "{{{1
     let grepprg    = &l:grepprg
     let grepformat = &l:grepformat
@@ -347,6 +320,44 @@ endfu
 
 fu! s:trash_cli_not_installed() abort "{{{1
     return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+endfu
+
+fu! unix#trash_put() abort "{{{1
+    if !executable('trash-put')
+        return s:trash_cli_not_installed()
+    endif
+
+    let file = expand('%:p')
+    if empty(file)
+        return ''
+    endif
+
+    " First try to unload the buffer.
+    " But before that, load the alternate file, if there's one.
+    let alternate_file = expand('#:p')
+    if !empty(alternate_file)
+    "   │
+    "   └ Why not `filereadable()`?
+    "     Because the alternate “file” could be a buffer.
+        exe 'e '.alternate_file
+        bd! #
+    else
+        bd!
+    endif
+
+    " if it's still loaded, stop
+    if bufloaded(file)
+        return ''
+    endif
+
+    " now, try to put the file in a trash can
+    call system('trash-put '.file)
+    if v:shell_error
+        call system('')
+        return 'echoerr '.string('Failed to delete '.file)
+    endif
+
+    return ''
 endfu
 
 fu! unix#unlink() abort "{{{1
