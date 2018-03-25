@@ -97,6 +97,36 @@ fu! s:make_executable() abort "{{{2
             echohl ErrorMsg
             echom 'Cannot make file executable: '.v:shell_error
             echohl None
+
+            " Why?{{{
+            "
+            " To reset `v:shell_error` to 0.
+            "}}}
+            " Is there another way?{{{
+            "
+            " `v:shell_error` is not writable.
+            " So, the only way I can think of is:
+            "
+            "         :call system('')
+            "         :!
+            "}}}
+            " Is it necessary?{{{
+            "
+            " I don't know.
+            "
+            " Usually,  plugins'  authors don't  seem  to  care about  resetting
+            " `v:shell_error`:
+            "
+            "         vim /v:shell_error/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
+            "
+            " But, better be safe than sorry.
+            "
+            " Also, have a look at `:h todo`, and search for `v:shell_error`.
+            " A patch was submitted in 2016 to make the variable writable.
+            " So, I'm not alone thinking it would  be useful to be able to write
+            " this variable.
+            "}}}
+            call system('')
         endif
     endif
 endfu

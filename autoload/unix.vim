@@ -48,6 +48,7 @@ fu! unix#delete() abort "{{{1
     " now, try to put the file in a trash can
     call system('!trash-put '.file)
     if v:shell_error
+        call system('')
         return 'echoerr '.string('Failed to delete '.file)
     endif
 
@@ -301,6 +302,7 @@ endif
 fu! s:sudo_error() abort "{{{2
     let error = join(readfile(s:error_file), ' | ')
     if error =~# '^sudo' || v:shell_error
+        call system('')
         return len(error) ? error : 'Error invoking sudo'
     else
         return error
@@ -360,6 +362,7 @@ fu! unix#unlink() abort "{{{1
         call system('!trash-put '.file)
 
         if v:shell_error
+            call system('')
             return 'echoerr '.string('Failed to delete '.file)
         else
             " we've deleted the current file, so now, we reload the buffer
