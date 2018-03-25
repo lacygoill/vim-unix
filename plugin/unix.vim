@@ -6,6 +6,12 @@ let g:loaded_unix = 1
 " TODO:
 " implement a `:Cp` command to create a copy of a file
 
+" FIXME:
+" Shouldn't we merge the functions implementing `:TrashPut` and `:Unlink`?
+" Besides, it's a bit weird to try to remember two different command names,
+" which have the same purpose.
+" Add a bang to `:TrashPut` to cover both behaviors?
+
 let s:template_dir = $HOME.'/.vim/template'
 
 " Autocmds "{{{1
@@ -40,8 +46,8 @@ com!      -bang -nargs=? -complete=dir Mkdir call unix#mkdir(<q-args>, <bang>0)
 com!      -nargs=1 -bang -complete=file                        Move    exe unix#move(<q-args>, <bang>0)
 com!      -nargs=1 -bang -complete=custom,unix#rename_complete Rename  Move<bang> %:h/<args>
 "                                                                                 └─┤ ├────┘
-"                                                        directory of current file ─┘ │
-"                                                                  new chosen name ───┘
+"                                                         directory of current file ┘ │
+"                                                                     new chosen name ┘
 
 com!      -bang -complete=file -nargs=? SudoEdit  call unix#sudo_edit(<q-args>, <bang>0)
 com! -bar                               SudoWrite call unix#sudo_setup(expand('%:p')) | w!
@@ -79,7 +85,7 @@ com! -bar Wall call unix#wall()
 "                │ │ │ a file owned by any user
 "                │ │ │
 com! -bar W exe 'w !sudo tee >/dev/null %' | setl nomod
-"                            │        │ └─ but write in the current file
+"                            │        │ └ but write in the current file
 "                            └────────┤
 "                                     └ don't write in the terminal
 
@@ -145,11 +151,11 @@ fu! s:maybe_read_template() abort "{{{2
     call map(filetypes, {i,v -> fnamemodify(v, ':t:r')})
 
     if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.'/'.&ft.'.vim')
-        "    ┌─ don't use the template file as the alternate file for the current
-        "    │  window; keep the current one
+        "    ┌ don't use the template file as the alternate file for the current
+        "    │ window; keep the current one
         "    │
-        "    │  Note that, `:keepalt` is not useful  when you read the output of
-        "    │  an external command (:r !cmd)
+        "    │ Note that, `:keepalt`  is not useful when you read  the output of
+        "    │ an external command (:r !cmd)
         "    │
         exe 'keepalt read '.fnameescape(s:template_dir.'/'.&ft.'.vim')
         1d_
