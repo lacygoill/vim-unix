@@ -28,7 +28,7 @@ fu! unix#chmod(flags) abort "{{{1
     " executed non silently.
 endfu
 
-fu! unix#delete() abort "{{{1
+fu! unix#trash_put() abort "{{{1
     if !executable('trash-put')
         return s:trash_cli_not_installed()
     endif
