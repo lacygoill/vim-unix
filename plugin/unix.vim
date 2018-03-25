@@ -32,7 +32,7 @@ augroup END
 " Don't bring inconsistency, a default Ex command doesn't need `:silent!` unless
 " it encounters a real error. Ours should behave in the same way.
 com! -bar -nargs=1 Chmod    exe unix#chmod(<q-args>)
-com! -bar          TrashPut exe unix#delete()
+com! -bar          TrashPut exe unix#trash_put()
 com! -bar          Unlink   exe unix#unlink()
 
 com!      -bang -complete=file -nargs=+ Find   call unix#grep('find',   <q-args>, <bang>0)

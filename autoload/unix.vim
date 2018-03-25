@@ -46,7 +46,7 @@ fu! unix#trash_put() abort "{{{1
     endif
 
     " now, try to put the file in a trash can
-    call system('!trash-put '.file)
+    call system('trash-put '.file)
     if v:shell_error
         call system('')
         return 'echoerr '.string('Failed to delete '.file)
@@ -359,7 +359,7 @@ fu! unix#unlink() abort "{{{1
     else
 
         let file = expand('%:p')
-        call system('!trash-put '.file)
+        call system('trash-put '.file)
 
         if v:shell_error
             call system('')
