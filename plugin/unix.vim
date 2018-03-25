@@ -10,6 +10,9 @@ let g:loaded_unix = 1
 " When you remove/delete a  file, it would be nice to  get the alternate buffer,
 " instead of closing the window.
 
+
+let s:template_dir = $HOME.'/.vim/template'
+
 " Autocmds "{{{1
 
 augroup my_unix
@@ -49,7 +52,6 @@ com!      -bang -complete=file -nargs=? SudoEdit  call unix#sudo_edit(<q-args>, 
 com! -bar                               SudoWrite call unix#sudo_setup(expand('%:p')) | w!
 
 com! -bar Wall call unix#wall()
-
 
 " What's the purpose of `:W`?{{{
 "
@@ -112,25 +114,24 @@ fu! s:maybe_read_template() abort "{{{2
     " For an example of template file, have a look at:
     "         /etc/init.d/skeleton
 
-    " Get all the filetypes for which we have a template in `~/.vim/template/`.
-    let filetypes = glob($HOME.'/.vim/template/*', 0, 1)
+    " Get all the filetypes for which we have a template.
+    let filetypes = glob(s:template_dir.'/*', 0, 1)
     call filter(filetypes, {i,v -> v !~# 'compiler.vim'})
     call map(filetypes, {i,v -> fnamemodify(v, ':t:r')})
 
-    if index(filetypes, &ft) >= 0 && filereadable($HOME.'/.vim/template/'.&ft.'.vim')
+    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.'/'.&ft.'.vim')
         "    ┌─ don't use the template file as the alternate file for the current
         "    │  window; keep the current one
         "    │
-        "    │  NOTE:
-        "    │  `:keepalt` is not useful when you read the output of an external
-        "    │  command (:r !cmd)
+        "    │  Note that, `:keepalt` is not useful  when you read the output of
+        "    │  an external command (:r !cmd)
         "    │
-        exe 'keepalt read '.fnameescape($HOME.'/.vim/template/'.&ft.'.vim')
+        exe 'keepalt read '.fnameescape(s:template_dir.'/'.&ft.'.vim')
         1d_
 
     elseif expand('%:p') =~# '.*/compiler/[^/]*.vim'
-    \   && filereadable($HOME.'/.vim/template/compiler.vim')
-        keepalt read $HOME/.vim/template/compiler.vim
+    \   && filereadable(s:template_dir.'/compiler.vim')
+        exe 'keepalt read '.s:template_dir.'/compiler.vim'
         " If  our  compiler  is  in  `~/.vim/compiler`,  we  want  to  skip  the
         " default  compilers in  `$VIMRUNTIME/compiler`. In this  case, we  need
         " 'current_compiler' to be set.
