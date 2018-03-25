@@ -9,8 +9,6 @@ let g:loaded_unix = 1
 " TODO:
 " When you remove/delete a  file, it would be nice to  get the alternate buffer,
 " instead of closing the window.
-" Btw, didn't the original plugin already do that?
-" Did we break this feature?
 
 let s:error_file = tempname()
 " Autocmds "{{{1
@@ -502,3 +500,4 @@ fu! s:wall() abort "{{{2
                   \| endif
     call win_gotoid(cur_winid)
 endfu
+
