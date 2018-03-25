@@ -255,7 +255,7 @@ fu! s:should_write_buffer(seen) abort "{{{1
     endif
 endfu
 
-fu! s:silent_sudo_cmd(editor) abort "{{{2
+fu! s:silent_sudo_cmd(editor) abort "{{{1
     let cmd = 'env SUDO_EDITOR='.a:editor.' VISUAL='.a:editor.' sudo -e'
     let local_nvim = has('nvim') && len($DISPLAY . $SECURITYSESSIONID)
     if !has('gui_running') && !local_nvim
@@ -271,7 +271,7 @@ fu! s:silent_sudo_cmd(editor) abort "{{{2
     endif
 endfu
 
-fu! unix#sudo_edit(file, bang) abort "{{{2
+fu! unix#sudo_edit(file, bang) abort "{{{1
     call unix#sudo_setup(fnamemodify(empty(a:file) ? expand('%') : a:file, ':p'))
 
     if !&modified || !empty(a:file)
@@ -283,7 +283,7 @@ fu! unix#sudo_edit(file, bang) abort "{{{2
     endif
 endfu
 
-fu! s:sudo_edit_init() abort "{{{2
+fu! s:sudo_edit_init() abort "{{{1
     let files = split($SUDO_COMMAND, ' ')[1:-1]
     if len(files) ==# argc()
         for i in range(argc())
@@ -299,7 +299,7 @@ if $SUDO_COMMAND =~# '^sudoedit '
     call s:sudo_edit_init()
 endif
 
-fu! s:sudo_error() abort "{{{2
+fu! s:sudo_error() abort "{{{1
     let error = join(readfile(s:error_file), ' | ')
     if error =~# '^sudo' || v:shell_error
         call system('')
@@ -309,7 +309,7 @@ fu! s:sudo_error() abort "{{{2
     endif
 endfu
 
-fu! s:sudo_read_cmd() abort "{{{2
+fu! s:sudo_read_cmd() abort "{{{1
     sil %d_
     let [silent, cmd] = s:silent_sudo_cmd('cat')
     exe sil 'read !'.cmd.' "%" 2> '.s:error_file
@@ -321,7 +321,7 @@ fu! s:sudo_read_cmd() abort "{{{2
     endif
 endfu
 
-fu! unix#sudo_setup(file) abort "{{{2
+fu! unix#sudo_setup(file) abort "{{{1
     if !filereadable(a:file) && !exists('#BufReadCmd#'.fnameescape(a:file))
         exe 'au BufReadCmd '.fnameescape(a:file).' exe s:sudo_read_cmd()'
     endif
@@ -331,7 +331,7 @@ fu! unix#sudo_setup(file) abort "{{{2
     endif
 endfu
 
-fu! s:sudo_write_cmd() abort "{{{2
+fu! s:sudo_write_cmd() abort "{{{1
     let [silent, cmd] = s:silent_sudo_cmd('tee')
     let cmd .= ' "%" >/dev/null'
     let cmd .= ' 2> '.s:error_file
@@ -368,7 +368,7 @@ fu! unix#unlink() abort "{{{1
             " we've deleted the current file, so now, we reload the buffer
             return "e!"
             "        │
-            "        └─ needed if the buffer is modified
+            "        └ needed if the buffer is modified
         endif
     endif
 endfu
