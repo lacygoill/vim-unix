@@ -28,6 +28,30 @@ fu! unix#chmod(flags) abort "{{{1
     " executed non silently.
 endfu
 
+fu! unix#cp(dst, bang) abort "{{{1
+    let src = expand('%:p')
+    let dir = expand('%:p:h')
+    let dst = stridx(a:dst, '/') ==# -1
+    \?            dir.'/'.a:dst
+    \:        stridx(a:dst, '/') ==# 0
+    \?            a:dst
+    \:            dir.'/'.simplify(a:dst)
+
+    if filereadable(dst) && !a:bang
+        return 'echoerr '.string(string(dst).' already exists; add a bang to overwrite it')
+    endif
+    call system('cp -L'.(a:bang ? '' : 'n').'p '.src.' '.dst)
+    "                │                  │    │
+    "                │                  │    └ same as --preserve=mode,ownership,timestamps
+    "                │                  └ do not overwrite an existing file
+    "                └ follow symbolic links
+
+    if v:shell_error
+        call system('')
+        return 'echoerr '.string('Failed to copy '.string(src).' to '.string(dst))
+    endif
+endfu
+
 fu! unix#grep(prg, pat, bang) abort "{{{1
     let grepprg    = &l:grepprg
     let grepformat = &l:grepformat

@@ -3,9 +3,6 @@ if exists('g:loaded_unix')
 endif
 let g:loaded_unix = 1
 
-" TODO:
-" implement a `:Cp` command to create a copy of a file
-
 let s:template_dir = $HOME.'/.vim/template'
 
 " Autocmds "{{{1
@@ -52,6 +49,8 @@ augroup END
 " error. Yours should behave in the same way.
 "}}}
 com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
+
+com! -bang -bar -nargs=1 Cp  exe unix#cp(<q-args>, <bang>0)
 
 com! -bang -complete=file -nargs=+ Find    call unix#grep('find',   <q-args>, <bang>0)
 com! -bang -complete=file -nargs=+ Locate  call unix#grep('locate', <q-args>, <bang>0)
