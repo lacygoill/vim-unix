@@ -18,34 +18,69 @@ augroup END
 
 " Commands {{{1
 
-" Do NOT replace some `exe`'s with `:echoerr`.
-" If you want to use a command inside a function, it will raise an error.
+" Do NOT replace `:exe` with `:echoerr`{{{
 "
-" Yeah I know:     silent!
-" But still, you  have to remember that  your command needs it. It  can make you
-" lose time in needless debugging.
-" Don't bring inconsistency, a default Ex command doesn't need `:silent!` unless
-" it encounters a real error. Ours should behave in the same way.
-com! -bar -nargs=1 Chmod     exe unix#chmod(<q-args>)
-com! -bar -bang    TrashPut  exe unix#trash_put(<bang>0)
+"                                   ┌ ✔
+"                                   │
+"         com! -bar -nargs=1 Chmod  exe     unix#chmod(<q-args>)
+"         com! -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
+"                                   │
+"                                   └ ✘
+"
+" Because with `:echoerr`,  if you execute the command from  a function, it will
+" raise an error.
+"
+" MWE:
+"
+"         com! -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
+"         nno  <silent>  cd  :<c-u>call Func()<cr>
+"         fu! Func() abort
+"             sp
+"             e /tmp/file
+"             " Error detected while processing function Func:
+"             Chmod 123
+"         endfu
+"
+" You could use `:silent!`:
+"
+"         sil! Chmod 123
+"
+" But still, you would have to remember  that your command needs it. It can make
+" you lose time in needless debugging.
+" Besides, you shouldn't bring inconsistency:
+" a  default Ex  command doesn't  need `:silent!`  unless it  encounters a  real
+" error. Yours should behave in the same way.
+"}}}
+com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
 
-com!      -bang -complete=file -nargs=+ Find   call unix#grep('find',   <q-args>, <bang>0)
-com!      -bang -complete=file -nargs=+ Locate call unix#grep('locate', <q-args>, <bang>0)
+com! -bang -complete=file -nargs=+ Find    call unix#grep('find',   <q-args>, <bang>0)
+com! -bang -complete=file -nargs=+ Locate  call unix#grep('locate', <q-args>, <bang>0)
 
-com!      -bang -nargs=? -complete=dir Mkdir call unix#mkdir(<q-args>, <bang>0)
+com! -bang -nargs=? -complete=dir Mkdir  call unix#mkdir(<q-args>, <bang>0)
 
 " `:Move` allows us to move the current file to any location.
 " `:Rename` allows us to rename the current file inside the current directory.
-com!      -nargs=1 -bang -complete=file                        Move    exe unix#move(<q-args>, <bang>0)
-com!      -nargs=1 -bang -complete=custom,unix#rename_complete Rename  Move<bang> %:h/<args>
-"                                                                                 └─┤ ├────┘
-"                                                         directory of current file ┘ │
-"                                                                     new chosen name ┘
+com! -nargs=1 -bang -complete=file                        Move    exe unix#move(<q-args>, <bang>0)
+com! -nargs=1 -bang -complete=custom,unix#rename_complete Rename  Move<bang> %:h/<args>
+"                                                                            └─┤ ├────┘
+"                                                    directory of current file ┘ │
+"                                                                new chosen name ┘
 
-com!      -bang -complete=file -nargs=? SudoEdit  call unix#sudo_edit(<q-args>, <bang>0)
-com! -bar                               SudoWrite call unix#sudo_setup(expand('%:p')) | w!
+com!      -bang -complete=file -nargs=? SudoEdit   call unix#sudo_edit(<q-args>, <bang>0)
+com! -bar                               SudoWrite  call unix#sudo_setup(expand('%:p')) | w!
 
-com! -bar Wall call unix#wall()
+" What's the effect of a bang?{{{
+"
+" `:TrashPut` deletes the current file and UNLOADS its buffer.
+" Also, before  that, it loads  the alternate file if  there's one, so  that the
+" current window is not (always) closed.
+"
+" `:TrashPut!` deletes the current file and RELOADS the buffer.
+" As a result, we can restart the creation of a new file with the same name.
+"}}}
+com! -bar -bang  TrashPut  exe unix#trash_put(<bang>0)
+
+com! -bar Wall  call unix#wall()
 
 " What's the purpose of `:W`?{{{
 "
@@ -71,16 +106,16 @@ com! -bar Wall call unix#wall()
 " automatically write the buffer.
 "}}}
 
-"                  ┌ write the buffer on the standard input of a shell command (:h w_c)
-"                  │ and execute the latter
-"                ┌─┤
-"                │ │ ┌ raise the right of the `tee` process so that it can write in
-"                │ │ │ a file owned by any user
-"                │ │ │
-com! -bar W exe 'w !sudo tee >/dev/null %' | setl nomod
-"                            │        │ └ but write in the current file
-"                            └────────┤
-"                                     └ don't write in the terminal
+"                   ┌ write the buffer on the standard input of a shell command (:h w_c)
+"                   │ and execute the latter
+"                 ┌─┤
+"                 │ │ ┌ raise the right of the `tee` process so that it can write in
+"                 │ │ │ a file owned by any user
+"                 │ │ │
+com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
+"                             │        │ └ but write in the current file
+"                             └────────┤
+"                                      └ don't write in the terminal
 
 " Functions {{{1
 fu! s:make_executable() abort "{{{2

@@ -319,13 +319,13 @@ fu! s:sudo_write_cmd() abort "{{{1
 endfu
 
 fu! unix#trash_put(bang) abort "{{{1
-    if !executable('trash-put')
-        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
-    endif
-
     let file = expand('%:p')
     if empty(file)
         return ''
+    endif
+
+    if !executable('trash-put')
+        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
     endif
 
     if !a:bang
