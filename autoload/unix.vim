@@ -46,8 +46,7 @@ fu! unix#delete() abort "{{{1
     endif
 
     " now, try to put the file in a trash can
-    sil exe '!trash-put '.file
-    redraw!
+    call system('!trash-put '.file)
     if v:shell_error
         return 'echoerr '.string('Failed to delete '.file)
     endif
@@ -358,8 +357,7 @@ fu! unix#unlink() abort "{{{1
     else
 
         let file = expand('%:p')
-        sil exe '!trash-put '.file
-        redraw!
+        call system('!trash-put '.file)
 
         if v:shell_error
             return 'echoerr '.string('Failed to delete '.file)
