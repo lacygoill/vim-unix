@@ -30,7 +30,7 @@ endfu
 
 fu! unix#delete() abort "{{{1
     if !executable('trash-put')
-        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+        return s:trash_cli_not_installed()
     endif
 
     let file = expand('%:p')
@@ -344,9 +344,13 @@ fu! s:sudo_write_cmd() abort "{{{2
     endif
 endfu
 
+fu! s:trash_cli_not_installed() abort "{{{1
+    return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+endfu
+
 fu! unix#unlink() abort "{{{1
     if !executable('trash-put')
-        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+        return s:trash_cli_not_installed()
     endif
 
     if &modified
