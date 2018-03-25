@@ -35,7 +35,7 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
 
     try
         let &l:grepprg = a:prg
-        "                ┌─ the output of `$grep` will just contain file names
+        "                ┌ the output of `$grep` will just contain file names
         "                │
         setl grepformat=%f
         " The default value of 'sp' ('2>&1| tee') causes the error messages
@@ -46,12 +46,12 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
         " Don't use `:grep`, it makes the screen flash. Use `cgetexpr` instead.
         " Look at what we did in `myfuncs#op_grep()`.
 
-        "            ┌─ don't jump to first match, we want to decide ourselves
-        "            │  whether to jump
+        "            ┌ don't jump to first match, we want to decide ourselves
+        "            │ whether to jump
         "            │
         sil exe 'grep! '.a:pat
         " │
-        " └─ bypass prompt “Press ENTER or type command to continue“
+        " └ bypass prompt “Press ENTER or type command to continue“
         redraw!
 
         " No need to inform  our custom autocmds, responsible for dealing with
@@ -106,7 +106,7 @@ fu! unix#move(dst, bang) abort "{{{1
     " If the destination is a directory, it must be completed, by appending
     " the current filename.
 
-    "                 ┌────────────────────── the destination is an existing directory
+    "                 ┌ the destination is an existing directory
     "                 │                     ┌ or a future directory (we're going to create it)
     "  ┌──────────────┤    ┌────────────────┤
     if isdirectory(dst) || dst[-1:-1] is# '/'
@@ -144,9 +144,9 @@ fu! unix#move(dst, bang) abort "{{{1
     if filereadable(dst) && !a:bang
         return 'keepalt saveas '.fnameescape(dst)
         "       │
-        "       └─ even though `:saveas` is going to fail, it will still
-        "          change the alternate file for the current window (`dst`);
-        "          we don't want that
+        "       └ even though `:saveas` is going to fail, it will still
+        "         change the alternate file for the current window (`dst`);
+        "         we don't want that
 
     " Try to rename current file.
     " What are the differences between `:saveas` and `rename()`:
@@ -318,13 +318,9 @@ fu! s:sudo_write_cmd() abort "{{{1
     endif
 endfu
 
-fu! s:trash_cli_not_installed() abort "{{{1
-    return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
-endfu
-
-fu! unix#trash_put() abort "{{{1
+fu! unix#trash_put(bang) abort "{{{1
     if !executable('trash-put')
-        return s:trash_cli_not_installed()
+        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
     endif
 
     let file = expand('%:p')
@@ -332,22 +328,24 @@ fu! unix#trash_put() abort "{{{1
         return ''
     endif
 
-    " First try to unload the buffer.
-    " But before that, load the alternate file, if there's one.
-    let alternate_file = expand('#:p')
-    if !empty(alternate_file)
-    "   │
-    "   └ Why not `filereadable()`?
-    "     Because the alternate “file” could be a buffer.
-        exe 'e '.alternate_file
-        bd! #
-    else
-        bd!
-    endif
+    if !a:bang
+        " First try to unload the buffer.
+        " But before that, load the alternate file, if there's one.
+        let alternate_file = expand('#:p')
+        if !empty(alternate_file)
+        "   │
+        "   └ Why not `filereadable()`?
+        "     Because the alternate “file” could be a buffer.
+            exe 'e '.alternate_file
+            bd! #
+        else
+            bd!
+        endif
 
-    " if it's still loaded, stop
-    if bufloaded(file)
-        return ''
+        " if it's still loaded, stop
+        if bufloaded(file)
+            return ''
+        endif
     endif
 
     " now, try to put the file in a trash can
@@ -357,31 +355,7 @@ fu! unix#trash_put() abort "{{{1
         return 'echoerr '.string('Failed to delete '.file)
     endif
 
-    return ''
-endfu
-
-fu! unix#unlink() abort "{{{1
-    if !executable('trash-put')
-        return s:trash_cli_not_installed()
-    endif
-
-    if &modified
-        return 'e'
-    else
-
-        let file = expand('%:p')
-        call system('trash-put '.file)
-
-        if v:shell_error
-            call system('')
-            return 'echoerr '.string('Failed to delete '.file)
-        else
-            " we've deleted the current file, so now, we reload the buffer
-            return "e!"
-            "        │
-            "        └ needed if the buffer is modified
-        endif
-    endif
+    return a:bang ? 'e' : ''
 endfu
 
 fu! unix#wall() abort "{{{1

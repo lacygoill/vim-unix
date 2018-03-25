@@ -6,12 +6,6 @@ let g:loaded_unix = 1
 " TODO:
 " implement a `:Cp` command to create a copy of a file
 
-" FIXME:
-" Shouldn't we merge the functions implementing `:TrashPut` and `:Unlink`?
-" Besides, it's a bit weird to try to remember two different command names,
-" which have the same purpose.
-" Add a bang to `:TrashPut` to cover both behaviors?
-
 let s:template_dir = $HOME.'/.vim/template'
 
 " Autocmds "{{{1
@@ -32,9 +26,8 @@ augroup END
 " lose time in needless debugging.
 " Don't bring inconsistency, a default Ex command doesn't need `:silent!` unless
 " it encounters a real error. Ours should behave in the same way.
-com! -bar -nargs=1 Chmod    exe unix#chmod(<q-args>)
-com! -bar          TrashPut exe unix#trash_put()
-com! -bar          Unlink   exe unix#unlink()
+com! -bar -nargs=1 Chmod     exe unix#chmod(<q-args>)
+com! -bar -bang    TrashPut  exe unix#trash_put(<bang>0)
 
 com!      -bang -complete=file -nargs=+ Find   call unix#grep('find',   <q-args>, <bang>0)
 com!      -bang -complete=file -nargs=+ Locate call unix#grep('locate', <q-args>, <bang>0)
