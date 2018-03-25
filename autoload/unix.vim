@@ -29,6 +29,10 @@ fu! unix#chmod(flags) abort "{{{1
 endfu
 
 fu! unix#delete() abort "{{{1
+    if !executable('trash-put')
+        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+    endif
+
     let file = expand('%:p')
     if empty(file)
         return ''
@@ -341,6 +345,10 @@ fu! s:sudo_write_cmd() abort "{{{2
 endfu
 
 fu! unix#unlink() abort "{{{1
+    if !executable('trash-put')
+        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+    endif
+
     if &modified
         return 'e'
     else
@@ -348,6 +356,7 @@ fu! unix#unlink() abort "{{{1
         let file = expand('%:p')
         sil exe '!trash-put '.file
         redraw!
+
         if v:shell_error
             return 'echoerr '.string('Failed to delete '.file)
         else

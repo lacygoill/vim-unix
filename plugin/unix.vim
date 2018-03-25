@@ -7,8 +7,8 @@ let g:loaded_unix = 1
 " implement a `:Cp` command to create a copy of a file
 
 " TODO:
-" When you remove/delete a  file, it would be nice to  get the alternate buffer,
-" instead of closing the window.
+" When you delete a file, it would  be nice to get the alternate buffer, instead
+" of closing the window.
 
 
 let s:template_dir = $HOME.'/.vim/template'
