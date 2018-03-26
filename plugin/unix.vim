@@ -3,7 +3,27 @@ if exists('g:loaded_unix')
 endif
 let g:loaded_unix = 1
 
-let s:template_dir = $HOME.'/.vim/template'
+"                                         ┌ if you change the value,
+"                                         │ don't forget to put a slash at the end
+let s:template_dir = $HOME.'/.vim/template/'
+
+" FIXME:
+" For which commands should we give the `-bar` attribute?
+
+
+" FIXME:
+"
+" Read this:
+" https://www.reddit.com/r/vim/comments/5mx8jq/is_there_a_way_to_get_vimeunuchs_rename_command/
+"
+" When is `%:{filename-modifier}` expanded after hitting Tab?
+" Make some tests:
+"
+"         com! -nargs=1 -complete=file Foo echo <args>
+"         com! -nargs=1 -complete=event Foo echo <args>
+"
+"         :Foo %:t Tab
+"         :Foo %:h Tab
 
 " Autocmds "{{{1
 
@@ -50,20 +70,26 @@ augroup END
 "}}}
 com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
 
-com! -bang -bar -nargs=1 Cp  exe unix#cp(<q-args>, <bang>0)
+com! -bang -bar -nargs=1 -complete=file Cp  exe unix#cp(<q-args>, <bang>0)
+"                                  │
+"                                  └ FIXME:
+"                                    Should we use `-complete=file` or `-complete=file_in_path`?
+"                                    Or a custom function?
 
 com! -bang -complete=file -nargs=+ Find    call unix#grep('find',   <q-args>, <bang>0)
 com! -bang -complete=file -nargs=+ Locate  call unix#grep('locate', <q-args>, <bang>0)
 
 com! -bang -nargs=? -complete=dir Mkdir  call unix#mkdir(<q-args>, <bang>0)
 
-" `:Move` allows us to move the current file to any location.
+" `:Mv` allows us to move the current file to any location.
 " `:Rename` allows us to rename the current file inside the current directory.
-com! -nargs=1 -bang -complete=file                        Move    exe unix#move(<q-args>, <bang>0)
-com! -nargs=1 -bang -complete=custom,unix#rename_complete Rename  Move<bang> %:h/<args>
-"                                                                            └─┤ ├────┘
-"                                                    directory of current file ┘ │
-"                                                                new chosen name ┘
+com! -bang -nargs=1 -complete=file                        Mv      exe unix#move(<q-args>, <bang>0)
+"                                    ┌ FIXME: what does it do?
+"                                    │
+com! -bang -nargs=1 -complete=custom,unix#rename_complete Rename  Mv<bang> %:h/<args>
+"                                                                          └─┤ ├────┘
+"                                                  directory of current file ┘ │
+"                                                              new chosen name ┘
 
 com!      -bang -complete=file -nargs=? SudoEdit   call unix#sudo_edit(<q-args>, <bang>0)
 com! -bar                               SudoWrite  call unix#sudo_setup(expand('%:p')) | w!
@@ -123,7 +149,7 @@ fu! s:make_executable() abort "{{{2
         call system('chmod +x '.shellescape(expand('%:p')))
         if v:shell_error
             echohl ErrorMsg
-            echom 'Cannot make file executable: '.v:shell_error
+            unsilent echom 'Cannot make file executable: '.v:shell_error
             echohl None
 
             " Why?{{{
@@ -173,23 +199,23 @@ fu! s:maybe_read_template() abort "{{{2
     "         /etc/init.d/skeleton
 
     " Get all the filetypes for which we have a template.
-    let filetypes = glob(s:template_dir.'/*', 0, 1)
+    let filetypes = glob(s:template_dir.'*', 0, 1)
     call filter(filetypes, {i,v -> v !~# 'compiler.vim'})
     call map(filetypes, {i,v -> fnamemodify(v, ':t:r')})
 
-    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.'/'.&ft.'.vim')
+    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.&ft.'.vim')
         "    ┌ don't use the template file as the alternate file for the current
         "    │ window; keep the current one
         "    │
         "    │ Note that, `:keepalt`  is not useful when you read  the output of
         "    │ an external command (:r !cmd)
         "    │
-        exe 'keepalt read '.fnameescape(s:template_dir.'/'.&ft.'.vim')
+        exe 'keepalt read '.fnameescape(s:template_dir.&ft.'.vim')
         1d_
 
     elseif expand('%:p') =~# '.*/compiler/[^/]*.vim'
-    \   && filereadable(s:template_dir.'/compiler.vim')
-        exe 'keepalt read '.s:template_dir.'/compiler.vim'
+    \   && filereadable(s:template_dir.'compiler.vim')
+        exe 'keepalt read '.s:template_dir.'compiler.vim'
         " If  our  compiler  is  in  `~/.vim/compiler`,  we  want  to  skip  the
         " default  compilers in  `$VIMRUNTIME/compiler`. In this  case, we  need
         " 'current_compiler' to be set.

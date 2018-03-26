@@ -31,11 +31,9 @@ endfu
 fu! unix#cp(dst, bang) abort "{{{1
     let src = expand('%:p')
     let dir = expand('%:p:h')
-    let dst = stridx(a:dst, '/') ==# -1
-    \?            dir.'/'.a:dst
-    \:        stridx(a:dst, '/') ==# 0
-    \?            a:dst
-    \:            dir.'/'.simplify(a:dst)
+    let dst = stridx(a:dst, '/') ==# 0
+          \ ?     a:dst
+          \ :     dir.'/'.simplify(a:dst)
 
     if filereadable(dst) && !a:bang
         return 'echoerr '.string(string(dst).' already exists; add a bang to overwrite it')
@@ -111,10 +109,10 @@ endfu
 
 fu! unix#mkdir(dir, bang) abort "{{{1
     let dest = empty(a:dir)
-    \?             expand('%:p:h')
-    \:         a:dir[0] is# '/'
-    \?             a:dir
-    \:             expand('%:p').a:dir
+           \ ?     expand('%:p:h')
+           \ : a:dir[0] is# '/'
+           \ ?     a:dir
+           \ :     expand('%:p').a:dir
 
     try
         call mkdir(dest, a:bang ? 'p' : '')
@@ -150,16 +148,16 @@ fu! unix#move(dst, bang) abort "{{{1
 
     let dst = substitute(simplify(dst), '^\.\/', '', '')
 
-    " `:Move` and `:Rename` should behave like `:saveas`.
+    " `:Mv` and `:Rename` should behave like `:saveas`.
     "
-    "         :Move existing_file      ✘
+    "         :Mv     existing_file    ✘
     "         :Rename existing_file    ✘
     "         :saveas existing_file    ✘
     "
     " The operation shouldn't overwrite the file.
     " Except if we added a bang:
     "
-    "         :Move! existing_file     ✔
+    "         :Mv!     existing_file   ✔
     "         :Rename! existing_file   ✔
     "         :saveas! existing_file   ✔
 
@@ -203,7 +201,7 @@ fu! unix#move(dst, bang) abort "{{{1
         " But only if it's not the current one.
         " It could be the current one if we execute, by accident:
         "
-        "         :Move   /path/to/current/file
+        "         :Mv     /path/to/current/file
         "         :Rename current_filename
         if src isnot# expand('%:p')
             exe 'bw '.fnameescape(src)
@@ -218,9 +216,16 @@ endfu
 fu! unix#rename_complete(arglead, _c, _p) abort "{{{1
     let prefix = expand('%:p:h').'/'
     let files  = glob(prefix.a:arglead.'*', 0, 1)
-    call filter(files, { i,v -> simplify(v) isnot# simplify(expand('%:p')) })
-    call map(files, { i,v ->   v[strlen(prefix) : -1]
-    \                        . (isdirectory(v) ? '/' : '') })
+
+    call map(files, {i,v -> simplify(v) !=# simplify(expand('%:p'))
+    \ ?                          v
+    \ :                      len(fnamemodify(v, ':p:t:r'))
+    \ ?                          fnamemodify(v, ':r').'.'
+    \ :                          v
+    \ })
+
+    " call map(files, { i,v ->   v[strlen(prefix) : -1]
+    " \                        . (isdirectory(v) ? '/' : '') })
 
     " Why not filtering the files?{{{
     "
@@ -231,7 +236,7 @@ fu! unix#rename_complete(arglead, _c, _p) abort "{{{1
     "     • each file must begin with `a:arglead`
     "     • the comparison respects 'ic' and 'scs'
     " }}}
-    return join(files + ['../'], "\n")
+    return join(files, "\n")
 endfu
 
 fu! s:should_write_buffer(seen) abort "{{{1
