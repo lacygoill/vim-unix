@@ -131,14 +131,20 @@ com! -bar                               SudoWrite  call unix#sudo_setup(expand('
 
 " What's the effect of a bang?{{{
 "
-" `:TrashPut` deletes the current file and UNLOADS its buffer.
+" `:Tp` deletes the current file and UNLOADS its buffer.
 " Also, before  that, it loads  the alternate file if  there's one, so  that the
 " current window is not (always) closed.
 "
-" `:TrashPut!` deletes the current file and RELOADS the buffer.
+" `:Tp!` deletes the current file and RELOADS the buffer.
 " As a result, we can restart the creation of a new file with the same name.
 "}}}
-com! -bar -bang  TrashPut  exe unix#trash_put(<bang>0)
+com! -bar -bang  Tp  exe unix#trash_put(<bang>0)
+com! -bar        Tl  exe unix#trash_list()
+"                └ Warning:{{{
+"
+"                It could conflict with the default `:tl[ast]` command.
+"                In practice, I don't think it will, because we'll use `]T` instead.
+"}}}
 
 com! -bar Wall  call unix#wall()
 

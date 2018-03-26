@@ -28,6 +28,10 @@ fu! unix#chmod(flags) abort "{{{1
     " executed non silently.
 endfu
 
+fu! s:command_unavailable(cmd) abort "{{{1
+    return 'echoerr '.string(a:cmd.' is not executable; install the trash-cli package')
+endfu
+
 fu! unix#cp(dst, bang) abort "{{{1
     let src = expand('%:p')
     let dir = expand('%:p:h')
@@ -217,6 +221,11 @@ fu! unix#rename_complete(arglead, _c, _p) abort "{{{1
     let prefix = expand('%:p:h').'/'
     let files  = glob(prefix.a:arglead.'*', 0, 1)
 
+    " TODO:
+    " Should we use this? Or the next commented `map()`?
+    "
+    " Source:
+    "     https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
     call map(files, {i,v -> simplify(v) !=# simplify(expand('%:p'))
                         \ ?     v
                         \ : !empty(fnamemodify(v, ':p:t:r'))
@@ -349,6 +358,22 @@ fu! s:sudo_write_cmd() abort "{{{1
     endif
 endfu
 
+fu! unix#trash_list() abort "{{{1
+    if !executable('trash-list')
+        return s:command_unavailable('trash-list')
+    endif
+
+    let listing = system('trash-list')
+    if v:shell_error
+        call system('')
+        return 'echoerr '.string('Failed to list the contents of the trash can')
+    else
+        echo listing
+    endif
+
+    return ''
+endfu
+
 fu! unix#trash_put(bang) abort "{{{1
     let file = expand('%:p')
     if empty(file)
@@ -356,7 +381,7 @@ fu! unix#trash_put(bang) abort "{{{1
     endif
 
     if !executable('trash-put')
-        return 'echoerr '.string('trash-put is not executable; install the trash-cli package')
+        return s:command_unavailable('trash-put')
     endif
 
     if !a:bang
