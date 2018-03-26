@@ -218,11 +218,11 @@ fu! unix#rename_complete(arglead, _c, _p) abort "{{{1
     let files  = glob(prefix.a:arglead.'*', 0, 1)
 
     call map(files, {i,v -> simplify(v) !=# simplify(expand('%:p'))
-    \ ?                          v
-    \ :                      len(fnamemodify(v, ':p:t:r'))
-    \ ?                          fnamemodify(v, ':r').'.'
-    \ :                          v
-    \ })
+                        \ ?     v
+                        \ : !empty(fnamemodify(v, ':p:t:r'))
+                        \ ?     fnamemodify(v, ':r').'.'
+                        \ :     v
+                        \ })
 
     " call map(files, { i,v ->   v[strlen(prefix) : -1]
     " \                        . (isdirectory(v) ? '/' : '') })
@@ -264,8 +264,8 @@ fu! s:silent_sudo_cmd(editor) abort "{{{1
         return ['silent', cmd]
 
     elseif !empty($SUDO_ASKPASS)
-    \||           filereadable('/etc/sudo.conf')
-    \&&           len(filter(readfile('/etc/sudo.conf', 50), { i,v -> v =~# '^Path askpass ' }))
+    \||    filereadable('/etc/sudo.conf')
+    \&&    len(filter(readfile('/etc/sudo.conf', 50), { i,v -> v =~# '^Path askpass ' }))
         return ['silent', cmd.' -A']
 
     else
@@ -314,8 +314,10 @@ endfu
 fu! s:sudo_read_cmd() abort "{{{1
     sil %d_
     let [silent, cmd] = s:silent_sudo_cmd('cat')
-    exe sil 'read !'.cmd.' "%" 2> '.s:error_file
+    sil exe printf('read !%s "%%" 2>%s', cmd, s:error_file)
     let exit_status = v:shell_error
+    " reset `v:shell_error`
+    call system('')
     sil 1d_
     setl nomodified
     if exit_status

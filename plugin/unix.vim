@@ -19,11 +19,22 @@ let s:template_dir = $HOME.'/.vim/template/'
 " When is `%:{filename-modifier}` expanded after hitting Tab?
 " Make some tests:
 "
-"         com! -nargs=1 -complete=file Foo echo <args>
+"                                 ✘
 "         com! -nargs=1 -complete=event Foo echo <args>
+"                                 ✔
+"         com! -nargs=1 -complete=file Foo echo <args>
 "
+"                ✘ (why?)
 "         :Foo %:t Tab
+"
+"                ✔
 "         :Foo %:h Tab
+"
+" Update:
+" I think  it depends on whether  the command was given  the `-complete=file` or
+" `-complete=file_in_path`.
+" Also, it depends on the file modifiers. It seems only `%:h` works.
+" I mean, they probably all work with Enter, but only `%:h` works with Tab.
 
 " Autocmds "{{{1
 
@@ -71,10 +82,31 @@ augroup END
 com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
 
 com! -bang -bar -nargs=1 -complete=file Cp  exe unix#cp(<q-args>, <bang>0)
-"                                  │
-"                                  └ FIXME:
-"                                    Should we use `-complete=file` or `-complete=file_in_path`?
-"                                    Or a custom function?
+"                                  └ Why not `-complete=file_in_path`? {{{
+"
+" We want as little suggestions as possible, and as relevant as possible.
+" `-complete=file_in_path` would give too many suggestions.
+"
+" -complete=file:
+"
+"     Vim uses the files/directories at the root of the working directory.
+"
+" -complete=file_in_path:
+"
+"     Vim uses the files/directories in 'path'.
+"
+"     For example, if `&path == '.,**'`:
+"
+"         Vim uses the files/directories at the root of the directory containing
+"         the  current file,  and ALL  the files/directories  below the  working
+"         directory.
+"
+" In both cases, a local working directory has priority over a global one.
+"
+" Choosing  `-complete=file`  will  give  less suggestions,  and  they  will  be
+" relevant  if we  configure the  working  directory to  match the  root of  the
+" project we're working on.
+"}}}
 
 com! -bang -complete=file -nargs=+ Find    call unix#grep('find',   <q-args>, <bang>0)
 com! -bang -complete=file -nargs=+ Locate  call unix#grep('locate', <q-args>, <bang>0)
@@ -93,6 +125,9 @@ com! -bang -nargs=1 -complete=custom,unix#rename_complete Rename  Mv<bang> %:h/<
 
 com!      -bang -complete=file -nargs=? SudoEdit   call unix#sudo_edit(<q-args>, <bang>0)
 com! -bar                               SudoWrite  call unix#sudo_setup(expand('%:p')) | w!
+" TODO:
+" Are `:SudoWrite` and `:W` doing the same thing?
+" Should we eliminate one of them?
 
 " What's the effect of a bang?{{{
 "
@@ -149,6 +184,8 @@ fu! s:make_executable() abort "{{{2
         call system('chmod +x '.shellescape(expand('%:p')))
         if v:shell_error
             echohl ErrorMsg
+            " FIXME:
+            " Why is `:unsilent` needed?
             unsilent echom 'Cannot make file executable: '.v:shell_error
             echohl None
 
