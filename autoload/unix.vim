@@ -414,6 +414,23 @@ fu! unix#trash_put(bang) abort "{{{1
     return a:bang ? 'e' : ''
 endfu
 
+fu! unix#tree(dir) abort "{{{1
+    let tempfile = tempname().'/:Tree'
+    exe 'lefta 40vnew '.tempfile
+    exe '.!tree -acfF --dirsfirst '.a:dir
+    "            ││││   │
+    "            ││││   └ list directories before files
+    "            ││││
+    "            │││└ append a `/' for directories, a `*' for executable file, ...
+    "            │││
+    "            ││└ print the full path for each entry (necessary for `gf` &friends)
+    "            ││
+    "            │└ sort the output by last status change
+    "            │
+    "            └ print All entries, including hidden ones
+    $
+endfu
+
 fu! unix#wall() abort "{{{1
     let cur_winid = win_getid()
     let seen = {}

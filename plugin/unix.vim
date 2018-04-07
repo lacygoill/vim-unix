@@ -7,6 +7,9 @@ let g:loaded_unix = 1
 "                                         │ don't forget to put a slash at the end
 let s:template_dir = $HOME.'/.vim/template/'
 
+" TODO:
+" Integrate `:Cloc`.
+
 " FIXME:
 " For which commands should we give the `-bar` attribute?
 
@@ -145,6 +148,8 @@ com! -bar        Tl  exe unix#trash_list()
 "                It could conflict with the default `:tl[ast]` command.
 "                In practice, I don't think it will, because we'll use `]T` instead.
 "}}}
+
+com! -bar -complete=file -nargs=?  Tree  call unix#tree(<q-args>)
 
 com! -bar Wall  call unix#wall()
 
