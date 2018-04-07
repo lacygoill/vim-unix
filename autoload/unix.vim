@@ -418,7 +418,7 @@ fu! unix#tree(dir) abort "{{{1
     let tempfile = tempname().'/:Tree'
     exe 'lefta '.(&columns/3).'vnew '.tempfile
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    exe '.!tree -acfF --dirsfirst '.ignore_pat.' '.a:dir
+    exe '.!tree -acfF --dirsfirst --noreport '.ignore_pat.' '.a:dir
     "            ││││   │
     "            ││││   └ list directories before files
     "            ││││
