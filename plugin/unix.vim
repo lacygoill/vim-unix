@@ -188,6 +188,10 @@ com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
 "                             └────────┤
 "                                      └ don't write in the terminal
 
+" Mappings {{{1
+
+nno  <silent>  -t  :<c-u>Tree<cr>
+
 " Functions {{{1
 fu! s:make_executable() abort "{{{2
     let shebang = matchstr(getline(1), '^#!\S\+')
