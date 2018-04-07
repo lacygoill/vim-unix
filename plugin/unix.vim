@@ -190,7 +190,7 @@ com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
 
 " Mappings {{{1
 
-nno  <silent>  -t  :<c-u>Tree<cr>
+nno  <unique><silent>  -t  :<c-u>Tree<cr>
 
 " Functions {{{1
 fu! s:make_executable() abort "{{{2
