@@ -3,6 +3,8 @@ if exists('g:autoloaded_unix#sudo')
 endif
 let g:autoloaded_unix#sudo = 1
 
+let s:error_file = tempname()
+
 fu! unix#sudo#edit(file, bang) abort "{{{1
     call unix#sudo#setup(fnamemodify(empty(a:file) ? expand('%') : a:file, ':p'))
 

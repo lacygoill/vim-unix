@@ -3,8 +3,6 @@ if exists('g:autoloaded_unix')
 endif
 let g:autoloaded_unix = 1
 
-let s:error_file = tempname()
-
 fu! unix#chmod(flags) abort "{{{1
     let output = systemlist('chmod '.a:flags.' '.shellescape(expand('%:p')))
 
