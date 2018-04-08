@@ -5,7 +5,7 @@ setl bh=wipe bt=nofile nobl noswf nowrap
 augroup my_tree
     au! * <buffer>
     au BufWinEnter <buffer> setl cocu=nc cole=3
-    \                            fde=unix#tree_fde() fdl=99 fdm=expr fdt=unix#tree_fdt()
+    \                            fde=unix#tree#fde() fdl=99 fdm=expr fdt=unix#tree#fdt()
 augroup END
 
 nno  <buffer><nowait><silent>  q   :<c-u>close<cr>

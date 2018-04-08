@@ -149,7 +149,7 @@ com! -bar        Tl  exe unix#trash_list()
 "                In practice, I don't think it will, because we'll use `]T` instead.
 "}}}
 
-com! -bar -complete=file -nargs=?  Tree  exe unix#tree(<q-args>)
+com! -bar -complete=file -nargs=?  Tree  exe unix#tree#dump(<q-args>)
 
 com! -bar Wall  call unix#wall()
 
