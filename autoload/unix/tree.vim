@@ -45,3 +45,12 @@ fu! unix#tree#fdt() abort "{{{1
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
+fu! unix#tree#open(where) abort "{{{1
+    let file = matchstr(getline('.'), '.*\%(─\s\|->\s\)\zs.*[/=*>|]\@<!')
+    if a:where is# 'split'
+        exe 'sp '.file
+    else
+        exe 'tabedit '.file
+    endif
+endfu
+

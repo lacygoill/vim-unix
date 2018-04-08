@@ -8,7 +8,9 @@ augroup my_tree
     \                            fde=unix#tree#fde() fdl=99 fdm=expr fdt=unix#tree#fdt()
 augroup END
 
-nno  <buffer><nowait><silent>  q   :<c-u>close<cr>
+nno  <buffer><nowait><silent>  q    :<c-u>close<cr>
+nno  <buffer><nowait><silent>  Zf   :<c-u>call unix#tree#open('split')<cr>
+nno  <buffer><nowait><silent>  Zgf  :<c-u>call unix#tree#open('tab')<cr>
 
 " teardown {{{1
 
@@ -18,5 +20,7 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                          setl bh< bl< bt< cocu< cole< fde< fdl< fdm< fdt< swf< wrap<
 \                        | exe 'au! my_tree * <buffer>'
 \                        | exe 'nunmap <buffer> q'
+\                        | exe 'nunmap <buffer> Zf'
+\                        | exe 'nunmap <buffer> Zgf'
 \                      "
 
