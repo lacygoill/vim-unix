@@ -433,8 +433,16 @@ fu! unix#tree(dir) abort "{{{1
     "                       │           │
     "                       │           └ don't print the file and directory report at the end
     "                       └ print directories before files
-    let cwd = getcwd().'/'
-    sil! %s:─\s\zs\./:\=cwd:
+
+    " `$ tree` make the paths begin with an initial dot to stand for the working
+    " directory.
+    " But the  latter could change after  we change the focus  to another window
+    " (`vim-cwd`).
+    " This could break `C-w f`.
+    "
+    " We need to translate the dot into the current working directory.
+    let cwd = getcwd()
+    sil! %s:─\s\zs\.\ze/:\=cwd:
 endfu
 
 fu! unix#tree_fde() abort "{{{1
