@@ -418,8 +418,10 @@ fu! unix#tree(dir) abort "{{{1
     if !executable('tree')
         return 'echoerr '.string('requires the tree shell command; currently not installed')
     endif
+
     let tempfile = tempname().'/:Tree'
     exe 'lefta '.(&columns/3).'vnew '.tempfile
+
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
     "                ┌ print All entries, including hidden ones
     "                │┌ sort the output by last status change
