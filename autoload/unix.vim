@@ -415,6 +415,9 @@ fu! unix#trash_put(bang) abort "{{{1
 endfu
 
 fu! unix#tree(dir) abort "{{{1
+    if !executable('tree')
+        return 'echoerr '.string('requires the tree shell command; currently not installed')
+    endif
     let tempfile = tempname().'/:Tree'
     exe 'lefta '.(&columns/3).'vnew '.tempfile
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
@@ -423,12 +426,10 @@ fu! unix#tree(dir) abort "{{{1
     "                ││┌ print the full path for each entry (necessary for `gf` &friends)
     "                │││┌ append a `/' for directories, a `*' for executable file, ...
     "                ││││
-    let cmd = 'tree -acfF --dirsfirst --noreport '.ignore_pat.' '.a:dir
+    sil exe '.!tree -acfF --dirsfirst --noreport '.ignore_pat.' '.(!empty(a:dir) ? shellescape(a:dir,1) : '')
     "                       │           │
     "                       │           └ don't print the file and directory report at the end
     "                       └ print directories before files
-    sil 0put =system(cmd)
-    $d_
 endfu
 
 fu! unix#wall() abort "{{{1
