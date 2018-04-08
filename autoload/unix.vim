@@ -435,6 +435,21 @@ fu! unix#tree(dir) abort "{{{1
     "                       └ print directories before files
 endfu
 
+fu! unix#tree_fde() abort "{{{1
+    let idx = matchend(split(getline(v:lnum), '\zs'), '[├└]')
+    let lvl = idx/4
+    if matchstr(getline(v:lnum + 1), '\%'.(idx+5).'v.') =~# '[├└]'
+        return '>'.(lvl + 1)
+    endif
+    return lvl
+endfu
+
+fu! unix#tree_fdt() abort "{{{1
+    let pat = '\(.*─\)\(.*\)'
+    let l:Rep = {-> repeat(' ', strchars(submatch(1), 1)).substitute(submatch(2), '.*/\ze.', '', '')}
+    return substitute(getline(v:foldstart), pat, l:Rep, '').' ['.(v:foldend - v:foldstart).']'
+endfu
+
 fu! unix#wall() abort "{{{1
     let cur_winid = win_getid()
     let seen = {}
