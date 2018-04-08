@@ -433,6 +433,8 @@ fu! unix#tree(dir) abort "{{{1
     "                       │           │
     "                       │           └ don't print the file and directory report at the end
     "                       └ print directories before files
+    let cwd = getcwd().'/'
+    sil! %s:─\s\zs\./:\=cwd:
 endfu
 
 fu! unix#tree_fde() abort "{{{1
@@ -447,7 +449,7 @@ endfu
 fu! unix#tree_fdt() abort "{{{1
     let pat = '\(.*─\)\(.*\)'
     let l:Rep = {-> repeat(' ', strchars(submatch(1), 1)).substitute(submatch(2), '.*/\ze.', '', '')}
-    return substitute(getline(v:foldstart), pat, l:Rep, '')
+    return (get(b:, 'my_title_full', 0) ? '['.(v:foldend - v:foldstart).']': '').substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
 fu! unix#wall() abort "{{{1
