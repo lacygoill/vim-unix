@@ -457,7 +457,7 @@ endfu
 fu! unix#tree_fdt() abort "{{{1
     let pat = '\(.*─\)\(.*\)'
     let l:Rep = {-> repeat(' ', strchars(submatch(1), 1)).substitute(submatch(2), '.*/\ze.', '', '')}
-    return (get(b:, 'my_title_full', 0) ? '['.(v:foldend - v:foldstart).']': '').substitute(getline(v:foldstart), pat, l:Rep, '')
+    return (get(b:, 'foldtitle_full', 0) ? '['.(v:foldend - v:foldstart).']': '').substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
 fu! unix#wall() abort "{{{1
