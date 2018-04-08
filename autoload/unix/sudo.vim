@@ -1,3 +1,8 @@
+if exists('g:autoloaded_unix#sudo')
+    finish
+endif
+let g:autoloaded_unix#sudo = 1
+
 fu! unix#sudo#edit(file, bang) abort "{{{1
     call unix#sudo#setup(fnamemodify(empty(a:file) ? expand('%') : a:file, ':p'))
 
