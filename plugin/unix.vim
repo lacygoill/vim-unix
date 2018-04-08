@@ -141,8 +141,8 @@ com! -bar                               SudoWrite  call unix#sudo#setup(expand('
 " `:Tp!` deletes the current file and RELOADS the buffer.
 " As a result, we can restart the creation of a new file with the same name.
 "}}}
-com! -bar -bang  Tp  exe unix#trash_put(<bang>0)
-com! -bar        Tl  exe unix#trash_list()
+com! -bar -bang  Tp  exe unix#trash#put(<bang>0)
+com! -bar        Tl  exe unix#trash#list()
 "                └ Warning:{{{
 "
 "                It could conflict with the default `:tl[ast]` command.
