@@ -10,6 +10,32 @@ fu! unix#sudo#edit(file, bang) abort "{{{1
     endif
 endfu
 
+fu! unix#sudo#setup(file) abort "{{{1
+    if !filereadable(a:file) && !exists('#BufReadCmd#'.fnameescape(a:file))
+        exe 'au BufReadCmd '.fnameescape(a:file).' exe s:sudo_read_cmd()'
+    endif
+    if !filewritable(a:file) && !exists('#BufWriteCmd#'.fnameescape(a:file))
+        exe 'au BufReadPost '.fnameescape(a:file).' set noreadonly'
+        exe 'au BufWriteCmd '.fnameescape(a:file).' exe s:sudo_write_cmd()'
+    endif
+endfu
+
+fu! s:silent_sudo_cmd(editor) abort "{{{1
+    let cmd = 'env SUDO_EDITOR='.a:editor.' VISUAL='.a:editor.' sudo -e'
+    let local_nvim = has('nvim') && len($DISPLAY . $SECURITYSESSIONID)
+    if !has('gui_running') && !local_nvim
+        return ['silent', cmd]
+
+    elseif !empty($SUDO_ASKPASS)
+    \||    filereadable('/etc/sudo.conf')
+    \&&    len(filter(readfile('/etc/sudo.conf', 50), { i,v -> v =~# '^Path askpass ' }))
+        return ['silent', cmd.' -A']
+
+    else
+        return [local_nvim ? 'silent' : '', cmd]
+    endif
+endfu
+
 fu! s:sudo_edit_init() abort "{{{1
     let files = split($SUDO_COMMAND, ' ')[1:-1]
     if len(files) ==# argc()
@@ -47,16 +73,6 @@ fu! s:sudo_read_cmd() abort "{{{1
     setl nomodified
     if exit_status
         return 'echoerr '.string(s:sudo_error())
-    endif
-endfu
-
-fu! unix#sudo#setup(file) abort "{{{1
-    if !filereadable(a:file) && !exists('#BufReadCmd#'.fnameescape(a:file))
-        exe 'au BufReadCmd '.fnameescape(a:file).' exe s:sudo_read_cmd()'
-    endif
-    if !filewritable(a:file) && !exists('#BufWriteCmd#'.fnameescape(a:file))
-        exe 'au BufReadPost '.fnameescape(a:file).' set noreadonly'
-        exe 'au BufWriteCmd '.fnameescape(a:file).' exe s:sudo_write_cmd()'
     endif
 endfu
 

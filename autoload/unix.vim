@@ -266,22 +266,6 @@ fu! s:should_write_buffer(seen) abort "{{{1
     endif
 endfu
 
-fu! s:silent_sudo_cmd(editor) abort "{{{1
-    let cmd = 'env SUDO_EDITOR='.a:editor.' VISUAL='.a:editor.' sudo -e'
-    let local_nvim = has('nvim') && len($DISPLAY . $SECURITYSESSIONID)
-    if !has('gui_running') && !local_nvim
-        return ['silent', cmd]
-
-    elseif !empty($SUDO_ASKPASS)
-    \||    filereadable('/etc/sudo.conf')
-    \&&    len(filter(readfile('/etc/sudo.conf', 50), { i,v -> v =~# '^Path askpass ' }))
-        return ['silent', cmd.' -A']
-
-    else
-        return [local_nvim ? 'silent' : '', cmd]
-    endif
-endfu
-
 fu! unix#trash_list() abort "{{{1
     if !executable('trash-list')
         return s:command_unavailable('trash-list')
