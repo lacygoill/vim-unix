@@ -126,8 +126,8 @@ com! -bang -nargs=1 -complete=custom,unix#rename_complete Rename  Mv<bang> %:h/<
 "                                                  directory of current file ┘ │
 "                                                              new chosen name ┘
 
-com!      -bang -complete=file -nargs=? SudoEdit   call unix#sudo_edit(<q-args>, <bang>0)
-com! -bar                               SudoWrite  call unix#sudo_setup(expand('%:p')) | w!
+com!      -bang -complete=file -nargs=? SudoEdit   call unix#sudo#edit(<q-args>, <bang>0)
+com! -bar                               SudoWrite  call unix#sudo#setup(expand('%:p')) | w!
 " TODO:
 " Are `:SudoWrite` and `:W` doing the same thing?
 " Should we eliminate one of them?
