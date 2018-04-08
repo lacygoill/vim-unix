@@ -418,17 +418,15 @@ fu! unix#tree(dir) abort "{{{1
     let tempfile = tempname().'/:Tree'
     exe 'lefta '.(&columns/3).'vnew '.tempfile
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let cmd = 'tree -acfF --dirsfirst --noreport '.ignore_pat.' '.a:dir
-    "                ││││   │
-    "                ││││   └ list directories before files
+    "                ┌ print All entries, including hidden ones
+    "                │┌ sort the output by last status change
+    "                ││┌ print the full path for each entry (necessary for `gf` &friends)
+    "                │││┌ append a `/' for directories, a `*' for executable file, ...
     "                ││││
-    "                │││└ append a `/' for directories, a `*' for executable file, ...
-    "                │││
-    "                ││└ print the full path for each entry (necessary for `gf` &friends)
-    "                ││
-    "                │└ sort the output by last status change
-    "                │
-    "                └ print All entries, including hidden ones
+    let cmd = 'tree -acfF --dirsfirst --noreport '.ignore_pat.' '.a:dir
+    "                       │           │
+    "                       │           └ don't print the file and directory report at the end
+    "                       └ print directories before files
     sil 0put =system(cmd)
     $d_
 endfu
