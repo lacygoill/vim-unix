@@ -423,12 +423,13 @@ fu! unix#tree(dir) abort "{{{1
     exe 'lefta '.(&columns/3).'vnew '.tempfile
 
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
+    let dir = !empty(a:dir) ? shellescape(a:dir,1) : ''
     "                ┌ print All entries, including hidden ones
     "                │┌ sort the output by last status change
     "                ││┌ print the full path for each entry (necessary for `gf` &friends)
     "                │││┌ append a `/' for directories, a `*' for executable file, ...
     "                ││││
-    sil exe '.!tree -acfF --dirsfirst --noreport '.ignore_pat.' '.(!empty(a:dir) ? shellescape(a:dir,1) : '')
+    sil exe '.!tree -acfF --dirsfirst --noreport '.ignore_pat.' '.dir
     "                       │           │
     "                       │           └ don't print the file and directory report at the end
     "                       └ print directories before files
