@@ -4,7 +4,7 @@ syn match  treeConceal '─\s\zs.*/\ze.\{-}\%(\s->\s\|\%(\s->\s.*\)\@<!$\)' conc
 syn region treeDirectory matchgroup=Directory start='─\s\zs.*/\ze.\{-1,}' end='\ze/$' oneline concealends
 syn match treeDirectoryEndingSlash '/$'
 
-syn match treeExecutable '[^/]*\*$'
+syn match treeExecutable '[^/]*\*$\|\%(->\s\)\@<=/.*\*$'
 syn match treeLink '[^/]*\s->\s'
 
 hi link treeDirectory Directory
