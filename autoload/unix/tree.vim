@@ -94,7 +94,7 @@ fu! s:getfile() abort "{{{1
 endfu
 
 fu! s:is_big_directory(dir) abort "{{{1
-    return a:dir is# '/' || a:dir is# '/home' || a:dir =~# '/home/[^/]\+'
+    return a:dir is# '/' || a:dir is# '/home' || a:dir =~# '^/home/[^/]\+/\?$'
 endfu
 
 fu! unix#tree#open(where) abort "{{{1
