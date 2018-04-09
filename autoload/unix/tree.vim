@@ -37,6 +37,15 @@ fu! unix#tree#dump(dir) abort "{{{1
         return ''
     endif
 
+    "                     ┌ sort the output by last status change
+    "                     │┌ print the full path for each entry (necessary for `gf` &friends)
+    "                     ││┌ append a `/' for directories, a `*' for executable file, ...
+    "                     │││
+    let short_options = '-cfF'.(get(s:, 'hide_dot_entries', 0) ? '' : ' -a')
+    let long_options = '--dirsfirst --noreport'
+    "                     │           │
+    "                     │           └ don't print the file and directory report at the end
+    "                     └ print directories before files
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
     let limit = '-L '.(s:is_big_directory(dir) ? 3 : 10).' --filelimit 300'
     "             │                                          │
@@ -45,15 +54,7 @@ fu! unix#tree#dump(dir) abort "{{{1
     "             │
     "             └ don't display directories whose depth is greater than 3 or 10
 
-    "                ┌ print All entries, including hidden ones
-    "                │┌ sort the output by last status change
-    "                ││┌ print the full path for each entry (necessary for `gf` &friends)
-    "                │││┌ append a `/' for directories, a `*' for executable file, ...
-    "                ││││
-    sil exe '.!tree -acfF --dirsfirst --noreport '.limit.' '.ignore_pat.' '.shellescape(dir,1)
-    "                       │           │
-    "                       │           └ don't print the file and directory report at the end
-    "                       └ print directories before files
+    sil exe '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(dir,1)
 
     " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
     " working directory.
@@ -122,5 +123,10 @@ fu! unix#tree#reload() abort "{{{1
     endif
     close
     exe 'Tree '.cur_dir
+endfu
+
+fu! unix#tree#hide_dot_entries() abort "{{{1
+    let s:hide_dot_entries = !get(s:, 'hide_dot_entries', 0)
+    call unix#tree#reload()
 endfu
 
