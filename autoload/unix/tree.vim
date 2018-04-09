@@ -1,3 +1,10 @@
+if exists('g:autoloaded_unix#tree')
+    finish
+endif
+let g:autoloaded_unix#tree = 1
+
+let s:cache = {}
+
 fu! unix#tree#dump(dir) abort "{{{1
     if !executable('tree')
         return 'echoerr '.string('requires the tree shell command; currently not installed')
@@ -6,14 +13,27 @@ fu! unix#tree#dump(dir) abort "{{{1
     let tempfile = tempname().'/:Tree'
     exe 'lefta '.(&columns/3).'vnew '.tempfile
 
+    let cwd = getcwd()
+    let dir = !empty(a:dir) ? expand(a:dir) : cwd
+    if has_key(s:cache, dir)
+        sil 0put =s:cache[dir]
+        return ''
+    endif
+
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let dir = !empty(a:dir) ? shellescape(expand(a:dir),1) : ''
+    let limit = '-L '.(s:is_big_directory(dir) ? 3 : 10).' --filelimit 200'
+    "             │                                          │
+    "             │                                          └ do not descend directories
+    "             │                                            that contain more than 200 entries
+    "             │
+    "             └ don't display directories whose depth is greater than 3 or 10
+
     "                ┌ print All entries, including hidden ones
     "                │┌ sort the output by last status change
     "                ││┌ print the full path for each entry (necessary for `gf` &friends)
     "                │││┌ append a `/' for directories, a `*' for executable file, ...
     "                ││││
-    sil exe '.!tree -acfF --dirsfirst --noreport '.ignore_pat.' '.dir
+    sil exe '.!tree -acfF --dirsfirst --noreport '.limit.' '.ignore_pat.' '.shellescape(dir,1)
     "                       │           │
     "                       │           └ don't print the file and directory report at the end
     "                       └ print directories before files
@@ -25,8 +45,9 @@ fu! unix#tree#dump(dir) abort "{{{1
     " This could break `C-w f`.
     "
     " We need to translate the dot into the current working directory.
-    let cwd = getcwd()
     sil! %s:─\s\zs\.\ze/:\=cwd:
+
+    call extend(s:cache, {dir : getline(1, '$')})
 endfu
 
 fu! unix#tree#fde() abort "{{{1
@@ -49,6 +70,10 @@ fu! s:getfile() abort "{{{1
     return matchstr(getline('.'), '.*\%(─\s\|->\s\)\zs.*[/=*>|]\@<!')
 endfu
 
+fu! s:is_big_directory(dir) abort "{{{1
+    return a:dir is# '/' || a:dir is# '/home' || a:dir =~# '/home/[^/]\+'
+endfu
+
 fu! unix#tree#open(where) abort "{{{1
     let file = s:getfile()
     if a:where is# 'split'
@@ -68,6 +93,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
     endif
 
+    " let s:cache[getline(1)].pos = line('.')
     close
     exe 'Tree '.new_dir
 endfu
