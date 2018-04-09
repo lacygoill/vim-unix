@@ -11,7 +11,7 @@ augroup END
 nno  <buffer><nowait><silent>  <c-n>  :<c-u>call search('.*/$')<cr>
 nno  <buffer><nowait><silent>  <c-p>  :<c-u>call search('.*/$', 'b')<cr>
 
-nno  <buffer><nowait><silent>  q    :<c-u>close<cr>
+nno  <buffer><nowait><silent>  q    :<c-u>call unix#tree#close()<cr>
 nno  <buffer><nowait><silent>  Zf   :<c-u>call unix#tree#open('split')<cr>
 nno  <buffer><nowait><silent>  Zgf  :<c-u>call unix#tree#open('tab')<cr>
 

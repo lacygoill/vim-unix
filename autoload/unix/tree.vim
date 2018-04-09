@@ -5,6 +5,11 @@ let g:autoloaded_unix#tree = 1
 
 let s:cache = {}
 
+fu! unix#tree#close() abort "{{{1
+    let s:cache[getline(1)].pos = line('.')
+    close
+endfu
+
 fu! unix#tree#dump(dir) abort "{{{1
     if !executable('tree')
         return 'echoerr '.string('requires the tree shell command; currently not installed')
@@ -15,13 +20,17 @@ fu! unix#tree#dump(dir) abort "{{{1
 
     let cwd = getcwd()
     let dir = !empty(a:dir) ? expand(a:dir) : cwd
-    if has_key(s:cache, dir)
-        sil 0put =s:cache[dir]
+    if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
+        sil 0put =s:cache[dir].contents
+        $d_
+        if has_key(s:cache[dir], 'pos')
+            exe s:cache[dir].pos
+        endif
         return ''
     endif
 
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let limit = '-L '.(s:is_big_directory(dir) ? 3 : 10).' --filelimit 200'
+    let limit = '-L '.(s:is_big_directory(dir) ? 7 : 10).' --filelimit 200'
     "             │                                          │
     "             │                                          └ do not descend directories
     "             │                                            that contain more than 200 entries
@@ -47,7 +56,7 @@ fu! unix#tree#dump(dir) abort "{{{1
     " We need to translate the dot into the current working directory.
     sil! %s:─\s\zs\.\ze/:\=cwd:
 
-    call extend(s:cache, {dir : getline(1, '$')})
+    call extend(s:cache, {dir : {'contents': getline(1, '$')}})
 endfu
 
 fu! unix#tree#fde() abort "{{{1
@@ -93,8 +102,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
     endif
 
-    " let s:cache[getline(1)].pos = line('.')
-    close
+    call unix#tree#close()
     exe 'Tree '.new_dir
 endfu
 
