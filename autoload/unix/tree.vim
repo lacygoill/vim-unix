@@ -117,6 +117,9 @@ endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
     if a:who is# 'parent'
+        if getline(1) is# '/'
+            return
+        endif
         let new_dir = fnamemodify(substitute(getline(1), '^\.', getcwd(), ''), ':h')
     else
         let new_dir = s:getfile()
