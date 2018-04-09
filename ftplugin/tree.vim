@@ -15,8 +15,8 @@ nno  <buffer><nowait><silent>  q    :<c-u>close<cr>
 nno  <buffer><nowait><silent>  Zf   :<c-u>call unix#tree#open('split')<cr>
 nno  <buffer><nowait><silent>  Zgf  :<c-u>call unix#tree#open('tab')<cr>
 
-nno  <buffer><nowait><silent>  <left>   :<c-u>call unix#tree#relative_dir('parent')<cr>
-nno  <buffer><nowait><silent>  <right>  :<c-u>call unix#tree#relative_dir('child')<cr>
+nno  <buffer><nowait><silent>  <c-h>  :<c-u>call unix#tree#relative_dir('parent')<cr>
+nno  <buffer><nowait><silent>  <c-m>  :<c-u>call unix#tree#relative_dir('child')<cr>
 
 " teardown {{{1
 
@@ -30,7 +30,7 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                        | exe 'nunmap <buffer> Zgf'
 \                        | exe 'nunmap <buffer> <c-n>'
 \                        | exe 'nunmap <buffer> <c-p>'
-\                        | exe 'nunmap <buffer> <left>'
-\                        | exe 'nunmap <buffer> <right>'
+\                        | exe 'nunmap <buffer> <c-h>'
+\                        | exe 'nunmap <buffer> <c-m>'
 \                      "
 
