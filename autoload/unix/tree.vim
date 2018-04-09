@@ -6,6 +6,9 @@ let g:autoloaded_unix#tree = 1
 let s:cache = {}
 
 fu! unix#tree#close() abort "{{{1
+    if !has_key(s:cache, getline(1))
+        return
+    endif
     let s:cache[getline(1)].pos = line('.')
     close
 endfu
