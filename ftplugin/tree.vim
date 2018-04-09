@@ -30,5 +30,7 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                        | exe 'nunmap <buffer> Zgf'
 \                        | exe 'nunmap <buffer> <c-n>'
 \                        | exe 'nunmap <buffer> <c-p>'
+\                        | exe 'nunmap <buffer> <left>'
+\                        | exe 'nunmap <buffer> <right>'
 \                      "
 
