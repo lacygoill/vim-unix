@@ -19,7 +19,7 @@ nno  <buffer><nowait><silent>  R    :<c-u>call unix#tree#reload()<cr>
 nno  <buffer><nowait><silent>  Zf   :<c-u>call unix#tree#open('split')<cr>
 nno  <buffer><nowait><silent>  Zgf  :<c-u>call unix#tree#open('tab')<cr>
 
-nno  <buffer><nowait><silent>  zh  :<c-u>call unix#tree#hide_dot_entries()<cr>
+nno  <buffer><nowait><silent>  gh  :<c-u>call unix#tree#hide_dot_entries()<cr>
 
 " teardown {{{1
 
@@ -34,7 +34,7 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                        | exe 'nunmap <buffer> R'
 \                        | exe 'nunmap <buffer> Zf'
 \                        | exe 'nunmap <buffer> Zgf'
-\                        | exe 'nunmap <buffer> zh'
+\                        | exe 'nunmap <buffer> gh'
 \                        | exe 'nunmap <buffer> <c-n>'
 \                        | exe 'nunmap <buffer> <c-p>'
 \                      "
