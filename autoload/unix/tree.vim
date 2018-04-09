@@ -112,6 +112,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
     else
         let new_dir = s:getfile()
         if !isdirectory(new_dir)
+            exe 'e '.new_dir
             return
         endif
     endif

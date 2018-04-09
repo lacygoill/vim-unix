@@ -1,6 +1,6 @@
 let b:did_ftplugin = 1
 
-setl bh=wipe bt=nofile nobl noswf nowrap
+setl bt=nofile nobl noswf nowrap
 
 augroup my_tree
     au! * <buffer>
@@ -26,7 +26,7 @@ nno  <buffer><nowait><silent>  zh  :<c-u>call unix#tree#hide_dot_entries()<cr>
 let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                     .(empty(get(b:, 'undo_ftplugin', '')) ? '' : '|')
 \                     ."
-\                          setl bh< bl< bt< cocu< cole< fde< fdl< fdm< fdt< swf< wrap<
+\                          setl bl< bt< cocu< cole< fde< fdl< fdm< fdt< swf< wrap<
 \                        | exe 'au! my_tree * <buffer>'
 \                        | exe 'nunmap <buffer> h'
 \                        | exe 'nunmap <buffer> l'
