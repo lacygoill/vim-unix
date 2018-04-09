@@ -7,6 +7,7 @@ let s:cache = {}
 
 fu! unix#tree#close() abort "{{{1
     if !has_key(s:cache, getline(1))
+        close
         return
     endif
     " save last position in this directory before closing the window
