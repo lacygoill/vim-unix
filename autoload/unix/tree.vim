@@ -97,6 +97,11 @@ fu! s:getfile() abort "{{{1
     \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
 endfu
 
+fu! unix#tree#hide_dot_entries() abort "{{{1
+    let s:hide_dot_entries = !get(s:, 'hide_dot_entries', 0)
+    call unix#tree#reload()
+endfu
+
 fu! s:is_big_directory(dir) abort "{{{1
     return a:dir is# '/' || a:dir is# '/home' || a:dir =~# '^/home/[^/]\+/\?$'
 endfu
@@ -132,10 +137,5 @@ fu! unix#tree#reload() abort "{{{1
     endif
     close
     exe 'Tree '.cur_dir
-endfu
-
-fu! unix#tree#hide_dot_entries() abort "{{{1
-    let s:hide_dot_entries = !get(s:, 'hide_dot_entries', 0)
-    call unix#tree#reload()
 endfu
 
