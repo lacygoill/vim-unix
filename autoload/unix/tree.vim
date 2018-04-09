@@ -86,7 +86,11 @@ fu! unix#tree#fdt() abort "{{{1
 endfu
 
 fu! s:getfile() abort "{{{1
-    return matchstr(getline('.'), '.*\%(─\s\|->\s\)\zs.*[/=*>|]\@<!')
+    let line = getline('.')
+
+    return line =~# '\s->\s'
+    \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
+    \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
 endfu
 
 fu! s:is_big_directory(dir) abort "{{{1
