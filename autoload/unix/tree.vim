@@ -122,6 +122,9 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
         let new_dir = fnamemodify(substitute(getline(1), '^\.', getcwd(), ''), ':h')
     else
+        if line('.') ==# 1
+            return
+        endif
         let new_dir = s:getfile()
         if !isdirectory(new_dir)
             exe 'e '.new_dir
