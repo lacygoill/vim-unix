@@ -9,6 +9,7 @@ fu! unix#tree#close() abort "{{{1
     if !has_key(s:cache, getline(1))
         return
     endif
+    " save last position in this directory before closing the window
     let s:cache[getline(1)].pos = line('.')
     close
 endfu
@@ -23,9 +24,12 @@ fu! unix#tree#dump(dir) abort "{{{1
 
     let cwd = getcwd()
     let dir = !empty(a:dir) ? expand(a:dir) : cwd
+    " If we've already visited this directory, no need to re-invoke `$ tree`.
+    " Just use the cache.
     if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
         sil 0put =s:cache[dir].contents
         $d_
+        " also restore last position if one was saved
         if has_key(s:cache[dir], 'pos')
             exe s:cache[dir].pos
         endif
@@ -59,6 +63,7 @@ fu! unix#tree#dump(dir) abort "{{{1
     " We need to translate the dot into the current working directory.
     sil! %s:─\s\zs\.\ze/:\=cwd:
 
+    " save the contents of the buffer in a cache, for quicker access in the future
     call extend(s:cache, {dir : {'contents': getline(1, '$')}})
 endfu
 
