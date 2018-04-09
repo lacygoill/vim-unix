@@ -45,12 +45,30 @@ fu! unix#tree#fdt() abort "{{{1
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
+fu! s:getfile() abort "{{{1
+    return matchstr(getline('.'), '.*\%(─\s\|->\s\)\zs.*[/=*>|]\@<!')
+endfu
+
 fu! unix#tree#open(where) abort "{{{1
-    let file = matchstr(getline('.'), '.*\%(─\s\|->\s\)\zs.*[/=*>|]\@<!')
+    let file = s:getfile()
     if a:where is# 'split'
         exe 'sp '.file
     else
         exe 'tabedit '.file
     endif
+endfu
+
+fu! unix#tree#relative_dir(who) abort "{{{1
+    if a:who is# 'parent'
+        let new_dir = fnamemodify(substitute(getline(1), '^\.', getcwd(), ''), ':h')
+    else
+        let new_dir = s:getfile()
+        if !isdirectory(new_dir)
+            return
+        endif
+    endif
+
+    close
+    exe 'Tree '.new_dir
 endfu
 

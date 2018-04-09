@@ -15,6 +15,9 @@ nno  <buffer><nowait><silent>  q    :<c-u>close<cr>
 nno  <buffer><nowait><silent>  Zf   :<c-u>call unix#tree#open('split')<cr>
 nno  <buffer><nowait><silent>  Zgf  :<c-u>call unix#tree#open('tab')<cr>
 
+nno  <buffer><nowait><silent>  <left>   :<c-u>call unix#tree#relative_dir('parent')<cr>
+nno  <buffer><nowait><silent>  <right>  :<c-u>call unix#tree#relative_dir('child')<cr>
+
 " teardown {{{1
 
 let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
