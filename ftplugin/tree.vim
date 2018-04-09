@@ -5,7 +5,8 @@ setl bt=nofile nobl noswf nowrap
 augroup my_tree
     au! * <buffer>
     au BufWinEnter <buffer> setl cocu=nc cole=3
-    \                            fde=unix#tree#fde() fdl=99 fdm=expr fdt=unix#tree#fdt()
+    \                            fde=unix#tree#fde() fdm=expr fdt=unix#tree#fdt()
+    \                     | call unix#tree#fdl()
 augroup END
 
 nno  <buffer><nowait><silent>  <c-n>  :<c-u>call search('.*/$')<cr>

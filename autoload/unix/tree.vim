@@ -78,6 +78,10 @@ fu! unix#tree#fde() abort "{{{1
     return lvl
 endfu
 
+fu! unix#tree#fdl() abort "{{{1
+    let &l:fdl = &foldclose is# 'all' ? 0 : 99
+endfu
+
 fu! unix#tree#fdt() abort "{{{1
     let pat = '\(.*─\s\)\(.*\)'
     let l:Rep = {-> submatch(1).substitute(submatch(2), '.*/\ze.', '', '')}
