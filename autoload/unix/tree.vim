@@ -37,10 +37,10 @@ fu! unix#tree#dump(dir) abort "{{{1
     endif
 
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let limit = '-L '.(s:is_big_directory(dir) ? 3 : 10).' --filelimit 200'
+    let limit = '-L '.(s:is_big_directory(dir) ? 3 : 10).' --filelimit 300'
     "             │                                          │
     "             │                                          └ do not descend directories
-    "             │                                            that contain more than 200 entries
+    "             │                                            that contain more than 300 entries
     "             │
     "             └ don't display directories whose depth is greater than 3 or 10
 
