@@ -18,8 +18,8 @@ fu! unix#tree#dump(dir) abort "{{{1
     "                       │           └ don't print the file and directory report at the end
     "                       └ print directories before files
 
-    " `$ tree` make the paths begin with an initial dot to stand for the working
-    " directory.
+    " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
+    " working directory.
     " But the  latter could change after  we change the focus  to another window
     " (`vim-cwd`).
     " This could break `C-w f`.
