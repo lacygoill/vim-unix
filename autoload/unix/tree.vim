@@ -114,3 +114,12 @@ fu! unix#tree#relative_dir(who) abort "{{{1
     exe 'Tree '.new_dir
 endfu
 
+fu! unix#tree#reload() abort "{{{1
+    let cur_dir = getline(1)
+    if has_key(s:cache, cur_dir)
+        call remove(s:cache, cur_dir)
+    endif
+    close
+    exe 'Tree '.cur_dir
+endfu
+

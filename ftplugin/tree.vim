@@ -12,6 +12,7 @@ nno  <buffer><nowait><silent>  <c-n>  :<c-u>call search('.*/$')<cr>
 nno  <buffer><nowait><silent>  <c-p>  :<c-u>call search('.*/$', 'b')<cr>
 
 nno  <buffer><nowait><silent>  q    :<c-u>call unix#tree#close()<cr>
+nno  <buffer><nowait><silent>  R    :<c-u>call unix#tree#reload()<cr>
 nno  <buffer><nowait><silent>  Zf   :<c-u>call unix#tree#open('split')<cr>
 nno  <buffer><nowait><silent>  Zgf  :<c-u>call unix#tree#open('tab')<cr>
 
@@ -26,6 +27,7 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                          setl bh< bl< bt< cocu< cole< fde< fdl< fdm< fdt< swf< wrap<
 \                        | exe 'au! my_tree * <buffer>'
 \                        | exe 'nunmap <buffer> q'
+\                        | exe 'nunmap <buffer> R'
 \                        | exe 'nunmap <buffer> Zf'
 \                        | exe 'nunmap <buffer> Zgf'
 \                        | exe 'nunmap <buffer> <c-n>'
