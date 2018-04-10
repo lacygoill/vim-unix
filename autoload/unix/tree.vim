@@ -11,26 +11,14 @@ let s:cache = {}
 " TODO:
 " Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
 
-" TODO:
-" We shouldn't rely on `getline(1)` to get the current viewed directory.
-" It's unreliable, since the buffer can be edited.
-"
-" Instead, the info should be in the buffer name.
-" But doing so, we lose the current ft detection.
-" Maybe we could name the buffer like this:
-"
-"         /tmp/v..../tree/current_directory
-"                    │    │
-"                    │    └ to know where we are
-"                    └ for ft detection
-
 fu! unix#tree#close() abort "{{{1
-    if !has_key(s:cache, getline(1))
+    let curdir = s:getcurdir()
+    if !has_key(s:cache, curdir)
         close
         return
     endif
     " save last position in this directory before closing the window
-    let s:cache[getline(1)].pos = line('.')
+    let s:cache[curdir].pos = line('.')
     close
 endfu
 
@@ -39,11 +27,12 @@ fu! unix#tree#dump(dir) abort "{{{1
         return 'echoerr '.string('requires the tree shell command; currently not installed')
     endif
 
-    let tempfile = tempname().'/:Tree'
-    exe 'lefta '.(&columns/3).'vnew '.tempfile
-
     let cwd = getcwd()
     let dir = !empty(a:dir) ? expand(a:dir) : cwd
+
+    let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
+    exe 'lefta '.(&columns/3).'vnew '.tempfile
+
     " If we've already visited this directory, no need to re-invoke `$ tree`.
     " Just use the cache.
     if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
@@ -108,6 +97,11 @@ fu! unix#tree#fdt() abort "{{{1
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
+fu! s:getcurdir() abort "{{{1
+    let curdir = matchstr(expand('%:p'), 'tree_viewer::\zs.*')
+    return empty(curdir) ? '/' : curdir
+endfu
+
 fu! s:getfile() abort "{{{1
     let line = getline('.')
 
@@ -139,10 +133,11 @@ endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
     if a:who is# 'parent'
-        if getline(1) is# '/'
+        let curdir = s:getcurdir()
+        if curdir is# '/'
             return
         endif
-        let new_dir = fnamemodify(substitute(getline(1), '^\.', getcwd(), ''), ':h')
+        let new_dir = fnamemodify(substitute(curdir, '^\.', getcwd(), ''), ':h')
     else
         if line('.') ==# 1 || getline('.') =~# '\s\[.\{-}\]$'
             return
@@ -159,7 +154,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
 endfu
 
 fu! unix#tree#reload() abort "{{{1
-    let cur_dir = getline(1)
+    let cur_dir = s:getcurdir()
     if has_key(s:cache, cur_dir)
         call remove(s:cache, cur_dir)
     endif
