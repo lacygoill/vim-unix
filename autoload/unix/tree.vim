@@ -11,6 +11,19 @@ let s:cache = {}
 " TODO:
 " Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
 
+" TODO:
+" :Tree /proc
+"
+"                           ┌ everything is colored as a directory
+"         ┌─────────────────┤
+"     ├── /proc/self -> 2827/
+"         └───────────┤ └───┤
+"                     │     └ this should be colored as a directory
+"                     └ this should be colored as a link
+
+" TODO:
+" `gh` makes us lose current position/view (✘).
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
