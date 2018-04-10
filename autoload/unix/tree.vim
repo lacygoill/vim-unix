@@ -4,6 +4,7 @@ endif
 let g:autoloaded_unix#tree = 1
 
 let s:cache = {}
+let s:hide_dot_entries = 0
 
 " TODO:
 " How to make the buffer survive a `:e`, like a dirvish buffer?
@@ -70,8 +71,8 @@ fu! s:getfile() abort "{{{1
     \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
 endfu
 
-fu! unix#tree#hide_dot_entries() abort "{{{1
-    let s:hide_dot_entries = !get(s:, 'hide_dot_entries', 0)
+fu! unix#tree#toggle_dot_entries() abort "{{{1
+    let s:hide_dot_entries = !s:hide_dot_entries
     call unix#tree#reload()
 endfu
 
@@ -126,7 +127,7 @@ fu! unix#tree#populate(dir) abort "{{{1
     "                     │┌ print the full path for each entry (necessary for `gf` &friends)
     "                     ││┌ append a `/' for directories, a `*' for executable file, ...
     "                     │││
-    let short_options = '-cfF'.(get(s:, 'hide_dot_entries', 0) ? '' : ' -a')
+    let short_options = '-cfF'.(s:hide_dot_entries ? '' : ' -a')
     let long_options = '--dirsfirst --noreport'
     "                     │           │
     "                     │           └ don't print the file and directory report at the end
@@ -177,16 +178,30 @@ fu! unix#tree#relative_dir(who) abort "{{{1
 endfu
 
 fu! unix#tree#reload() abort "{{{1
+    " remove information in cache, so that  the reloading is forced to re-invoke
+    " `$ tree`
     let cur_dir = s:getcurdir()
     if has_key(s:cache, cur_dir)
         call remove(s:cache, cur_dir)
     endif
+
+    " grab current line; necessary to restore position later
     let line = getline('.')
-    if line =~# '.*/\.\%(.*/\)\@!'
+    " if the  current line matches a  hidden file/directory, and we're  going to
+    " hide dot  entries, we won't  be able to  restore the position;  instead we
+    " will restore  the position using the  previous line which is  NOT a hidden
+    " entry
+    if line =~# '.*/\.\%(.*/\)\@!' && s:hide_dot_entries
         let line = getline(search('─\s.*/[^.]\%(.*/\)\@!', 'bnW'))
     endif
+
+    " reload
     close
     exe 'Tree '.cur_dir
-    sil! call search('\V\^'.escape(line, '\').'\$')
+
+    " restore position
+    let pat = '\V\^'.escape(line, '\').'\$'
+    let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
+    sil! call search(pat)
 endfu
 

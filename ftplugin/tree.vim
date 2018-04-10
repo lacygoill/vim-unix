@@ -12,7 +12,7 @@ augroup END
 nno  <buffer><nowait><silent>  J  :<c-u>call search('.*/$')<cr>
 nno  <buffer><nowait><silent>  K  :<c-u>call search('.*/$', 'b')<cr>
 
-nno  <buffer><nowait><silent>  gh  :<c-u>call unix#tree#hide_dot_entries()<cr>
+nno  <buffer><nowait><silent>  gh  :<c-u>call unix#tree#toggle_dot_entries()<cr>
 
 nno  <buffer><nowait><silent>  h  :<c-u>call unix#tree#relative_dir('parent')<cr>
 nno  <buffer><nowait><silent>  l  :<c-u>call unix#tree#relative_dir('child')<cr>
