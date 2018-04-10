@@ -26,8 +26,8 @@ let s:cache = {}
 " we're in root folder, and the window is non-focused.
 " It should be `/`.
 
-" TODO:
-" We lose current position after reload.
+" FIXME:
+" We lose current position after reload. Also after `gh` (sometimes).
 
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
@@ -101,6 +101,7 @@ fu! unix#tree#populate(dir) abort "{{{1
 
     let cwd = getcwd()
     let dir = !empty(a:dir) ? expand(a:dir) : cwd
+    let dir = substitute(dir, '/\+$', '', '')
 
     let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
     exe 'lefta '.(&columns/3).'vnew '.tempfile
