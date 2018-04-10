@@ -26,9 +26,6 @@ let s:cache = {}
 " we're in root folder, and the window is non-focused.
 " It should be `/`.
 
-" FIXME:
-" We lose current position after reload. Also after `gh` (sometimes).
-
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
@@ -185,7 +182,7 @@ fu! unix#tree#reload() abort "{{{1
         call remove(s:cache, cur_dir)
     endif
     let line = getline('.')
-    if line =~# '.*/\.'
+    if line =~# '.*/\.\%(.*/\)\@!'
         let line = getline(search('─\s.*/[^.]\%(.*/\)\@!', 'bnW'))
     endif
     close
