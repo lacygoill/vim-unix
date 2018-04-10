@@ -202,6 +202,6 @@ fu! unix#tree#reload() abort "{{{1
     " restore position
     let pat = '\V\^'.escape(line, '\').'\$'
     let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
-    sil! call search(pat)
+    call search(pat)
 endfu
 
