@@ -29,6 +29,9 @@ let s:cache = {}
 " TODO:
 " C-n, C-p conflict with tab navigation.
 
+" TODO:
+" We lose current position after reload.
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
