@@ -101,7 +101,7 @@ fu! unix#tree#populate(dir) abort "{{{1
 
     let cwd = getcwd()
     let dir = !empty(a:dir) ? expand(a:dir) : cwd
-    let dir = substitute(dir, '/\+$', '', '')
+    let dir = substitute(dir, '.\{-1,}\zs/\+$', '', '')
 
     let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
     exe 'lefta '.(&columns/3).'vnew '.tempfile
