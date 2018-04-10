@@ -131,7 +131,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
         let new_dir = fnamemodify(substitute(getline(1), '^\.', getcwd(), ''), ':h')
     else
-        if line('.') ==# 1 || getline('.') =~# '\[.\{-}\]$'
+        if line('.') ==# 1 || getline('.') =~# '\s\[.\{-}\]$'
             return
         endif
         let new_dir = s:getfile()
