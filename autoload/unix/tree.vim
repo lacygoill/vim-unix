@@ -21,11 +21,20 @@ let s:hide_dot_entries = 0
 "         └───────────┤ └───┤
 "                     │     └ this should be colored as a directory
 "                     └ this should be colored as a link
+"
+" Also:
+"     :Tree ~
+"
+" Look at the `zsh/` directory.
 
 " TODO:
 " The name  of the  current directory  in the  statusline is  `tree_viewer` when
 " we're in root folder, and the window is non-focused.
 " It should be `/`.
+
+" FIXME:
+" We still have issues with the restoration of the cursor position after `gh`.
+" Try in home folder.
 
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
