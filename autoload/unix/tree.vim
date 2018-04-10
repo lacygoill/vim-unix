@@ -112,7 +112,7 @@ fu! s:is_big_directory(dir) abort "{{{1
     return a:dir is# '/'
     \ ||   a:dir is# '/home'
     \ ||   a:dir =~# '^/home/[^/]\+/\?$'
-    \ ||   systemlist('find '.a:dir.' -type f | wc -l')[0] > 10000
+    \ ||   systemlist('find '.a:dir.' -type f | wc -l')[0] > 5000
 endfu
 
 fu! unix#tree#open(where) abort "{{{1
