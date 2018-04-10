@@ -5,6 +5,12 @@ let g:autoloaded_unix#tree = 1
 
 let s:cache = {}
 
+" TODO:
+" How to make the buffer survive a `:e`, like a dirvish buffer?
+
+" TODO:
+" Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
+
 fu! unix#tree#close() abort "{{{1
     if !has_key(s:cache, getline(1))
         close
@@ -47,12 +53,12 @@ fu! unix#tree#dump(dir) abort "{{{1
     "                     │           └ don't print the file and directory report at the end
     "                     └ print directories before files
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let limit = '-L '.(s:is_big_directory(dir) ? 3 : 10).' --filelimit 300'
+    let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 500'
     "             │                                          │
     "             │                                          └ do not descend directories
-    "             │                                            that contain more than 300 entries
+    "             │                                            that contain more than 500 entries
     "             │
-    "             └ don't display directories whose depth is greater than 3 or 10
+    "             └ don't display directories whose depth is greater than 2 or 10
 
     sil exe '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(dir,1)
 
