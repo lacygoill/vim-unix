@@ -27,9 +27,6 @@ let s:cache = {}
 " It should be `/`.
 
 " TODO:
-" C-n, C-p conflict with tab navigation.
-
-" TODO:
 " We lose current position after reload.
 
 fu! unix#tree#close() abort "{{{1
