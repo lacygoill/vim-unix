@@ -11,6 +11,19 @@ let s:cache = {}
 " TODO:
 " Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
 
+" TODO:
+" We shouldn't rely on `getline(1)` to get the current viewed directory.
+" It's unreliable, since the buffer can be edited.
+"
+" Instead, the info should be in the buffer name.
+" But doing so, we lose the current ft detection.
+" Maybe we could name the buffer like this:
+"
+"         /tmp/v..../tree/current_directory
+"                    │    │
+"                    │    └ to know where we are
+"                    └ for ft detection
+
 fu! unix#tree#close() abort "{{{1
     if !has_key(s:cache, getline(1))
         close
