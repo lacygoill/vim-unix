@@ -8,9 +8,10 @@ syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{
 syn match treeExecutable '[^/]*\*$\|\%(->\s\)\@<=/.*\*$'
 syn match treeLink '[^/]*\s->\s'
 
+hi treeLink        ctermfg=darkmagenta guifg=darkmagenta
+hi treeExecutable  ctermfg=darkgreen   guifg=darkgreen
+
 hi link  treeDirectory             Directory
 hi link  treeDirectoryEndingSlash  Directory
 hi link  treeDirectoryNotOpened    WarningMsg
-hi link  treeExecutable            Comment
-hi link  treeLink                  Identifier
 
