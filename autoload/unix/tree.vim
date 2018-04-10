@@ -103,6 +103,10 @@ fu! unix#tree#populate(dir) abort "{{{1
     let dir = !empty(a:dir) ? expand(a:dir) : cwd
     let dir = substitute(dir, '.\{-1,}\zs/\+$', '', '')
 
+    if !isdirectory(dir)
+        return 'echoerr '.string(dir.'/ is not a directory')
+    endif
+
     let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
     exe 'lefta '.(&columns/3).'vnew '.tempfile
     " Can be used  by `vim-statusline` to get the directory  viewed in a focused
