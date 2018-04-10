@@ -179,12 +179,12 @@ fu! unix#tree#reload() abort "{{{1
     if has_key(s:cache, cur_dir)
         call remove(s:cache, cur_dir)
     endif
-    let line = matchstr(getline('.'), '─\s\zs.*')
+    let line = getline('.')
     if line =~# '.*/\.'
-        let line = matchstr(getline(search('─\s.*/[^.]\%(.*/\)\@!', 'bnW')), '─\s\zs.*')
+        let line = getline(search('─\s.*/[^.]\%(.*/\)\@!', 'bnW'))
     endif
     close
     exe 'Tree '.cur_dir
-    sil! call search('\V'.escape(line, '\'))
+    sil! call search('\V\^'.escape(line, '\').'\$')
 endfu
 
