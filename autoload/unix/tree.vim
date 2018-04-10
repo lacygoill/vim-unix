@@ -22,9 +22,9 @@ let s:cache = {}
 "                     └ this should be colored as a link
 
 " TODO:
-" The name of the tabpage in the tabline is `tree_viewer` when we're in root folder.
+" The name  of the  current directory  in the  statusline is  `tree_viewer` when
+" we're in root folder, and the window is non-focused.
 " It should be `/`.
-" Same issue with the statusline when we focus another window.
 
 " TODO:
 " C-n, C-p conflict with tab navigation.
