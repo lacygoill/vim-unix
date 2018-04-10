@@ -63,7 +63,7 @@ fu! unix#tree#dump(dir) abort "{{{1
     " This could break `C-w f`.
     "
     " We need to translate the dot into the current working directory.
-    sil! %s:─\s\zs\.\ze/:\=cwd:
+    sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
 
     " save the contents of the buffer in a cache, for quicker access in the future
     call extend(s:cache, {dir : {'contents': getline(1, '$')}})
