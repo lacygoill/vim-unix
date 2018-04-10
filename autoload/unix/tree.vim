@@ -22,7 +22,12 @@ let s:cache = {}
 "                     └ this should be colored as a link
 
 " TODO:
-" `gh` makes us lose current position/view (✘).
+" The name of the tabpage in the tabline is `tree_viewer` when we're in root folder.
+" It should be `/`.
+" Same issue with the statusline when we focus another window.
+
+" TODO:
+" C-n, C-p conflict with tab navigation.
 
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
@@ -174,7 +179,12 @@ fu! unix#tree#reload() abort "{{{1
     if has_key(s:cache, cur_dir)
         call remove(s:cache, cur_dir)
     endif
+    let line = matchstr(getline('.'), '─\s\zs.*')
+    if line =~# '.*/\.'
+        let line = matchstr(getline(search('─\s.*/[^.]\%(.*/\)\@!', 'bnW')), '─\s\zs.*')
+    endif
     close
     exe 'Tree '.cur_dir
+    sil! call search('\V'.escape(line, '\'))
 endfu
 
