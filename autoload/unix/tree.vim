@@ -22,61 +22,6 @@ fu! unix#tree#close() abort "{{{1
     close
 endfu
 
-fu! unix#tree#dump(dir) abort "{{{1
-    if !executable('tree')
-        return 'echoerr '.string('requires the tree shell command; currently not installed')
-    endif
-
-    let cwd = getcwd()
-    let dir = !empty(a:dir) ? expand(a:dir) : cwd
-
-    let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
-    exe 'lefta '.(&columns/3).'vnew '.tempfile
-
-    " If we've already visited this directory, no need to re-invoke `$ tree`.
-    " Just use the cache.
-    if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
-        sil 0put =s:cache[dir].contents
-        $d_
-        " also restore last position if one was saved
-        if has_key(s:cache[dir], 'pos')
-            exe s:cache[dir].pos
-        endif
-        return ''
-    endif
-
-    "                     ┌ sort the output by last status change
-    "                     │┌ print the full path for each entry (necessary for `gf` &friends)
-    "                     ││┌ append a `/' for directories, a `*' for executable file, ...
-    "                     │││
-    let short_options = '-cfF'.(get(s:, 'hide_dot_entries', 0) ? '' : ' -a')
-    let long_options = '--dirsfirst --noreport'
-    "                     │           │
-    "                     │           └ don't print the file and directory report at the end
-    "                     └ print directories before files
-    let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 300'
-    "             │                                          │
-    "             │                                          └ do not descend directories
-    "             │                                            that contain more than 300 entries
-    "             │
-    "             └ don't display directories whose depth is greater than 2 or 10
-
-    sil exe '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(dir,1)
-
-    " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
-    " working directory.
-    " But the  latter could change after  we change the focus  to another window
-    " (`vim-cwd`).
-    " This could break `C-w f`.
-    "
-    " We need to translate the dot into the current working directory.
-    sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
-
-    " save the contents of the buffer in a cache, for quicker access in the future
-    call extend(s:cache, {dir : {'contents': getline(1, '$')}})
-endfu
-
 fu! unix#tree#fde() abort "{{{1
     let idx = matchend(split(getline(v:lnum), '\zs'), '[├└]')
     let lvl = idx/4
@@ -129,6 +74,64 @@ fu! unix#tree#open(where) abort "{{{1
     else
         exe 'tabedit '.file
     endif
+endfu
+
+fu! unix#tree#populate(dir) abort "{{{1
+    if !executable('tree')
+        return 'echoerr '.string('requires the tree shell command; currently not installed')
+    endif
+
+    let cwd = getcwd()
+    let dir = !empty(a:dir) ? expand(a:dir) : cwd
+
+    let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
+    exe 'lefta '.(&columns/3).'vnew '.tempfile
+    " Can be used  by `vim-statusline` to get the directory  viewed in a focused
+    " `tree` window.
+    let b:curdir = dir
+
+    " If we've already visited this directory, no need to re-invoke `$ tree`.
+    " Just use the cache.
+    if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
+        sil 0put =s:cache[dir].contents
+        $d_
+        " also restore last position if one was saved
+        if has_key(s:cache[dir], 'pos')
+            exe s:cache[dir].pos
+        endif
+        return ''
+    endif
+
+    "                     ┌ sort the output by last status change
+    "                     │┌ print the full path for each entry (necessary for `gf` &friends)
+    "                     ││┌ append a `/' for directories, a `*' for executable file, ...
+    "                     │││
+    let short_options = '-cfF'.(get(s:, 'hide_dot_entries', 0) ? '' : ' -a')
+    let long_options = '--dirsfirst --noreport'
+    "                     │           │
+    "                     │           └ don't print the file and directory report at the end
+    "                     └ print directories before files
+    let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
+    let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 300'
+    "             │                                          │
+    "             │                                          └ do not descend directories
+    "             │                                            that contain more than 300 entries
+    "             │
+    "             └ don't display directories whose depth is greater than 2 or 10
+
+    sil exe '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(dir,1)
+
+    " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
+    " working directory.
+    " But the  latter could change after  we change the focus  to another window
+    " (`vim-cwd`).
+    " This could break `C-w f`.
+    "
+    " We need to translate the dot into the current working directory.
+    sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
+
+    " save the contents of the buffer in a cache, for quicker access in the future
+    call extend(s:cache, {dir : {'contents': getline(1, '$')}})
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
