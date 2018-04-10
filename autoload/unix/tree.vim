@@ -53,10 +53,10 @@ fu! unix#tree#dump(dir) abort "{{{1
     "                     │           └ don't print the file and directory report at the end
     "                     └ print directories before files
     let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
-    let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 500'
+    let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 300'
     "             │                                          │
     "             │                                          └ do not descend directories
-    "             │                                            that contain more than 500 entries
+    "             │                                            that contain more than 300 entries
     "             │
     "             └ don't display directories whose depth is greater than 2 or 10
 
