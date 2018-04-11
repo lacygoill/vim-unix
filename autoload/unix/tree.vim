@@ -209,7 +209,7 @@ fu! unix#tree#reload() abort "{{{1
     exe 'Tree '.cur_dir
 
     " restore position
-    let pat = '\V\^'.escape(line, '\').'\$'
+    let pat = '\C\V\^'.escape(line, '\').'\$'
     let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
     call search(pat)
 endfu
