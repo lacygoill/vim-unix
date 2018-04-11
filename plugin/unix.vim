@@ -15,7 +15,6 @@ let s:template_dir = $HOME.'/.vim/template/'
 
 
 " FIXME:
-"
 " Read this:
 " https://www.reddit.com/r/vim/comments/5mx8jq/is_there_a_way_to_get_vimeunuchs_rename_command/
 "

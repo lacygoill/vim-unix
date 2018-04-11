@@ -25,7 +25,16 @@ let s:hide_dot_entries = 0
 " Also:
 "     :Tree ~
 "
-" Look at the `zsh/` directory.
+" Look at the `.zsh/` directory:
+"
+"                                        ┌ is currently concealed
+"         ┌──────────────────────────────┤
+"         │                              │   ┌ is currently colored as a directory
+"         │                              │┌──┤
+"     ├── /home/jean/.zsh -> Dropbox/conf/zsh/
+"         └────────────────┤ └───────────────┤
+"                          │                 └ this should be colored as a directory
+"                          └ this should be colored as a link
 
 " TODO:
 " The name  of the  current directory  in the  statusline is  `tree_viewer` when
@@ -74,11 +83,6 @@ fu! s:getfile() abort "{{{1
     return line =~# '\s->\s'
     \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
     \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
-endfu
-
-fu! unix#tree#toggle_dot_entries() abort "{{{1
-    let s:hide_dot_entries = !s:hide_dot_entries
-    call unix#tree#reload()
 endfu
 
 fu! s:is_big_directory(dir) abort "{{{1
@@ -155,6 +159,15 @@ fu! unix#tree#populate(dir) abort "{{{1
     "
     " We need to translate the dot into the current working directory.
     sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
+    " Why?{{{
+    "
+    " We  may have  created a  symbolic link  whose target  is a  directory, and
+    " during the creation we may have appended a slash at the end.
+    " If that's the case, because of the `-F` option, `$ tree` will add a second
+    " slash.  We'll end up with two  slashes, which will give unexpected results
+    " regarding the syntax highlighting.
+    "}}}
+    sil! keepj keepp %s:/\ze/$::
 
     " save the contents of the buffer in a cache, for quicker access in the future
     call extend(s:cache, {dir : {'contents': getline(1, '$')}})
@@ -168,6 +181,10 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
         let new_dir = fnamemodify(substitute(curdir, '^\.', getcwd(), ''), ':h')
     else
+        "                                                   ┌ don't try to open an entry
+        "                                                   │ for which `$ tree` encountered an error
+        "                                                   │ (ends with a message in square brackets)
+        "                                      ┌────────────┤
         if line('.') ==# 1 || getline('.') =~# '\s\[.\{-}\]$'
             return
         endif
@@ -180,6 +197,11 @@ fu! unix#tree#relative_dir(who) abort "{{{1
 
     call unix#tree#close()
     exe 'Tree '.new_dir
+
+    " If we go up the tree, position the cursor on the directory we come from.
+    if exists('curdir')
+        call search('\C\V─\s'.curdir.'/\$')
+    endif
 endfu
 
 fu! unix#tree#reload() abort "{{{1
@@ -208,5 +230,10 @@ fu! unix#tree#reload() abort "{{{1
     let pat = '\C\V\^'.escape(line, '\').'\$'
     let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
     call search(pat)
+endfu
+
+fu! unix#tree#toggle_dot_entries() abort "{{{1
+    let s:hide_dot_entries = !s:hide_dot_entries
+    call unix#tree#reload()
 endfu
 
