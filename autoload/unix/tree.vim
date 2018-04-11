@@ -78,25 +78,6 @@ fu! unix#tree#fdt() abort "{{{1
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
-fu! s:getcurdir() abort "{{{1
-    let curdir = matchstr(expand('%:p'), 'tree_viewer::\zs.*')
-    return empty(curdir) ? '/' : curdir
-endfu
-
-fu! s:getfile() abort "{{{1
-    let line = getline('.')
-
-    return line =~# '\s->\s'
-    \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
-    \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
-    " Do NOT add the `$` anchor !                   ^{{{
-    "
-    " You don't want match until the end of the line.
-    " You want to match  a maximum of text, so maybe until the  end of the line,
-    " but with the condition until that it doesn't finish with [/=*>|].
-    "}}}
-endfu
-
 fu! s:get_ignore_pat() abort "{{{1
     " Purpose:
     " Build a FILE pattern to pass to `$ tree`, so that it ignores certain entries.
@@ -130,6 +111,47 @@ fu! s:get_ignore_pat() abort "{{{1
     let ignore_pat = join(ignore_pat, '|')
 
     return printf('-I "%s"', ignore_pat)
+endfu
+
+fu! s:get_tree_cmd(dir) abort "{{{1
+    "                     ┌ print the full path for each entry (necessary for `gf` &friends)
+    "                     │┌ append a `/' for directories, a `*' for executable file, ...
+    "                     ││
+    let short_options = '-fF'.(s:hide_dot_entries ? '' : ' -a')
+    let long_options = '--dirsfirst --noreport'
+    "                     │           │
+    "                     │           └ don't print the file and directory report at the end
+    "                     └ print directories before files
+
+    let ignore_pat = s:get_ignore_pat()
+
+    let limit = '-L '.(s:is_big_directory(a:dir) ? 2 : 10).' --filelimit 300'
+    "             │                                            │
+    "             │                                            └ do not descend directories
+    "             │                                              that contain more than 300 entries
+    "             │
+    "             └ don't display directories whose depth is greater than 2 or 10
+
+    return '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(a:dir,1)
+endfu
+
+fu! s:getcurdir() abort "{{{1
+    let curdir = matchstr(expand('%:p'), 'tree_viewer::\zs.*')
+    return empty(curdir) ? '/' : curdir
+endfu
+
+fu! s:getfile() abort "{{{1
+    let line = getline('.')
+
+    return line =~# '\s->\s'
+    \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
+    \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
+    " Do NOT add the `$` anchor !                   ^{{{
+    "
+    " You don't want match until the end of the line.
+    " You want to match  a maximum of text, so maybe until the  end of the line,
+    " but with the condition until that it doesn't finish with [/=*>|].
+    "}}}
 endfu
 
 fu! s:is_big_directory(dir) abort "{{{1
@@ -179,25 +201,7 @@ fu! unix#tree#populate(dir) abort "{{{1
         return ''
     endif
 
-    "                     ┌ print the full path for each entry (necessary for `gf` &friends)
-    "                     │┌ append a `/' for directories, a `*' for executable file, ...
-    "                     ││
-    let short_options = '-fF'.(s:hide_dot_entries ? '' : ' -a')
-    let long_options = '--dirsfirst --noreport'
-    "                     │           │
-    "                     │           └ don't print the file and directory report at the end
-    "                     └ print directories before files
-
-    let ignore_pat = s:get_ignore_pat()
-
-    let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 300'
-    "             │                                          │
-    "             │                                          └ do not descend directories
-    "             │                                            that contain more than 300 entries
-    "             │
-    "             └ don't display directories whose depth is greater than 2 or 10
-
-    sil exe '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(dir,1)
+    sil exe s:get_tree_cmd(dir)
 
     " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
     " working directory.
