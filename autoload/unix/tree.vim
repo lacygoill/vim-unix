@@ -278,13 +278,6 @@ fu! unix#tree#reload() abort "{{{1
 
     " grab current line; necessary to restore position later
     let line = getline('.')
-    " if the  current line matches a  hidden file/directory, and we're  going to
-    " hide dot  entries, we won't  be able to  restore the position;  instead we
-    " will restore  the position using the  previous line which is  NOT a hidden
-    " entry
-    if line =~# '.*/\.[^/]\+/\?$' && s:hide_dot_entries
-        let line = getline(search('.*/[^.][^/]\{-}/\?$', 'bnW'))
-    endif
 
     " reload
     close
