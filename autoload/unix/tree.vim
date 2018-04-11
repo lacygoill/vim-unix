@@ -6,14 +6,7 @@ let g:autoloaded_unix#tree = 1
 let s:cache = {}
 let s:hide_dot_entries = 0
 
-" TODO:
-" How to make the buffer survive a `:e`, like a dirvish buffer?
-
-" TODO:
-" Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
-
-" TODO:
-" :Tree /proc
+" TODO: :Tree /proc{{{
 "
 "                           ┌ everything is colored as a directory
 "         ┌─────────────────┤
@@ -35,17 +28,18 @@ let s:hide_dot_entries = 0
 "         └────────────────┤ └───────────────┤
 "                          │                 └ this should be colored as a directory
 "                          └ this should be colored as a link
+"}}}
 
-" TODO:
-" The name  of the  current directory  in the  statusline is  `tree_viewer` when
-" we're in root folder, and the window is non-focused.
+" TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
+
+" TODO: Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
+
+" TODO: The name  of the  current directory  in the  statusline is  `tree_viewer`{{{
+" when we're in root folder, and the window is non-focused.
 " It should be `/`.
+"}}}
 
-" TODO:
-" Sort hidden directories after non-hidden ones.
-
-" TODO:
-" Correctly position the cursor when we hide dot entries.
+" TODO: Sort hidden directories after non-hidden ones.
 
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
