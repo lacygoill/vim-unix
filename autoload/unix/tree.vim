@@ -32,10 +32,6 @@ let s:hide_dot_entries = 0
 " we're in root folder, and the window is non-focused.
 " It should be `/`.
 
-" FIXME:
-" We still have issues with the restoration of the cursor position after `gh`.
-" Try in home folder.
-
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
@@ -200,8 +196,8 @@ fu! unix#tree#reload() abort "{{{1
     " hide dot  entries, we won't  be able to  restore the position;  instead we
     " will restore  the position using the  previous line which is  NOT a hidden
     " entry
-    if line =~# '.*/\.\%(.*/\)\@!' && s:hide_dot_entries
-        let line = getline(search('─\s.*/[^.]\%(.*/\)\@!', 'bnW'))
+    if line =~# '.*/\.[^/]\+/\?$' && s:hide_dot_entries
+        let line = getline(search('.*/[^.][^/]\{-}/\?$', 'bnW'))
     endif
 
     " reload
@@ -210,7 +206,7 @@ fu! unix#tree#reload() abort "{{{1
 
     " restore position
     let pat = '\C\V\^'.escape(line, '\').'\$'
-    let pat = substitute(pat, '[├└]', '\\m[├└]\\C\\V', 'g')
+    let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
     call search(pat)
 endfu
 
