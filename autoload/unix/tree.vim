@@ -89,9 +89,12 @@ fu! s:getfile() abort "{{{1
     return line =~# '\s->\s'
     \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
     \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
-    " Do NOT add the `$` anchor !                   ^
-    " TODO:
-    " Explain why.
+    " Do NOT add the `$` anchor !                   ^{{{
+    "
+    " You don't want match until the end of the line.
+    " You want to match  a maximum of text, so maybe until the  end of the line,
+    " but with the condition until that it doesn't finish with [/=*>|].
+    "}}}
 endfu
 
 fu! s:is_big_directory(dir) abort "{{{1
