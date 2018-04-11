@@ -97,6 +97,40 @@ fu! s:getfile() abort "{{{1
     "}}}
 endfu
 
+fu! s:get_ignore_pat() abort "{{{1
+    " Purpose:
+    " Build a FILE pattern to pass to `$ tree`, so that it ignores certain entries.
+    " We use 'wig' to decide what to ignore.
+
+    " 'wig' can contain patterns matching directories.
+    " But  `$ tree`  compares the  patterns we  pass to  `-I` to  the LAST  path
+    " component of the entries (files/directories).
+    " So, you can't do this:
+    "
+    "         $ tree -I '*/__pycache__/*' ~/.vim/pythonx/
+    "
+    " Instead, you must do this:
+    "
+    "         $ tree -I '__pycache__' ~/.vim/pythonx/
+
+    "                   ┌ to match `*.bak` in `&wig`
+    "                   │
+    "                   │              ┌ to match `*/pycache/*`
+    "                   │              │
+    "          ┌────────┤        ┌─────┤
+    let pat = '\*\.[^/]\+\|\*/\zs[^*/]\+\ze/\*'
+    let ignore_pat = map(split(&wig, ','), {i,v -> matchstr(v, pat)})
+    " We may get empty matches, or sth like `*.*` because of (in vimrc):
+    "
+    "         let &wig .= ','.&undodir.'/*.*'
+    "
+    " We must eliminate those.
+    call filter(ignore_pat, {i,v -> !empty(v) && v !~# '^[.*/]\+$'})
+    let ignore_pat = join(ignore_pat, '|')
+
+    return printf('-I "%s"', ignore_pat)
+endfu
+
 fu! s:is_big_directory(dir) abort "{{{1
     return a:dir is# '/'
     \ ||   a:dir is# '/home'
@@ -152,7 +186,9 @@ fu! unix#tree#populate(dir) abort "{{{1
     "                     │           │
     "                     │           └ don't print the file and directory report at the end
     "                     └ print directories before files
-    let ignore_pat = printf('-I "%s"', '.git|'.substitute(&wig, ',', '|', 'g'))
+
+    let ignore_pat = s:get_ignore_pat()
+
     let limit = '-L '.(s:is_big_directory(dir) ? 2 : 10).' --filelimit 300'
     "             │                                          │
     "             │                                          └ do not descend directories
