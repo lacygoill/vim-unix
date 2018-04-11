@@ -30,14 +30,9 @@ let s:hide_dot_entries = 0
 "                          └ this should be colored as a link
 "}}}
 
-" TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
-
 " TODO: Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
 
-" TODO: The name  of the  current directory  in the  statusline is  `tree_viewer`{{{
-" when we're in root folder, and the window is non-focused.
-" It should be `/`.
-"}}}
+" TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
 
 " TODO: Sort hidden directories after non-hidden ones.
 
