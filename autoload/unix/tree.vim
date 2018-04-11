@@ -41,6 +41,12 @@ let s:hide_dot_entries = 0
 " we're in root folder, and the window is non-focused.
 " It should be `/`.
 
+" TODO:
+" Sort hidden directories after non-hidden ones.
+
+" TODO:
+" Correctly position the cursor when we hide dot entries.
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
@@ -83,6 +89,9 @@ fu! s:getfile() abort "{{{1
     return line =~# '\s->\s'
     \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
     \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
+    " Do NOT add the `$` anchor !                   ^
+    " TODO:
+    " Explain why.
 endfu
 
 fu! s:is_big_directory(dir) abort "{{{1
@@ -132,11 +141,10 @@ fu! unix#tree#populate(dir) abort "{{{1
         return ''
     endif
 
-    "                     ┌ sort the output by last status change
-    "                     │┌ print the full path for each entry (necessary for `gf` &friends)
-    "                     ││┌ append a `/' for directories, a `*' for executable file, ...
-    "                     │││
-    let short_options = '-cfF'.(s:hide_dot_entries ? '' : ' -a')
+    "                     ┌ print the full path for each entry (necessary for `gf` &friends)
+    "                     │┌ append a `/' for directories, a `*' for executable file, ...
+    "                     ││
+    let short_options = '-fF'.(s:hide_dot_entries ? '' : ' -a')
     let long_options = '--dirsfirst --noreport'
     "                     │           │
     "                     │           └ don't print the file and directory report at the end
