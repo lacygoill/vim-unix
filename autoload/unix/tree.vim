@@ -117,8 +117,9 @@ fu! s:get_ignore_pat() abort "{{{1
     "                   │
     "                   │              ┌ to match `*/pycache/*`
     "                   │              │
-    "          ┌────────┤        ┌─────┤
-    let pat = '\*\.[^/]\+\|\*/\zs[^*/]\+\ze/\*'
+    "                   │              │                ┌ to match `tags`
+    "          ┌────────┤        ┌─────┤        ┌───────┤
+    let pat = '\*\.[^/]\+\|\*/\zs[^*/]\+\ze/\*\|^[^*/]\+$'
     let ignore_pat = map(split(&wig, ','), {i,v -> matchstr(v, pat)})
     " We may get empty matches, or sth like `*.*` because of (in vimrc):
     "
