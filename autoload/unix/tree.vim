@@ -78,6 +78,26 @@ fu! unix#tree#fdt() abort "{{{1
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
 
+fu! s:format() abort "{{{1
+    " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
+    " working directory.
+    " But the  latter could change after  we change the focus  to another window
+    " (`vim-cwd`).
+    " This could break `C-w f`.
+    "
+    " We need to translate the dot into the current working directory.
+    sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
+    " Why?{{{
+    "
+    " We  may have  created a  symbolic link  whose target  is a  directory, and
+    " during the creation we may have appended a slash at the end.
+    " If that's the case, because of the `-F` option, `$ tree` will add a second
+    " slash.  We'll end up with two  slashes, which will give unexpected results
+    " regarding the syntax highlighting.
+    "}}}
+    sil! keepj keepp %s:/\ze/$::
+endfu
+
 fu! s:get_ignore_pat() abort "{{{1
     " Purpose:
     " Build a FILE pattern to pass to `$ tree`, so that it ignores certain entries.
@@ -170,6 +190,14 @@ fu! unix#tree#open(where) abort "{{{1
     endif
 endfu
 
+fu! s:open(dir) abort "{{{1
+    let tempfile = tempname().'/tree_viewer::'.(a:dir is# '/' ? '' : a:dir)
+    exe 'lefta '.(&columns/3).'vnew '.tempfile
+    " Can be used  by `vim-statusline` to get the directory  viewed in a focused
+    " `tree` window.
+    let b:curdir = a:dir
+endfu
+
 fu! unix#tree#populate(dir) abort "{{{1
     if !executable('tree')
         return 'echoerr '.string('requires the tree shell command; currently not installed')
@@ -183,46 +211,30 @@ fu! unix#tree#populate(dir) abort "{{{1
         return 'echoerr '.string(dir.'/ is not a directory')
     endif
 
-    let tempfile = tempname().'/tree_viewer::'.(dir is# '/' ? '' : dir)
-    exe 'lefta '.(&columns/3).'vnew '.tempfile
-    " Can be used  by `vim-statusline` to get the directory  viewed in a focused
-    " `tree` window.
-    let b:curdir = dir
+    call s:open(dir)
 
     " If we've already visited this directory, no need to re-invoke `$ tree`.
     " Just use the cache.
     if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
-        sil 0put =s:cache[dir].contents
-        $d_
-        " also restore last position if one was saved
-        if has_key(s:cache[dir], 'pos')
-            exe s:cache[dir].pos
-        endif
+        call s:put_cache(dir)
         return ''
     endif
 
     sil exe s:get_tree_cmd(dir)
-
-    " `$  tree` makes  the paths  begin with  an initial  dot to  stand for  the
-    " working directory.
-    " But the  latter could change after  we change the focus  to another window
-    " (`vim-cwd`).
-    " This could break `C-w f`.
-    "
-    " We need to translate the dot into the current working directory.
-    sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
-    " Why?{{{
-    "
-    " We  may have  created a  symbolic link  whose target  is a  directory, and
-    " during the creation we may have appended a slash at the end.
-    " If that's the case, because of the `-F` option, `$ tree` will add a second
-    " slash.  We'll end up with two  slashes, which will give unexpected results
-    " regarding the syntax highlighting.
-    "}}}
-    sil! keepj keepp %s:/\ze/$::
+    call s:format()
 
     " save the contents of the buffer in a cache, for quicker access in the future
     call extend(s:cache, {dir : {'contents': getline(1, '$')}})
+    return ''
+endfu
+
+fu! s:put_cache(dir) abort "{{{1
+    sil 0put =s:cache[a:dir].contents
+    $d_
+    " also restore last position if one was saved
+    if has_key(s:cache[a:dir], 'pos')
+        exe s:cache[a:dir].pos
+    endif
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
