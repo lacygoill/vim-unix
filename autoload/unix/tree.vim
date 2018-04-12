@@ -30,6 +30,24 @@ let s:hide_dot_entries = 0
 "                          └ this should be colored as a link
 "}}}
 
+" TODO: Try to optimize the plugin.{{{
+"
+" For example, `:Tree /proc` is slow the first time:
+"
+"         $ vim --cmd 'prof  start /tmp/script.profile' \
+"               --cmd 'prof! file  */tree.vim' \
+"               -c    ':Tree /proc' \
+"               -cq
+"
+"         :q
+"
+"         $ vim /tmp/script.profile
+"
+" It's because of `unix#tree#fde()` and `sil exe s:get_tree_cmd()`.
+" Maybe  we could  make the  code a  little faster  by using  `put =system(...)`
+" instead of `:.!...                                                           `
+"}}}
+
 " TODO: Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
 
 " TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
