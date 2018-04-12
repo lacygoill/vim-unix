@@ -36,6 +36,9 @@ let s:hide_dot_entries = 0
 
 " TODO: Sort hidden directories after non-hidden ones.
 
+" TODO: Maybe add some  indicator to let us know when  a directory's contents is
+" not fully listed (-L 2, because too big).
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
@@ -104,12 +107,13 @@ fu! s:get_ignore_pat() abort "{{{1
     "         $ tree -I '__pycache__' ~/.vim/pythonx/
 
     "                   ┌ to match `*.bak` in `&wig`
+    "                   │ (no dot in the pattern to also match `*~`)
     "                   │
-    "                   │              ┌ to match `*/pycache/*`
-    "                   │              │
-    "                   │              │                ┌ to match `tags`
-    "          ┌────────┤        ┌─────┤        ┌───────┤
-    let pat = '\*\.[^/]\+\|\*/\zs[^*/]\+\ze/\*\|^[^*/]\+$'
+    "                   │            ┌ to match `*/pycache/*`
+    "                   │            │
+    "                   │            │                ┌ to match `tags`
+    "          ┌────────┤      ┌─────┤        ┌───────┤
+    let pat = '\*[^/]\+\|\*/\zs[^*/]\+\ze/\*\|^[^*/]\+$'
     let ignore_pat = map(split(&wig, ','), {i,v -> matchstr(v, pat)})
     " We may get empty matches, or sth like `*.*` because of (in vimrc):
     "
@@ -181,7 +185,7 @@ endfu
 
 fu! s:open(dir) abort "{{{1
     let tempfile = tempname().'/tree_viewer::'.(a:dir is# '/' ? '' : a:dir)
-    exe 'lefta '.(&columns/3).'vnew '.tempfile
+    exe 'lefta '.get(s:, 'cur_width', &columns/3).'vnew '.tempfile
     " Can be used  by `vim-statusline` to get the directory  viewed in a focused
     " `tree` window.
     let b:curdir = a:dir
@@ -248,8 +252,11 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
     endif
 
+    " don't reset the width of the window, if we've manually changed it
+    let s:cur_width = winwidth(0)
     call unix#tree#close()
     exe 'Tree '.new_dir
+    unlet s:cur_width
 
     " If we go up the tree, position the cursor on the directory we come from.
     if exists('curdir')
