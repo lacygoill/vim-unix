@@ -8,11 +8,14 @@ let s:hide_dot_entries = 0
 
 " TODO: :Tree /proc{{{
 "
-"                           ┌ everything is colored as a directory
-"         ┌─────────────────┤
+"              ┌ it's currently concealed
+"              │
+"              │            ┌ everything is colored as a directory
+"         ┌────┤┌───────────┤
 "     ├── /proc/self -> 2827/
-"         └───────────┤ └───┤
+"               └─────┤ └───┤
 "                     │     └ this should be colored as a directory
+"                     │
 "                     └ this should be colored as a link
 "
 " Also:
