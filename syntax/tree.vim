@@ -13,7 +13,6 @@ syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{
 "                         │         my_script*
 "                         │         ^^^^^^^^^^
 "                         │
-"                         │
 "                         │         ┌ full path to executable in a symlink:
 "                         │         │
 "                         │         │         /bin/mt -> /etc/alternatives/mt*
@@ -21,11 +20,11 @@ syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{
 "                         ├──────┐  ├───────────────────┐
 syn match treeExecutable '[^/]*\*$\|\%(\s->\s\)\@<=/.*\*$'
 syn match treeLink '[^/]*\s->\s'
-"                   └───┤
-"                       └ last path component of a symlink:
+"                   ├───┘
+"                   └ last path component of a symlink:
 "
-"                                 /proc/11201/exe -> /usr/lib/firefox/firefox*
-"                                             ^^^^^^^
+"                             /proc/11201/exe -> /usr/lib/firefox/firefox*
+"                                         ^^^^^^^
 
 " Colors {{{1
 
