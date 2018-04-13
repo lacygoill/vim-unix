@@ -5,7 +5,7 @@ let g:autoloaded_unix#tree = 1
 
 let s:cache = {}
 let s:hide_dot_entries = 0
-let s:indicator = '[/=*>|]'
+let s:INDICATOR = '[/=*>|]'
 
 " TODO: :Tree /proc{{{
 "
@@ -186,7 +186,7 @@ fu! s:getfile() abort "{{{1
 
     return line =~# '\s->\s'
     \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
-    \ :        matchstr(line, '.*─\s\zs.*'.s:indicator.'\@<!')
+    \ :        matchstr(line, '.*─\s\zs.*'.s:INDICATOR.'\@<!')
     " Do NOT add the `$` anchor !                           ^{{{
     "
     " You don't want match until the end of the line.
