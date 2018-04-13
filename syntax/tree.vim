@@ -4,8 +4,7 @@ let b:current_syntax = 'tree'
 
 syn match  treeOnlyLastComponent '─\s\zs.*/\ze.*\%(\s->\s\|\%(\s->\s.*\)\@<!$\)' conceal
 
-syn region treeDirectory matchgroup=Directory start='─\s\zs.*/\ze.\{-1,}' end='\ze/$' oneline concealends
-syn match  treeDirectoryEndingSlash '/$'
+syn region treeDirectory matchgroup=Directory start='─\s\zs.*/\ze.\{-1,}' end='/$' oneline concealends
 syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{-}/' end='\ze\s\[.\{-}\]$' concealends oneline
 
 "                         ┌ simple executable:
@@ -13,12 +12,13 @@ syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{
 "                         │         my_script*
 "                         │         ^^^^^^^^^^
 "                         │
-"                         │         ┌ full path to executable in a symlink:
-"                         │         │
-"                         │         │         /bin/mt -> /etc/alternatives/mt*
-"                         │         │                    ^^^^^^^^^^^^^^^^^^^^^
-"                         ├──────┐  ├───────────────────┐
-syn match treeExecutable '[^/]*\*$\|\%(\s->\s\)\@<=/.*\*$'
+"                         │            ┌ full path to executable in a symlink:
+"                         │            │
+"                         │            │         /bin/mt -> /etc/alternatives/mt*
+"                         │            │                    ^^^^^^^^^^^^^^^^^^^^^
+"                         ├─────────┐  ├──────────────────────┐
+syn match treeExecutable '[^/]*\ze\*$\|\%(\s->\s\)\@<=/.*\ze\*$'
+syn match treeConcealStar '\*$' conceal
 syn match treeLink '[^/]*\s->\s'
 "                   ├───┘
 "                   └ last path component of a symlink:
