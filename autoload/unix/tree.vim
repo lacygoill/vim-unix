@@ -5,6 +5,7 @@ let g:autoloaded_unix#tree = 1
 
 let s:cache = {}
 let s:hide_dot_entries = 0
+let s:indicator = '[/=*>|]'
 
 " TODO: :Tree /proc{{{
 "
@@ -13,10 +14,12 @@ let s:hide_dot_entries = 0
 "              │            ┌ everything is colored as a directory
 "         ┌────┤┌───────────┤
 "     ├── /proc/self -> 2827/
-"               └─────┤ └───┤
-"                     │     └ this should be colored as a directory
-"                     │
-"                     └ this should be colored as a link
+"         └────┤└─────┤ └───┤
+"              │      │     └ this should be colored as a directory
+"              │      │
+"              │      └ this should be colored as a link
+"              │
+"              └ this should be concealed
 "
 " Also:
 "     :Tree ~
@@ -24,13 +27,16 @@ let s:hide_dot_entries = 0
 " Look at the `.zsh/` directory:
 "
 "                                        ┌ is currently concealed
-"         ┌──────────────────────────────┤
-"         │                              │   ┌ is currently colored as a directory
-"         │                              │┌──┤
+"                                        │
+"                                        │   ┌ is currently colored as a directory
+"         ┌──────────────────────────────┤┌──┤
 "     ├── /home/jean/.zsh -> Dropbox/conf/zsh/
-"         └────────────────┤ └───────────────┤
-"                          │                 └ this should be colored as a directory
-"                          └ this should be colored as a link
+"         └─────────┤└─────┤ └───────────────┤
+"                   │      │                 └ this should be colored as a directory
+"                   │      │
+"                   │      └ this should be colored as a link
+"                   │
+"                   └ this should be concealed
 "}}}
 
 " TODO: Try to optimize the plugin.{{{
@@ -99,6 +105,7 @@ fu! s:format() abort "{{{1
     " This could break `C-w f`.
     "
     " We need to translate the dot into the current working directory.
+    let cwd = getcwd()
     sil! keepj keepp %s:─\s\zs\.\ze/:\=cwd:
     " Why?{{{
     "
@@ -179,8 +186,8 @@ fu! s:getfile() abort "{{{1
 
     return line =~# '\s->\s'
     \ ?        matchstr(line, '.*─\s\zs.*\ze\s->\s')
-    \ :        matchstr(line, '.*─\s\zs.*[/=*>|]\@<!')
-    " Do NOT add the `$` anchor !                   ^{{{
+    \ :        matchstr(line, '.*─\s\zs.*'.s:indicator.'\@<!')
+    " Do NOT add the `$` anchor !                           ^{{{
     "
     " You don't want match until the end of the line.
     " You want to match  a maximum of text, so maybe until the  end of the line,
@@ -217,20 +224,25 @@ fu! unix#tree#populate(dir) abort "{{{1
         return 'echoerr '.string('requires the tree shell command; currently not installed')
     endif
 
-    let cwd = getcwd()
-    let dir = !empty(a:dir) ? expand(a:dir) : cwd
-    let dir = substitute(dir, '.\{-1,}\zs/\+$', '', '')
+    " save current file name to position the cursor on it
+    if a:dir is# ''
+        let current_file_pat = '\C\V─\s'.expand('%:p').'\m\%('.s:indicator.'\|\s->\s\|$\)'
+    endif
 
+    let dir = !empty(a:dir) ? expand(a:dir) : expand('%:p:h')
+    let dir = substitute(dir, '.\{-1,}\zs/\+$', '', '')
     if !isdirectory(dir)
         return 'echoerr '.string(dir.'/ is not a directory')
     endif
-
     call s:open(dir)
 
     " If we've already visited this directory, no need to re-invoke `$ tree`.
     " Just use the cache.
     if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
         call s:put_cache(dir)
+        if exists('current_file_pat')
+            call search(current_file_pat)
+        endif
         return ''
     endif
 
@@ -239,6 +251,12 @@ fu! unix#tree#populate(dir) abort "{{{1
 
     " save the contents of the buffer in a cache, for quicker access in the future
     call extend(s:cache, {dir : {'contents': getline(1, '$')}})
+
+    " position cursor on current file
+    if exists('current_file_pat')
+        call search(current_file_pat)
+    endif
+
     return ''
 endfu
 
@@ -281,7 +299,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
 
     " If we go up the tree, position the cursor on the directory we come from.
     if exists('curdir')
-        call search('\C\V─\s'.curdir.'/\$')
+        call search('\C\V─\s'.curdir.'\m\%(\s->\s\|/$\)')
     endif
 endfu
 
