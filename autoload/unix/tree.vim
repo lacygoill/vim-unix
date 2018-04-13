@@ -226,7 +226,7 @@ fu! unix#tree#populate(dir) abort "{{{1
 
     " save current file name to position the cursor on it
     if a:dir is# ''
-        let current_file_pat = '\C\V─\s'.expand('%:p').'\m\%('.s:indicator.'\|\s->\s\|$\)'
+        let current_file_pat = '\C\V─\s'.expand('%:p').'\m\%('.s:INDICATOR.'\|\s->\s\|$\)'
     endif
 
     let dir = !empty(a:dir) ? expand(a:dir) : expand('%:p:h')
