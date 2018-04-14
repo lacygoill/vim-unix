@@ -2,10 +2,10 @@ let b:current_syntax = 'tree'
 
 " Syntax {{{1
 
-syn match  treeOnlyLastComponent '─\s\zs.*/\ze.*\%(\s->\s\|\%(\s->\s.*\)\@<!$\)' conceal
+syn match  treeOnlyLastComponent '─\s\zs.*/' conceal
 
-syn region treeDirectory matchgroup=Directory start='─\s\zs.*/\ze.\{-1,}' end='/$' oneline concealends
-syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{-}/' end='\ze\s\[.\{-}\]$' concealends oneline
+syn region treeDirectory matchgroup=Directory start='─\s\zs.*/\ze.\+' end='/$' oneline concealends contains=treeLink
+syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.*/' end='\ze\s\[.\{-}\]$' concealends oneline
 
 "                         ┌ simple executable:
 "                         │
@@ -19,7 +19,7 @@ syn region treeDirectoryNotOpened matchgroup=WarningMsg start='─\s\zs.*/\ze.\{
 "                         ├─────────┐  ├──────────────────────┐
 syn match treeExecutable '[^/]*\ze\*$\|\%(\s->\s\)\@<=/.*\ze\*$'
 syn match treeConcealStar '\*$' conceal
-syn match treeLink '[^/]*\s->\s'
+syn match treeLink '[^/]*\s->\s' contained
 "                   ├───┘
 "                   └ last path component of a symlink:
 "

@@ -91,7 +91,7 @@ fu! unix#tree#fdl() abort "{{{1
 endfu
 
 fu! unix#tree#fdt() abort "{{{1
-    let pat = '\(.*─\s\)\(.*\)'
+    let pat = '\(.*─\s\)\(.*\)/'
     let l:Rep = {-> submatch(1).substitute(submatch(2), '.*/\ze.', '', '')}
     return (get(b:, 'foldtitle_full', 0) ? '['.(v:foldend - v:foldstart).']': '')
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
@@ -286,7 +286,11 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
         let new_dir = s:getfile()
         if !isdirectory(new_dir)
-            exe 'e '.new_dir
+            let id = win_getid()
+            wincmd p
+            exe 'sp '.new_dir
+            norm! zv
+            call win_gotoid(id)
             return
         endif
     endif
