@@ -13,9 +13,6 @@ let s:INDICATOR = '[/=*>|]'
 
 " TODO: Sort hidden directories after non-hidden ones.
 
-" TODO: Maybe add some  indicator to let us know when  a directory's contents is
-" not fully listed (-L 2, because too big).
-
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
