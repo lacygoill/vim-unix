@@ -2,8 +2,7 @@ let b:current_syntax = 'tree'
 
 " Syntax {{{1
 
-syn  match  treeOnlyLastComponent     '─\s\zs.*/\%(.\{-}[^/]\)\@='          conceal
-syn  match  treeOnlyLastComponentFoo  '─\s\zs.*/\ze.\{-}/\%(\s\[.\{-}\]\)\@='  conceal
+syn  match  treeOnlyLastComponent  '─\s\zs.*/\%(.\{-}[^/]\)\@='  conceal
 
 syn  match  treeDirectory   '\%(─\s.*/\)\@<=[^/]*/$'
 syn  match  treeExecutable  '[^/]*\*$'
