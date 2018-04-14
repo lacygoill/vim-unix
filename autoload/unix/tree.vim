@@ -204,19 +204,26 @@ fu! unix#tree#populate(dir) abort "{{{1
     " If we've already visited this directory, no need to re-invoke `$ tree`.
     " Just use the cache.
     if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
-        call s:put_cache(dir)
-        if exists('current_file_pat')
-            call search(current_file_pat)
-        endif
-        return ''
+        return s:use_cache(dir)
     endif
 
-    sil 0put =system(s:get_tree_cmd(dir))
+    let cmd = s:get_tree_cmd(dir)
+    sil 0put =system(cmd)
     $d_
     call s:format()
 
-    " save the contents of the buffer in a cache, for quicker access in the future
-    call extend(s:cache, {dir : {'contents': getline(1, '$')}})
+    if stridx(cmd, '-L 2 --filelimit 300') == -1
+        " save the contents of the buffer in a cache, for quicker access in the future
+        call extend(s:cache, {dir : {'contents': getline(1, '$'), 'big': 0}})
+    else
+        call matchadd('WarningMsg', '\%1l.*')
+        call extend(s:cache, {dir : {'contents': getline(1, '$'), 'big': 1}})
+        "                                                                ^
+        " When an entry of the cache contains a non-zero 'big' key, it means the
+        " directory is too big for all of its contents to be displayed.
+        " We use this info  to highlight the path of a too  big directory on the
+        " first line.
+    endif
 
     " position cursor on current file
     if exists('current_file_pat')
@@ -296,6 +303,19 @@ fu! unix#tree#reload() abort "{{{1
     let pat = '\C\V\^'.escape(line, '\').'\$'
     let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
     call search(pat)
+endfu
+
+fu! s:use_cache(dir) abort "{{{1
+    call s:put_cache(a:dir)
+    if exists('current_file_pat')
+        call search(current_file_pat)
+    endif
+    " if the  directory is big, and  not all its contents  can be displayed,
+    " highlight its path on the first line as an indicator
+    if s:cache[a:dir].big
+        call matchadd('WarningMsg', '\%1l.*')
+    endif
+    return ''
 endfu
 
 fu! unix#tree#toggle_dot_entries() abort "{{{1
