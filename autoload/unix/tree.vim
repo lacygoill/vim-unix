@@ -7,24 +7,6 @@ let s:cache = {}
 let s:hide_dot_entries = 0
 let s:INDICATOR = '[/=*>|]'
 
-" TODO: Try to optimize the plugin.{{{
-"
-" For example, `:Tree /proc` is slow the first time:
-"
-"         $ vim --cmd 'prof  start /tmp/script.profile' \
-"               --cmd 'prof! file  */tree.vim' \
-"               -c    ':Tree /proc' \
-"               -cq
-"
-"         :q
-"
-"         $ vim /tmp/script.profile
-"
-" It's because of `unix#tree#fde()` and `sil exe s:get_tree_cmd()`.
-" Maybe  we could  make the  code a  little faster  by using  `put =system(...)`
-" instead of `:.!...                                                           `
-"}}}
-
 " TODO: Implement `yy`, `dd`, `tp`, to copy, cut, delete (trash-put) a file.
 
 " TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
@@ -48,6 +30,22 @@ endfu
 fu! unix#tree#fde() abort "{{{1
     let idx = matchend(split(getline(v:lnum), '\zs'), '[├└]')
     let lvl = idx/4
+    "}}}
+    " Warning:{{{
+    " This function is by far the slowest when we execute `:Tree`.
+    " And this instruction is by far the slowest in this function.
+    "
+    " For example, `:Tree /proc` is slow the first time:
+    "
+    "         $ vim --cmd 'prof  start /tmp/script.profile' \
+    "               --cmd 'prof! file  */tree.vim' \
+    "               -c    ':Tree /proc' \
+    "               -cq
+    "
+    "         :q
+    "
+    "         $ vim /tmp/script.profile
+    "}}}
     if matchstr(getline(v:lnum + 1), '\%'.(idx+5).'v.') =~# '[├└]'
         return '>'.(lvl + 1)
     endif
@@ -141,7 +139,7 @@ fu! s:get_tree_cmd(dir) abort "{{{1
     "             │
     "             └ don't display directories whose depth is greater than 2 or 10
 
-    return '.!tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(a:dir,1)
+    return 'tree '.short_options.' '.long_options.' '.limit.' '.ignore_pat.' '.shellescape(a:dir,1)
 endfu
 
 fu! s:getcurdir() abort "{{{1
@@ -214,7 +212,8 @@ fu! unix#tree#populate(dir) abort "{{{1
         return ''
     endif
 
-    sil exe s:get_tree_cmd(dir)
+    sil 0put =system(s:get_tree_cmd(dir))
+    $d_
     call s:format()
 
     " save the contents of the buffer in a cache, for quicker access in the future
