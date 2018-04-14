@@ -153,7 +153,7 @@ fu! s:getfile() abort "{{{1
     "
     " You don't want match until the end of the line.
     " You want to match  a maximum of text, so maybe until the  end of the line,
-    " but with the condition until that it doesn't finish with [/=*>|].
+    " but with the condition that it doesn't finish with [/=*>|].
     "}}}
 endfu
 
