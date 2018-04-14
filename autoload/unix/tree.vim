@@ -7,38 +7,6 @@ let s:cache = {}
 let s:hide_dot_entries = 0
 let s:INDICATOR = '[/=*>|]'
 
-" TODO: :Tree /proc{{{
-"
-"              ┌ it's currently concealed
-"              │
-"              │            ┌ everything is colored as a directory
-"         ┌────┤┌───────────┤
-"     ├── /proc/self -> 2827/
-"         └────┤└─────┤ └───┤
-"              │      │     └ this should be colored as a directory
-"              │      │
-"              │      └ this should be colored as a link
-"              │
-"              └ this should be concealed
-"
-" Also:
-"     :Tree ~
-"
-" Look at the `.zsh/` directory:
-"
-"                                        ┌ is currently concealed
-"                                        │
-"                                        │   ┌ is currently colored as a directory
-"         ┌──────────────────────────────┤┌──┤
-"     ├── /home/jean/.zsh -> Dropbox/conf/zsh/
-"         └─────────┤└─────┤ └───────────────┤
-"                   │      │                 └ this should be colored as a directory
-"                   │      │
-"                   │      └ this should be colored as a link
-"                   │
-"                   └ this should be concealed
-"}}}
-
 " TODO: Try to optimize the plugin.{{{
 "
 " For example, `:Tree /proc` is slow the first time:
