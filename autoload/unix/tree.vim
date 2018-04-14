@@ -57,7 +57,7 @@ let s:INDICATOR = '[/=*>|]'
 " instead of `:.!...                                                           `
 "}}}
 
-" TODO: Implement `yy`, `dd`, `dD`, to copy, cut, delete (trash-put) a file.
+" TODO: Implement `yy`, `dd`, `tp`, to copy, cut, delete (trash-put) a file.
 
 " TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
 
@@ -92,7 +92,7 @@ endfu
 
 fu! unix#tree#fdt() abort "{{{1
     let pat = '\(.*─\s\)\(.*\)/'
-    let l:Rep = {-> submatch(1).substitute(submatch(2), '.*/\ze.', '', '')}
+    let l:Rep = {-> submatch(1).substitute(submatch(2), '.*/', '', '')}
     return (get(b:, 'foldtitle_full', 0) ? '['.(v:foldend - v:foldstart).']': '')
     \      .substitute(getline(v:foldstart), pat, l:Rep, '')
 endfu
