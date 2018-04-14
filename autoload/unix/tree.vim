@@ -45,7 +45,6 @@ fu! unix#tree#fde() abort "{{{1
     "}}}
     let idx = strchars(matchstr(getline(v:lnum), '.\{-}[├└]'))-1
     let lvl = idx/4
-    "}}}
     if matchstr(getline(v:lnum + 1), '\%'.(idx+5).'v.') =~# '[├└]'
         return '>'.(lvl + 1)
     endif
