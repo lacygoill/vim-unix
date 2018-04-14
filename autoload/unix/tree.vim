@@ -288,8 +288,12 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         if !isdirectory(new_dir)
             let id = win_getid()
             wincmd p
-            exe 'sp '.new_dir
-            norm! zv
+            " If we keep pressing  `l` on a file, we don't  want to keep opening
+            " splits forever.
+            if new_dir isnot# expand('%:p')
+                exe 'sp '.new_dir
+                norm! zv
+            endif
             call win_gotoid(id)
             return
         endif
