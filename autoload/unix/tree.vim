@@ -28,14 +28,11 @@ fu! unix#tree#close() abort "{{{1
 endfu
 
 fu! unix#tree#fde() abort "{{{1
-    let idx = matchend(split(getline(v:lnum), '\zs'), '[├└]')
-    let lvl = idx/4
-    "}}}
     " Warning:{{{
     " This function is by far the slowest when we execute `:Tree`.
-    " And this instruction is by far the slowest in this function.
+    " This is due to the `let idx =` and `if matchstr()` statements.
     "
-    " For example, `:Tree /proc` is slow the first time:
+    " As a result, `:Tree /proc` is slow the first time:
     "
     "         $ vim --cmd 'prof  start /tmp/script.profile' \
     "               --cmd 'prof! file  */tree.vim' \
@@ -45,6 +42,9 @@ fu! unix#tree#fde() abort "{{{1
     "         :q
     "
     "         $ vim /tmp/script.profile
+    "}}}
+    let idx = strchars(matchstr(getline(v:lnum), '.\{-}[├└]'))-1
+    let lvl = idx/4
     "}}}
     if matchstr(getline(v:lnum + 1), '\%'.(idx+5).'v.') =~# '[├└]'
         return '>'.(lvl + 1)
