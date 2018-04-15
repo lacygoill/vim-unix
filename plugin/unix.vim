@@ -76,7 +76,11 @@ augroup END
 " Besides, you shouldn't bring inconsistency:
 " a  default Ex  command doesn't  need `:silent!`  unless it  encounters a  real
 " error. Yours should behave in the same way.
-"}}}
+" }}}
+" FIXME:
+" For this reason, should we refactor all our plugins to remove `return 'echoerr
+" ...`?
+
 com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
 
 com! -bang -bar -nargs=1 -complete=file Cp  exe unix#cp(<q-args>, <bang>0)
