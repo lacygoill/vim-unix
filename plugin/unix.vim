@@ -8,7 +8,8 @@ let g:loaded_unix = 1
 let s:template_dir = $HOME.'/.vim/template/'
 
 " TODO:
-" Integrate `:Cloc`.
+" You shouldn't call `system()`; you should `:echo` it, so that we see the exact
+" error message in case of an issue (useful for example with `:Cp`).
 
 " FIXME:
 " Read this:
@@ -82,6 +83,8 @@ augroup END
 " ...`?
 
 com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
+
+com! -bar -range=% -nargs=? -complete=file  Cloc  call unix#cloc#main(<line1>,<line2>,<q-args>)
 
 com! -bang -bar -nargs=1 -complete=file Cp  exe unix#cp(<q-args>, <bang>0)
 "                                  └ Why not `-complete=file_in_path`? {{{
@@ -188,6 +191,9 @@ com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
 "                             └ don't write in the terminal
 
 " Mappings {{{1
+
+nno  <silent><unique>  g<c-l>  :<c-u>Cloc<cr>
+xno  <silent><unique>  g<c-l>  :Cloc<cr>
 
 nno  <unique><silent>  -t  :<c-u>Tree<cr>
 nno  <unique><silent>  -T  :<c-u>exe 'Tree '.getcwd()<cr>
