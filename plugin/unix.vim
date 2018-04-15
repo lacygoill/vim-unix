@@ -11,10 +11,6 @@ let s:template_dir = $HOME.'/.vim/template/'
 " Integrate `:Cloc`.
 
 " FIXME:
-" For which commands should we give the `-bar` attribute?
-
-
-" FIXME:
 " Read this:
 " https://www.reddit.com/r/vim/comments/5mx8jq/is_there_a_way_to_get_vimeunuchs_rename_command/
 "
@@ -176,16 +172,16 @@ com! -bar Wall  call unix#wall()
 " automatically write the buffer.
 "}}}
 
-"                   ┌ write the buffer on the standard input of a shell command (:h w_c)
-"                   │ and execute the latter
-"                 ┌─┤
-"                 │ │ ┌ raise the right of the `tee` process so that it can write in
-"                 │ │ │ a file owned by any user
-"                 │ │ │
+"                 ┌ write the buffer on the standard input of a shell command (:h w_c)
+"                 │ and execute the latter
+"                 │
+"                 │   ┌ raise the right of the `tee` process so that it can write in
+"                 │   │ a file owned by any user
+"                 ├─┐ │
 com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
-"                             │        │ └ but write in the current file
-"                             └────────┤
-"                                      └ don't write in the terminal
+"                             ├────────┘ └ but write in the current file
+"                             │
+"                             └ don't write in the terminal
 
 " Mappings {{{1
 

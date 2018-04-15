@@ -19,6 +19,31 @@ let s:INDICATOR = '[/=*>|]'
 " TODO: Study `syntax/` and infer some rules from it. Note them somewhere.
 " Also, refactor this file; it has become a little complex.
 " Split it into several files, or into several categories (interface, core, misc).
+" Also, try to make each function fit on one single screen (with folding).
+
+" TODO:
+" Remove the cache after a few minutes to prevent it from taking too much memory.
+" Or better,  find a  way to  measure its size,  and when  it exceeds  a certain
+" amount, only remove some keys (the biggest?, the oldest?).
+"
+" There's no function to get the size of a dictionary.
+" But we could do:
+"
+"         let size = strlen(string(dictionary))
+"
+" And after every display  of a layout, we would update a  key storing the total
+" size of the cache.
+
+" TODO:
+" Add preview mode.
+" `p` should preview the file under the cursor.
+" `cop` should preview any file while our cursor is moving.
+"
+" Also, after pressing `cop`, if our cursor is on a dictionary
+" and its contents is too big to be displayed in the current tree buffer,
+" the preview window should show it nonetheless.
+" It would  be useful to  see what's in there,  without losing the  current tree
+" layout.
 
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()

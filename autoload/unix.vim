@@ -58,8 +58,11 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
     let shellpipe  = &shellpipe
 
     try
+        " TODO:
+        " Make `$ find` ignore files matching 'wig'.
+        " https://stackoverflow.com/a/22558474/9477010
         let &l:grepprg = a:prg
-        "                ┌ the output of `$grep` will just contain file names
+        "                ┌ the output of `$ find` and `$ locate` will just contain file names
         "                │
         setl grepformat=%f
         " The default value of 'sp' ('2>&1| tee') causes the error messages
@@ -76,6 +79,7 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
         sil exe 'grep! '.a:pat
         " │
         " └ bypass prompt “Press ENTER or type command to continue“
+        " FIXME:
         redraw!
 
         " No need to inform  our custom autocmds, responsible for dealing with
