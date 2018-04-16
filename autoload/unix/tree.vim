@@ -49,6 +49,15 @@ let s:INDICATOR = '[/=*>|]'
 " Make the plugin remember the foldlevel  when we leave a directory, and restore
 " it when we revisit the directory later.
 
+" FIXME:
+"     :Tree ~/Dropbox/
+"     L
+"     Z C-l or Z C-h
+"     smash ; and ,
+"
+" It's slow, and consumes 30% of cpu.
+" Profile and optimize syntax highlighting.
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
