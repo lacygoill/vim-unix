@@ -45,6 +45,10 @@ let s:INDICATOR = '[/=*>|]'
 " It would  be useful to  see what's in there,  without losing the  current tree
 " layout.
 
+" TODO:
+" Make the plugin remember the foldlevel  when we leave a directory, and restore
+" it when we revisit the directory later.
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
