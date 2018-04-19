@@ -58,6 +58,18 @@ let s:INDICATOR = '[/=*>|]'
 " It's slow, and consumes 30% of cpu.
 " Profile and optimize syntax highlighting.
 
+" FIXME:
+"     Press `-t`.
+"     C-l
+"     :sp
+"     C-h
+"     Press `R`.
+"
+" The horizontal split at the bottom has been moved.
+" It shouldn't move.
+"
+" Same issue if you move to the parent/child node in the tree.
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
