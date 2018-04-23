@@ -74,7 +74,7 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort
         "}}}
     endif
 
-    let cmd = 'cloc --exclude-dir=.cache,test '.to_scan
+    let cmd = 'cloc --exclude-dir=.cache,t,test '.to_scan
     " remove the header
     let output_cloc = matchstr(system(cmd), '\zs-\+.*')
 
