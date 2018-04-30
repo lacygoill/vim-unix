@@ -70,6 +70,25 @@ let s:INDICATOR = '[/=*>|]'
 "
 " Same issue if you move to the parent/child node in the tree.
 
+" TODO:
+" Do you think the name of the buffer is right?
+"
+" In this plugin:
+"     https://github.com/thinca/vim-editvar/blob/master/plugin/editvar.vim
+"
+" The name of the special buffer is simply:
+"     editvar://{variable_name}
+"
+" If we followed the same scheme, we would use:
+"     tree_viewer:///path/to/file
+"
+" instead of:
+"     /tmp/v.../../tree_viewer::/path/to/file
+"
+" What's the best choice?
+" Why using `tempname()`?
+" `::` vs `://`?
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
