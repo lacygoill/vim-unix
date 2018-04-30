@@ -87,7 +87,7 @@ let s:INDICATOR = '[/=*>|]'
 "
 " What's the best choice?
 " Why using `tempname()`?
-" `::` vs `://`?
+" `::` vs ``?
 
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
