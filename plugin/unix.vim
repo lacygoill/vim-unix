@@ -40,7 +40,7 @@ let s:template_dir = $HOME.'/.vim/template/'
 augroup my_unix
     au!
     au BufNewFile * call s:maybe_read_template()
-                 \| call s:maybe_make_executable()
+                \ | call s:maybe_make_executable()
 augroup END
 
 " Commands {{{1
@@ -247,8 +247,8 @@ fu! s:maybe_make_executable() abort "{{{2
     augroup my_make_executable
         au! BufWritePost <buffer>
         au  BufWritePost <buffer> call s:make_executable()
-                               \| exe 'au! my_make_executable'
-                               \| aug! my_make_executable
+                              \ | exe 'au! my_make_executable'
+                              \ | aug! my_make_executable
     augroup END
 endfu
 

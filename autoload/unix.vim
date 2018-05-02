@@ -260,10 +260,10 @@ fu! s:should_write_buffer(seen) abort "{{{1
     "           (&bt = 'acwrite')
 
     if !&readonly
-  \&&  &modifiable
-  \&&  &bt is# '' || &bt is# 'acwrite'
-  \&&  !empty(expand('%'))
-  \&&  !has_key(a:seen, bufnr('%'))
+  \ && &modifiable
+  \ && &bt is# '' || &bt is# 'acwrite'
+  \ && !empty(expand('%'))
+  \ && !has_key(a:seen, bufnr('%'))
         return 1
     endif
 endfu
@@ -276,9 +276,9 @@ fu! unix#wall() abort "{{{1
         write
     endif
     sil! tabdo windo if s:should_write_buffer(seen)
-                  \|     write
-                  \|     let seen[bufnr('%')] = 1
-                  \| endif
+                 \ |     write
+                 \ |     let seen[bufnr('%')] = 1
+                 \ | endif
     call win_gotoid(cur_winid)
 endfu
 
