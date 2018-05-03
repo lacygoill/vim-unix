@@ -195,8 +195,9 @@ endfu
 fu! s:get_tree_cmd(dir) abort "{{{1
     "                     ┌ print the full path for each entry (necessary for `gf` &friends)
     "                     │┌ append a `/' for directories, a `*' for executable file, ...
-    "                     ││
-    let short_options = '-fF'.(s:hide_dot_entries ? '' : ' -a')
+    "                     ││┌ turn colorization off
+    "                     │││
+    let short_options = '-fFn'.(s:hide_dot_entries ? '' : ' -a')
     let long_options = '--dirsfirst --noreport'
     "                     │           │
     "                     │           └ don't print the file and directory report at the end
