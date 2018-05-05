@@ -303,20 +303,6 @@ fu! unix#tree#populate(dir, nosplit) abort "{{{1
     return ''
 endfu
 
-fu! s:put_cache(dir) abort "{{{1
-    call setline(1, s:cache[a:dir].contents)
-
-    " restore last position if one was saved
-    if has_key(s:cache[a:dir], 'pos')
-        exe s:cache[a:dir].pos
-    endif
-
-    " restore last foldlevel if one was saved
-    if has_key(s:cache[a:dir], 'fdl')
-        let &l:fdl = s:cache[a:dir].fdl
-    endif
-endfu
-
 fu! unix#tree#relative_dir(who) abort "{{{1
     let curdir = s:getcurdir()
 
@@ -383,13 +369,21 @@ fu! s:save_view(curdir) abort "{{{1
 endfu
 
 fu! s:use_cache(dir) abort "{{{1
-    call s:put_cache(a:dir)
-    if exists('current_file_pat')
-        call search(current_file_pat)
+    call setline(1, s:cache[a:dir].contents)
+
+    " restore last position if one was saved
+    if has_key(s:cache[a:dir], 'pos')
+        exe s:cache[a:dir].pos
     endif
+
+    " restore last foldlevel if one was saved
+    if has_key(s:cache[a:dir], 'fdl')
+        let &l:fdl = s:cache[a:dir].fdl
+    endif
+
     " if the  directory is big, and  not all its contents  can be displayed,
     " highlight its path on the first line as an indicator
-    if s:cache[a:dir].big
+    if get(s:cache[a:dir], 'big', 0)
         call matchadd('WarningMsg', '\%1l.*')
     endif
     return ''
