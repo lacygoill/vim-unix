@@ -39,9 +39,9 @@ let s:INDICATOR = '[/=*>|]'
 " `p` should preview the file under the cursor.
 " `cop` should preview any file while our cursor is moving.
 "
-" Also, after pressing `cop`, if our cursor is on a dictionary
-" and its contents is too big to be displayed in the current tree buffer,
-" the preview window should show it nonetheless.
+" Also, after pressing `cop`,  if our cursor is on a  directory and its contents
+" is too  big to  be displayed in  the current tree  buffer, the  preview window
+" should show it nonetheless.
 " It would  be useful to  see what's in there,  without losing the  current tree
 " layout.
 
