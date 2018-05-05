@@ -39,13 +39,11 @@ let s:INDICATOR = '[/=*>|]'
 "
 " Update:
 " Done.
-" However, 2 issues:
 "
-"       • clash with our `C-j` and `C-k` mappings to move across viewports
-"       • what happens if we use a count:  `3 C-j`
-"         what happens in vanilla (without unmapping C-n) dirvish, if we use a count:  `3 C-n`
+" However,  it  clashes  with  our  `C-j` and  `C-k`  mappings  to  move  across
+" viewports.
 "
-" The preview window is too small.
+" Also, the preview window is too small.
 " The issue is not in this plugin; it's probably in `vim-window`.
 " Still, it's an annoying and frequent one. Fix it.
 
