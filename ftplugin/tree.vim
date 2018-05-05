@@ -17,6 +17,8 @@ nno  <buffer><nowait><silent>  gh  :<c-u>call unix#tree#toggle_dot_entries()<cr>
 nno  <buffer><nowait><silent>  h  :<c-u>call unix#tree#relative_dir('parent')<cr>
 nno  <buffer><nowait><silent>  l  :<c-u>call unix#tree#relative_dir('child')<cr>
 
+nno  <buffer><nowait><silent>  p  :<c-u>call unix#tree#preview()<cr>
+
 nno  <buffer><nowait><silent>  q        :<c-u>call unix#tree#close()<cr>
 nno  <buffer><nowait><silent>  R        :<c-u>call unix#tree#reload()<cr>
 nno  <buffer><nowait><silent>  <c-w>f   :<c-u>call unix#tree#open('split')<cr>
@@ -34,6 +36,7 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                        | exe 'nunmap <buffer> K'
 \                        | exe 'nunmap <buffer> h'
 \                        | exe 'nunmap <buffer> l'
+\                        | exe 'nunmap <buffer> p'
 \                        | exe 'nunmap <buffer> q'
 \                        | exe 'nunmap <buffer> R'
 \                        | exe 'nunmap <buffer> <c-w>f'

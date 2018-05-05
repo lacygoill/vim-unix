@@ -36,15 +36,12 @@ let s:INDICATOR = '[/=*>|]'
 
 " TODO:
 " Add preview mode.
-" `p` should preview the file under the cursor.
-" `cop` should preview any file while our cursor is moving.
+" `C-j` and `C-k` should preview the next/previous entry.
 "
-" Also, after pressing `cop`,  if our cursor is on a  directory and its contents
-" is too  big to  be displayed in  the current tree  buffer, the  preview window
-" should show it nonetheless.
-" It would  be useful to  see what's in there,  without losing the  current tree
-" layout.
-
+" Also, the preview window is too small.
+" The issue is not in this plugin; it's probably in `vim-window`.
+" Still, it's an annoying and frequent one. Fix it.
+"
 " FIXME:
 "     :Tree ~/Dropbox/
 "     gg
@@ -301,6 +298,10 @@ fu! unix#tree#populate(dir, nosplit) abort "{{{1
     endif
 
     return ''
+endfu
+
+fu! unix#tree#preview() abort "{{{1
+    exe 'pedit '.s:getfile()
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
