@@ -306,11 +306,16 @@ endfu
 
 fu! s:put_cache(dir) abort "{{{1
     call setline(1, s:cache[a:dir].contents)
-    " also restore last position if one was saved
+
+    " restore last position if one was saved
     if has_key(s:cache[a:dir], 'pos')
         exe s:cache[a:dir].pos
     endif
-    let &l:fdl = get(s:cache[a:dir], 'fdl', &l:fdl)
+
+    " restore last foldlevel if one was saved
+    if has_key(s:cache[a:dir], 'fdl')
+        let &l:fdl = s:cache[a:dir].fdl
+    endif
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
