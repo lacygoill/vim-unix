@@ -42,10 +42,16 @@ let s:INDICATOR = '[/=*>|]'
 "
 " However,  it  clashes  with  our  `C-j` and  `C-k`  mappings  to  move  across
 " viewports.
+" If you  think about  using `J` and  `K`, think twice. We  already use  them to
+" scroll in the preview window.
+" They're used in  buffer-local mappings automatically installed  by some plugin
+" (`vim-window`?).
 "
 " Also, the preview window is too small.
 " The issue is not in this plugin; it's probably in `vim-window`.
 " Still, it's an annoying and frequent one. Fix it.
+"
+" Also, when we close a tree buffer, the preview window should be closed too.
 
 " FIXME:
 "     :Tree ~/Dropbox/
