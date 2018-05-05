@@ -45,10 +45,6 @@ let s:INDICATOR = '[/=*>|]'
 " It would  be useful to  see what's in there,  without losing the  current tree
 " layout.
 
-" TODO:
-" Make the plugin remember the foldlevel  when we leave a directory, and restore
-" it when we revisit the directory later.
-
 " FIXME:
 "     :Tree ~/Dropbox/
 "     L
@@ -92,6 +88,11 @@ let s:INDICATOR = '[/=*>|]'
 " TODO:
 " Color special files (socket, ...).
 
+" TODO:
+" For a plugin, maybe we should also support a diagram using only ascii chars.
+" We would need to use the option `--charset=ascii`, and we would need to tweak
+" some regexes whenever they contain `─` (→  --), `└` (→ `--), `├` (|--).
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
@@ -100,6 +101,7 @@ fu! unix#tree#close() abort "{{{1
     endif
     " save last position in this directory before closing the window
     let s:cache[curdir].pos = line('.')
+    let s:cache[curdir].fdl = &l:fdl
     close
 endfu
 
@@ -317,6 +319,7 @@ fu! s:put_cache(dir) abort "{{{1
     if has_key(s:cache[a:dir], 'pos')
         exe s:cache[a:dir].pos
     endif
+    let &l:fdl = s:cache[a:dir].fdl
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
