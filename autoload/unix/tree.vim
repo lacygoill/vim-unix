@@ -279,8 +279,7 @@ fu! unix#tree#populate(dir, nosplit) abort "{{{1
     endif
 
     let cmd = s:get_tree_cmd(dir)
-    sil 0put =system(cmd)
-    $d_
+    call setline(1, systemlist(cmd))
     call s:format()
 
     if stridx(cmd, '-L 2 --filelimit 300') == -1
