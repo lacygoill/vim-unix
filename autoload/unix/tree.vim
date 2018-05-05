@@ -55,18 +55,6 @@ let s:INDICATOR = '[/=*>|]'
 " It's slow, and consumes 30% of cpu.
 " Profile and optimize syntax highlighting.
 
-" FIXME:
-"     Press `-t`.
-"     C-l
-"     :sp
-"     C-h
-"     Press `R`.
-"
-" The horizontal split at the bottom has been moved.
-" It shouldn't move.
-"
-" Same issue if you move to the parent/child node in the tree.
-
 " TODO:
 " Do you think the name of the buffer is right?
 "
@@ -256,15 +244,19 @@ fu! unix#tree#open(where) abort "{{{1
     endif
 endfu
 
-fu! s:open(dir) abort "{{{1
+fu! s:open(dir, nosplit) abort "{{{1
     let tempfile = tempname().'/tree_viewer::'.(a:dir is# '/' ? '' : a:dir)
-    exe 'lefta '.get(s:, 'cur_width', &columns/3).'vnew '.tempfile
+    if a:nosplit
+        exe 'e '.tempfile
+    else
+        exe 'lefta '.get(s:, 'cur_width', &columns/3).'vnew '.tempfile
+    endif
     " Can be used  by `vim-statusline` to get the directory  viewed in a focused
     " `tree` window.
     let b:curdir = a:dir
 endfu
 
-fu! unix#tree#populate(dir) abort "{{{1
+fu! unix#tree#populate(dir, nosplit) abort "{{{1
     if !executable('tree')
         return 'echoerr '.string('requires the tree shell command; currently not installed')
     endif
@@ -279,7 +271,7 @@ fu! unix#tree#populate(dir) abort "{{{1
     if !isdirectory(dir)
         return 'echoerr '.string(dir.'/ is not a directory')
     endif
-    call s:open(dir)
+    call s:open(dir, a:nosplit)
 
     " If we've already visited this directory, no need to re-invoke `$ tree`.
     " Just use the cache.
@@ -314,13 +306,12 @@ fu! unix#tree#populate(dir) abort "{{{1
 endfu
 
 fu! s:put_cache(dir) abort "{{{1
-    sil 0put =s:cache[a:dir].contents
-    $d_
+    call setline(1, s:cache[a:dir].contents)
     " also restore last position if one was saved
     if has_key(s:cache[a:dir], 'pos')
         exe s:cache[a:dir].pos
     endif
-    let &l:fdl = s:cache[a:dir].fdl
+    let &l:fdl = get(s:cache[a:dir], 'fdl', &l:fdl)
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
@@ -353,11 +344,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
     endif
 
-    " don't reset the width of the window, if we've manually changed it
-    let s:cur_width = winwidth(0)
-    call unix#tree#close()
-    exe 'Tree '.new_dir
-    unlet s:cur_width
+    exe 'Tree! '.new_dir
 
     " If we go up the tree, position the cursor on the directory we come from.
     if exists('curdir')
@@ -377,8 +364,7 @@ fu! unix#tree#reload() abort "{{{1
     let line = getline('.')
 
     " reload
-    close
-    exe 'Tree '.cur_dir
+    exe 'Tree! '.cur_dir
 
     " restore position
     let pat = '\C\V\^'.escape(line, '\').'\$'

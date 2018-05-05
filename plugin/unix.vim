@@ -151,7 +151,7 @@ com! -bar        Tl  exe unix#trash#list()
 "                In practice, I don't think it will, because we'll use `]T` instead.
 "}}}
 
-com! -bar -complete=file -nargs=?  Tree  exe unix#tree#populate(<q-args>)
+com! -bang -bar -complete=file -nargs=?  Tree  exe unix#tree#populate(<q-args>, <bang>0)
 
 com! -bar Wall  call unix#wall()
 
