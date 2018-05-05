@@ -9,6 +9,9 @@ augroup my_tree
     \                     | call unix#tree#fdl()
 augroup END
 
+nno  <buffer><nowait><silent>  <c-j>  j:call unix#tree#preview()<cr>
+nno  <buffer><nowait><silent>  <c-k>  k:call unix#tree#preview()<cr>
+
 nno  <buffer><nowait><silent>  J  :<c-u>call search('.*/$')<cr>
 nno  <buffer><nowait><silent>  K  :<c-u>call search('.*/$', 'b')<cr>
 
@@ -32,6 +35,8 @@ let b:undo_ftplugin =         get(b:, 'undo_ftplugin', '')
 \                     ."
 \                          setl bl< bt< cocu< cole< fde< fdl< fdm< fdt< swf< wrap<
 \                        | exe 'au! my_tree * <buffer>'
+\                        | exe 'nunmap <buffer> <c-j>'
+\                        | exe 'nunmap <buffer> <c-k>'
 \                        | exe 'nunmap <buffer> J'
 \                        | exe 'nunmap <buffer> K'
 \                        | exe 'nunmap <buffer> h'

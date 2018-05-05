@@ -36,12 +36,19 @@ let s:INDICATOR = '[/=*>|]'
 
 " TODO:
 " Add preview mode.
-" `C-j` and `C-k` should preview the next/previous entry.
 "
-" Also, the preview window is too small.
+" Update:
+" Done.
+" However, 2 issues:
+"
+"       • clash with our `C-j` and `C-k` mappings to move across viewports
+"       • what happens if we use a count:  `3 C-j`
+"         what happens in vanilla (without unmapping C-n) dirvish, if we use a count:  `3 C-n`
+"
+" The preview window is too small.
 " The issue is not in this plugin; it's probably in `vim-window`.
 " Still, it's an annoying and frequent one. Fix it.
-"
+
 " FIXME:
 "     :Tree ~/Dropbox/
 "     gg
