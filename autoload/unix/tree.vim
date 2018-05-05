@@ -88,9 +88,8 @@ fu! unix#tree#close() abort "{{{1
         close
         return
     endif
-    " save last position in this directory before closing the window
-    let s:cache[curdir].pos = line('.')
-    let s:cache[curdir].fdl = &l:fdl
+    " save the view in this directory before closing the window
+    call s:save_view(curdir)
     close
 endfu
 
@@ -315,8 +314,9 @@ fu! s:put_cache(dir) abort "{{{1
 endfu
 
 fu! unix#tree#relative_dir(who) abort "{{{1
+    let curdir = s:getcurdir()
+
     if a:who is# 'parent'
-        let curdir = s:getcurdir()
         if curdir is# '/'
             return
         endif
@@ -344,6 +344,7 @@ fu! unix#tree#relative_dir(who) abort "{{{1
         endif
     endif
 
+    call s:save_view(curdir)
     exe 'Tree! '.new_dir
 
     " If we go up the tree, position the cursor on the directory we come from.
@@ -370,6 +371,11 @@ fu! unix#tree#reload() abort "{{{1
     let pat = '\C\V\^'.escape(line, '\').'\$'
     let pat = substitute(pat, '[├└]', '\\m[├└]\\V', 'g')
     call search(pat)
+endfu
+
+fu! s:save_view(curdir) abort "{{{1
+    let s:cache[a:curdir].pos = line('.')
+    let s:cache[a:curdir].fdl = &l:fdl
 endfu
 
 fu! s:use_cache(dir) abort "{{{1
