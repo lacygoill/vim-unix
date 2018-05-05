@@ -89,6 +89,9 @@ let s:INDICATOR = '[/=*>|]'
 " Why using `tempname()`?
 " `::` vs `://`?
 
+" TODO:
+" Color special files (socket, ...).
+
 fu! unix#tree#close() abort "{{{1
     let curdir = s:getcurdir()
     if !has_key(s:cache, curdir)
