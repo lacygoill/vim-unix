@@ -47,7 +47,8 @@ let s:INDICATOR = '[/=*>|]'
 
 " FIXME:
 "     :Tree ~/Dropbox/
-"     L
+"     gg
+"     C-l
 "     Z C-l or Z C-h
 "     smash ; and ,
 "
