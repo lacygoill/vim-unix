@@ -6,13 +6,9 @@ let g:autoloaded_unix#tree = 1
 let s:cache = {}
 let s:hide_dot_entries = 0
 let s:INDICATOR = '[/=*>|]'
+let s:BIG_DIR_PAT = '\%1l.*'
 
 " TODO: Move all the code implementing `:Tree` in `vim-mirvish`.
-
-" FIXME: From this  file, press `-t`, then  keep pressing `h` until  you reach a
-" big directory, whose name is highlighted with `WarningMsg`.
-" Now get  back by pressing  `l`: the names  of the directories  are highlighted
-" with `WarningMsg`. They should not.
 
 " TODO: Implement `yy`, `dd`, `tp`, to copy, cut, delete (trash-put) a file.
 
@@ -233,6 +229,14 @@ fu! s:is_big_directory(dir) abort "{{{1
     \ ||   systemlist('find '.a:dir.' -type f 2>/dev/null | wc -l')[0] > 10000
 endfu
 
+fu! s:matchdelete() abort "{{{1
+    let id = get(get(filter(getmatches(),
+    \            {i,v -> v.pattern is# s:BIG_DIR_PAT}), 0, []), 'id', 0)
+    if id
+        call matchdelete(id)
+    endif
+endfu
+
 fu! unix#tree#open(where) abort "{{{1
     let file = s:getfile()
     if a:where is# 'split'
@@ -271,6 +275,9 @@ fu! unix#tree#populate(dir, nosplit) abort "{{{1
     endif
     call s:open(dir, a:nosplit)
 
+    " if there's an old match, delete it
+    call s:matchdelete()
+
     " If we've already visited this directory, no need to re-invoke `$ tree`.
     " Just use the cache.
     if has_key(s:cache, dir) && has_key(s:cache[dir], 'contents')
@@ -285,7 +292,7 @@ fu! unix#tree#populate(dir, nosplit) abort "{{{1
         " save the contents of the buffer in a cache, for quicker access in the future
         call extend(s:cache, {dir : {'contents': getline(1, '$'), 'big': 0}})
     else
-        call matchadd('WarningMsg', '\%1l.*')
+        call matchadd('WarningMsg', s:BIG_DIR_PAT)
         call extend(s:cache, {dir : {'contents': getline(1, '$'), 'big': 1}})
         "                                                                ^
         " When an entry of the cache contains a non-zero 'big' key, it means the
@@ -387,7 +394,7 @@ fu! s:use_cache(dir) abort "{{{1
     " if the  directory is big, and  not all its contents  can be displayed,
     " highlight its path on the first line as an indicator
     if get(s:cache[a:dir], 'big', 0)
-        call matchadd('WarningMsg', '\%1l.*')
+        call matchadd('WarningMsg', s:BIG_DIR_PAT)
     endif
     return ''
 endfu
