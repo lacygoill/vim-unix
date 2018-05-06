@@ -35,20 +35,7 @@ let s:INDICATOR = '[/=*>|]'
 " size of the cache.
 
 " TODO:
-" Add preview mode.
-"
-" Update:
-" Done.
-"
-" However,  it  clashes  with  our  `C-j` and  `C-k`  mappings  to  move  across
-" viewports.
-" If you  think about  using `J` and  `K`, think twice. We  already use  them to
-" scroll in the preview window.
-" They're used in  buffer-local mappings automatically installed  by some plugin
-" (`vim-window`?).
-" Maybe we should install a submode. If you do, do the same for `vim-plug` buffer.
-"
-" Also, when we close a tree buffer, the preview window should be closed too.
+" When we close a tree buffer, the preview window should be closed too.
 
 " FIXME:
 "     :Tree ~/Dropbox/
