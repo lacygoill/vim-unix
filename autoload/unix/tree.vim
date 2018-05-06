@@ -50,6 +50,14 @@ let s:INDICATOR = '[/=*>|]'
 " Also, the preview window is too small.
 " The issue is not in this plugin; it's probably in `vim-window`.
 " Still, it's an annoying and frequent one. Fix it.
+" Update:
+" The issue comes from the fact that when we come back to the original window,
+" it's maximized vertically, hence the preview window becomes 1 line high.
+" We have some code to restore the height of special windows, but for some reason
+" it doesn't work.
+" See the function `s:ignore_this_window()`.
+" It makes the code ignore the restoration of the height of the preview window.
+" It shouldn't.
 "
 " Also, when we close a tree buffer, the preview window should be closed too.
 
