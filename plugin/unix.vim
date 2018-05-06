@@ -151,8 +151,6 @@ com! -bar        Tl  exe unix#trash#list()
 "                In practice, I don't think it will, because we'll use `]T` instead.
 "}}}
 
-com! -bang -bar -complete=file -nargs=?  Tree  exe unix#tree#populate(<q-args>, <bang>0)
-
 com! -bar Wall  call unix#wall()
 
 " What's the purpose of `:W`?{{{
@@ -194,9 +192,6 @@ com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
 
 nno  <silent><unique>  g<c-l>  :<c-u>Cloc<cr>
 xno  <silent><unique>  g<c-l>  :Cloc<cr>
-
-nno  <unique><silent>  -t  :<c-u>Tree<cr>
-nno  <unique><silent>  -T  :<c-u>exe 'Tree '.getcwd()<cr>
 
 " Functions {{{1
 fu! s:make_executable() abort "{{{2
