@@ -7,6 +7,13 @@ let s:cache = {}
 let s:hide_dot_entries = 0
 let s:INDICATOR = '[/=*>|]'
 
+" TODO: Move all the code implementing `:Tree` in `vim-mirvish`.
+
+" FIXME: From this  file, press `-t`, then  keep pressing `h` until  you reach a
+" big directory, whose name is highlighted with `WarningMsg`.
+" Now get  back by pressing  `l`: the names  of the directories  are highlighted
+" with `WarningMsg`. They should not.
+
 " TODO: Implement `yy`, `dd`, `tp`, to copy, cut, delete (trash-put) a file.
 
 " TODO: How to make the buffer survive a `:e`, like a dirvish buffer?
