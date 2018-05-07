@@ -85,7 +85,7 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
         " No need to inform  our custom autocmds, responsible for dealing with
         " qf windows (opening, layout, …), that we have just populated a qfl:
         "
-        "         doautocmd <nomodeline> QuickFixCmdPost grep
+        "         doautocmd <nomodeline> QuickFixCmdPost cwindow
         "
         " … because `:vimgrep` has already triggered `QuickFixCmdPost`.
 
