@@ -252,27 +252,32 @@ fu! s:maybe_read_template() abort "{{{2
     "         /etc/init.d/skeleton
 
     " Get all the filetypes for which we have a template.
-    let filetypes = glob(s:template_dir.'*', 0, 1)
-    call filter(filetypes, {i,v -> v !~# 'compiler.vim'})
+    let filetypes = glob(s:template_dir.'by_filetype/*', 0, 1)
+    call filter(filetypes, {i,v -> v !~# 'compiler.txt'})
     call map(filetypes, {i,v -> fnamemodify(v, ':t:r')})
 
-    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.&ft.'.vim')
+    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.'by_filetype/'.&ft.'.txt')
         "    ┌ don't use the template file as the alternate file for the current
         "    │ window; keep the current one
         "    │
         "    │ Note that, `:keepalt`  is not useful when you read  the output of
         "    │ an external command (:r !cmd)
         "    │
-        exe 'keepalt read '.fnameescape(s:template_dir.&ft.'.vim')
+        exe 'keepalt read '.fnameescape(s:template_dir.'by_filetype/'.&ft.'.txt')
         1d_
 
-    elseif expand('%:p') =~# '.*/compiler/[^/]*.vim'
-    \   && filereadable(s:template_dir.'compiler.vim')
-        exe 'keepalt read '.s:template_dir.'compiler.vim'
+    elseif expand('%:p') =~# '.*/compiler/[^/]*\.vim'
+    \   && filereadable(s:template_dir.'by_name/compiler.txt')
+        exe 'keepalt read '.s:template_dir.'by_name/compiler.txt'
         " If  our  compiler  is  in  `~/.vim/compiler`,  we  want  to  skip  the
         " default  compilers in  `$VIMRUNTIME/compiler`. In this  case, we  need
         " 'current_compiler' to be set.
         0put ='let current_compiler = '.string(expand('%:p:t:r'))
+
+    elseif expand('%:p') =~# '.*/filetype\.vim'
+    \   && filereadable(s:template_dir.'by_name/compiler.txt')
+        exe 'keepalt read '.s:template_dir.'by_name/filetype.txt'
+        1d_
     endif
 endfu
 
