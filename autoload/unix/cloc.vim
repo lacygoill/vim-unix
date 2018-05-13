@@ -134,9 +134,9 @@ fu! unix#cloc#count_lines_in_func() abort "{{{1
     let lnum1 = search('^\s*fu\%[nction]!\=\>', 'bn') + 1
     let lnum2 = search('^\s*endf\%[unction]\s*$', 'n') - 1
     sil call unix#cloc#main(lnum1,lnum2,'')
-    let blank_cnt = get(get(g:cloc_results, 'vim script'), 'blank', 0)
-    let comment_cnt = get(get(g:cloc_results, 'vim script'), 'comment', 0)
-    let code_cnt = get(get(g:cloc_results, 'vim script'), 'code', 0)
+    let blank_cnt = get(get(g:cloc_results, 'vim script', {}), 'blank', 0)
+    let comment_cnt = get(get(g:cloc_results, 'vim script', {}), 'comment', 0)
+    let code_cnt = get(get(g:cloc_results, 'vim script', {}), 'code', 0)
     echo printf('blank: %s   comment: %s   code: %s', blank_cnt, comment_cnt, code_cnt)
 endfu
 
