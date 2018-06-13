@@ -9,12 +9,10 @@ fu! unix#share#main(lnum1, lnum2) abort
 
     let lines = getline(a:lnum1, a:lnum2)
     let url = get(split(system("curl -F'file=@-' https://0x0.st", lines), '\n'), -1, '')
-    "                                 │ │    ││{{{
-    "                                 │ │    │└ standard input
-    "                                 │ │    │
-    "                                 │ │    └ force the 'content' part to be a file
-    "                                 │ │
-    "                                 │ └ change the name field of the file upload part
+    "                                 │      ││{{{
+    "                                 │      │└ standard input
+    "                                 │      │
+    "                                 │      └ force the 'content' part to be a file
     "                                 │
     "                                 └ Let curl emulate a filled-in form
     "                                   in which a user has pressed the submit button.
