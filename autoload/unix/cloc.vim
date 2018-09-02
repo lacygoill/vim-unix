@@ -36,7 +36,8 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     if !empty(a:path)
         if a:path =~# '^http'
             let tempdir = tempname()
-            let git_output = system('git clone '.a:path.' '.tempdir)
+            let cmd = a:path =~# 'bitbucket' ? 'hg' : 'git'
+            let git_output = system(cmd.' clone '.a:path.' '.tempdir)
             let to_scan = tempdir
         else
             let to_scan = a:path
