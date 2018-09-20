@@ -49,7 +49,7 @@ fu! s:sudo_edit_init() abort "{{{1
         for i in range(argc())
             exe 'autocmd BufEnter '.fnameescape(argv(i))
                         \ 'if empty(&ft) || &ft is "conf"'
-                        \ '|doautocmd <nomodeline> filetypedetect BufReadPost '.fnameescape(files[i])
+                        \ '|doautocmd filetypedetect BufReadPost '.fnameescape(files[i])
                         \ '|endif'
         endfor
     endif
