@@ -132,17 +132,17 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
 endfu
 
 fu! unix#cloc#count_lines_in_func() abort "{{{1
+    let ft = get({'vim': 'vim script', 'sh': 'Bourne Shell',}, &ft, '')
+    if ft is# ''
+        echo 'non supported filetype'
+        return
+    endif
     let view = winsaveview()
     norm [m
     let lnum1 = line('.')+1
     norm ]M
     let lnum2 = line('.')-1
     sil call unix#cloc#main(lnum1,lnum2,'')
-    let ft = get({'vim': 'vim script', 'sh': 'Bourne Shell',}, &ft, '')
-    if ft is# ''
-        echo 'non supported filetype'
-        return
-    endif
     let blank_cnt = get(get(g:cloc_results, ft, {}), 'blank', 0)
     let comment_cnt = get(get(g:cloc_results, ft, {}), 'comment', 0)
     let code_cnt = get(get(g:cloc_results, ft, {}), 'code', 0)
