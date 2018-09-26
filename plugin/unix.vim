@@ -274,11 +274,11 @@ fu! s:maybe_read_template() abort "{{{2
 
     elseif expand('%:p') =~# '.*/compiler/[^/]*\.vim'
     \   && filereadable(s:template_dir.'by_name/compiler.txt')
-        exe 'keepalt read '.s:template_dir.'by_name/compiler.txt'
+        call setline(1, ['let current_compiler = '.string(expand('%:p:t:r')), ''])
+        exe 'keepalt 2read '.s:template_dir.'by_name/compiler.txt'
         " If  our  compiler  is  in  `~/.vim/compiler`,  we  want  to  skip  the
         " default  compilers in  `$VIMRUNTIME/compiler`. In this  case, we  need
         " 'current_compiler' to be set.
-        0put ='let current_compiler = '.string(expand('%:p:t:r'))
 
     elseif expand('%:p') =~# '.*/filetype\.vim'
     \   && filereadable(s:template_dir.'by_name/compiler.txt')
