@@ -219,7 +219,7 @@ fu! unix#move(dst, bang) abort "{{{1
     endif
 endfu
 
-fu! unix#rename_complete(arglead, _c, _p) abort "{{{1
+fu! unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
     let prefix = expand('%:p:h').'/'
     let files  = glob(prefix.a:arglead.'*', 0, 1)
 
