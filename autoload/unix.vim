@@ -238,15 +238,6 @@ fu! unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
     " call map(files, { i,v ->   v[strlen(prefix) : -1]
     " \                        . (isdirectory(v) ? '/' : '') })
 
-    " Why not filtering the files?{{{
-    "
-    " We don't need to, because the command invoking this completion function is
-    " defined with the attribute `-complete=custom`, not `-complete=customlist`,
-    " which means Vim performs a basic filtering automatically:
-    "
-    "     • each file must begin with `a:arglead`
-    "     • the comparison respects 'ic' and 'scs'
-    " }}}
     return join(files, "\n")
 endfu
 
