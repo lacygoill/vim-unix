@@ -133,8 +133,9 @@ com! -bang -nargs=1 -complete=custom,unix#rename_complete Rename  Mv<bang> %:h/<
 " `0x0.st`, or just execute `:Share` to upload the whole current file.
 com! -bar -range=% Share  call unix#share#main(<line1>, <line2>)
 
-com!      -bang -complete=file -nargs=? SudoEdit   call unix#sudo#edit(<q-args>, <bang>0)
-com! -bar                               SudoWrite  call unix#sudo#setup(expand('%:p')) | w!
+com! -bang -complete=file -nargs=?  SudoEdit  call unix#sudo#edit(<q-args>, <bang>0)
+com! -bar  SudoWrite  call unix#sudo#setup(expand('%:p')) | w!
+
 " TODO:
 " Are `:SudoWrite` and `:W` doing the same thing?
 " Should we eliminate one of them?
