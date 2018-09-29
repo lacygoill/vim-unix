@@ -82,11 +82,11 @@ augroup END
 " For this reason, should we refactor all our plugins to remove `return 'echoerr
 " ...`?
 
-com! -bar -nargs=1 Chmod  exe unix#chmod(<q-args>)
+com! -bar -nargs=1  Chmod  exe unix#chmod(<q-args>)
 
 com! -bar -range=% -nargs=? -complete=file  Cloc  call unix#cloc#main(<line1>,<line2>,<q-args>)
 
-com! -bang -bar -nargs=1 -complete=file Cp  exe unix#cp(<q-args>, <bang>0)
+com! -bang -bar -nargs=1 -complete=file  Cp  exe unix#cp(<q-args>, <bang>0)
 "                                  └ Why not `-complete=file_in_path`? {{{
 "
 " We want as little suggestions as possible, and as relevant as possible.
@@ -113,27 +113,27 @@ com! -bang -bar -nargs=1 -complete=file Cp  exe unix#cp(<q-args>, <bang>0)
 " project we're working on.
 "}}}
 
-com! -bang -complete=file -nargs=+ Find    call unix#grep('find',   <q-args>, <bang>0)
-com! -bang -complete=file -nargs=+ Locate  call unix#grep('locate', <q-args>, <bang>0)
+com! -bang -bar -complete=file -nargs=+  Find  call unix#grep('find', <q-args>, <bang>0)
+com! -bang -bar -complete=file -nargs=+  Locate  call unix#grep('locate', <q-args>, <bang>0)
 
-com! -bang -nargs=? -complete=dir Mkdir  call unix#mkdir(<q-args>, <bang>0)
+com! -bang -bar -nargs=? -complete=dir  Mkdir  call unix#mkdir(<q-args>, <bang>0)
 
 " `:Mv` allows us to move the current file to any location.
 " `:Rename` allows us to rename the current file inside the current directory.
-com! -bang -nargs=1 -complete=file                        Mv      exe unix#move(<q-args>, <bang>0)
-"                                    ┌ FIXME: what does it do?
-"                                    │
-com! -bang -nargs=1 -complete=custom,unix#rename_complete Rename  Mv<bang> %:h/<args>
-"                                                                          └─┤ ├────┘
-"                                                  directory of current file ┘ │
-"                                                              new chosen name ┘
+com! -bang -bar -nargs=1 -complete=file  Mv  exe unix#move(<q-args>, <bang>0)
+"                                         ┌ FIXME: what does it do?
+"                                         │
+com! -bang -bar -nargs=1 -complete=custom,unix#rename_complete  Rename  Mv<bang> %:h/<args>
+"                                                                           └─┤ ├────┘
+"                                                   directory of current file ┘ │
+"                                                               new chosen name ┘
 
 " Usage:
 " Select  some  text, and  execute  `:'<,'>Share`  to  upload the  selection  on
 " `0x0.st`, or just execute `:Share` to upload the whole current file.
-com! -bar -range=% Share  call unix#share#main(<line1>, <line2>)
+com! -bar -range=%  Share  call unix#share#main(<line1>, <line2>)
 
-com! -bang -complete=file -nargs=?  SudoEdit  call unix#sudo#edit(<q-args>, <bang>0)
+com! -bang -bar -complete=file -nargs=?  SudoEdit  call unix#sudo#edit(<q-args>, <bang>0)
 com! -bar  SudoWrite  call unix#sudo#setup(expand('%:p')) | w!
 
 " TODO:
