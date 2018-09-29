@@ -40,7 +40,7 @@ fu! unix#cp(dst, bang) abort "{{{1
     if filereadable(dst) && !a:bang
         return 'echoerr '.string(string(dst).' already exists; add a bang to overwrite it')
     endif
-    call system('cp -L'.(a:bang ? '' : 'n').'p '.src.' '.dst)
+    call system('cp -L'.(a:bang ? '' : 'n').'p '.shellescape(src).' '.shellescape(dst))
     "                │                  │    │
     "                │                  │    └ same as --preserve=mode,ownership,timestamps
     "                │                  └ do not overwrite an existing file
@@ -134,17 +134,18 @@ fu! unix#move(dst, bang) abort "{{{1
     " If the destination is a directory, it must be completed, by appending
     " the current filename.
 
-    "                 ┌ the destination is an existing directory
-    "                 │                     ┌ or a future directory (we're going to create it)
-    "  ┌──────────────┤    ┌────────────────┤
+    "  ┌ the destination is an existing directory
+    "  │
+    "  │                   ┌ or a future directory (we're going to create it)
+    "  ├──────────────┐    ├────────────────┐
     if isdirectory(dst) || dst[-1:-1] is# '/'
-        "                                        ┌ make sure there's a slash
-        "                                        │ between the directory and the filename
-        "          ┌─────────────────────────────┤
+        "          ┌ make sure there's a slash
+        "          │ between the directory and the filename
+        "          ├─────────────────────────────┐
         let dst .= (dst[-1:-1] is# '/' ? '' : '/').fnamemodify(src, ':t')
-        "                                          └────────────────────┤
-        "                                                               └ add the current filename
-        "                                                                 to complete the destination
+        "                                          ├────────────────────┘
+        "                                          └ add the current filename
+        "                                            to complete the destination
     endif
 
     " If the directory of the destination doesn't exist, create it.
