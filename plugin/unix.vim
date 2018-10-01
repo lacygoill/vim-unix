@@ -155,7 +155,7 @@ nno  <silent><unique>  gl      :<c-u>call unix#cloc#count_lines_in_func()<cr>
 fu! s:make_executable() abort "{{{2
     let shebang = matchstr(getline(1), '^#!\S\+')
     if !empty(shebang) && executable('chmod')
-        call system('chmod +x '.shellescape(expand('%:p')))
+        call system('chmod +x '.expand('%:p:S'))
         if v:shell_error
             echohl ErrorMsg
             " FIXME:

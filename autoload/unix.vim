@@ -4,7 +4,7 @@ endif
 let g:autoloaded_unix = 1
 
 fu! unix#chmod(flags) abort "{{{1
-    let output = systemlist('chmod '.a:flags.' '.shellescape(expand('%:p')))
+    let output = systemlist('chmod '.a:flags.' '.expand('%:p:S'))
 
     " reload buffer to avoid a (delayed) message such as:
     "         “"/tmp/file" 1L, 6C“
