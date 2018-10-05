@@ -108,6 +108,8 @@ com! -bar        Tl  exe unix#trash#list()
 "                In practice, I don't think it will, because we'll use `]T` instead.
 "}}}
 
+com! -bar -nargs=0 Trr  call unix#trash#restore()
+
 com! -bar Wall  call unix#wall()
 
 " What's the purpose of `:W`?{{{
