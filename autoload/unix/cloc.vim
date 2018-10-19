@@ -37,7 +37,7 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         if a:path =~# '^http'
             let tempdir = tempname()
             let cmd = a:path =~# 'bitbucket' ? 'hg' : 'git'
-            let git_output = system(cmd.' clone '.a:path.' '.tempdir)
+            sil let git_output = system(cmd.' clone '.a:path.' '.tempdir)
             let to_scan = tempdir
         else
             let to_scan = a:path
@@ -77,7 +77,7 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
 
     let cmd = 'cloc --exclude-dir=.cache,t,test '.to_scan
     " remove the header
-    let output_cloc = matchstr(system(cmd), '\zs-\+.*')
+    sil let output_cloc = matchstr(system(cmd), '\zs-\+.*')
 
     " Why do store the output in a variable, and echo it at the very end of
     " the function? Why don't we echo it directly?

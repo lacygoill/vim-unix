@@ -4,7 +4,7 @@ endif
 let g:autoloaded_unix = 1
 
 fu! unix#chmod(flags) abort "{{{1
-    let output = systemlist('chmod '.a:flags.' '.expand('%:p:S'))
+    sil let output = systemlist('chmod '.a:flags.' '.expand('%:p:S'))
 
     " reload buffer to avoid a (delayed) message such as:
     "         “"/tmp/file" 1L, 6C“
@@ -40,11 +40,11 @@ fu! unix#cp(dst, bang) abort "{{{1
     if filereadable(dst) && !a:bang
         return 'echoerr '.string(string(dst).' already exists; add a bang to overwrite it')
     endif
-    call system('cp -L'.(a:bang ? '' : 'n').'p '.shellescape(src).' '.shellescape(dst))
-    "                │                  │    │
-    "                │                  │    └ same as --preserve=mode,ownership,timestamps
-    "                │                  └ do not overwrite an existing file
-    "                └ follow symbolic links
+    sil call system('cp -L'.(a:bang ? '' : 'n').'p '.shellescape(src).' '.shellescape(dst))
+    "                    │                  │    │
+    "                    │                  │    └ same as --preserve=mode,ownership,timestamps
+    "                    │                  └ do not overwrite an existing file
+    "                    └ follow symbolic links
 
     if v:shell_error
         call system('')

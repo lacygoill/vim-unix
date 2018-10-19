@@ -3,7 +3,7 @@ fu! unix#trash#list() abort "{{{1
         return s:command_unavailable('trash-list')
     endif
 
-    let listing = system('trash-list')
+    sil let listing = system('trash-list')
     if v:shell_error
         call system('')
         return 'echoerr '.string('Failed to list the contents of the trash can')
@@ -45,7 +45,7 @@ fu! unix#trash#put(bang) abort "{{{1
     endif
 
     " now, try to put the file in a trash can
-    call system('trash-put '.file)
+    sil call system('trash-put '.file)
     if v:shell_error
         call system('')
         return 'echoerr '.string('Failed to delete '.file)
