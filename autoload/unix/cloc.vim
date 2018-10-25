@@ -33,6 +33,10 @@
 " Use the `--csv` option. It makes the output easier to parse.
 
 fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
+    if !executable('cloc')
+        echom '`cloc` is not installed, or it''s not in the $PATH of the current user'
+        return
+    endif
     if !empty(a:path)
         if a:path =~# '^http'
             let tempdir = tempname()
