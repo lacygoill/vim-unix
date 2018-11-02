@@ -147,6 +147,11 @@ com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
 "                             │
 "                             └ don't write in the terminal
 
+" In Neovim, `:W` doesn't work, but `:SudoWrite` works.
+if has('nvim')
+    com! -bar W SudoWrite
+endif
+
 " Mappings {{{1
 
 nno  <silent><unique>  g<c-l>  :<c-u>Cloc<cr>
