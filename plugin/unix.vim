@@ -206,8 +206,8 @@ endfu
 fu! s:maybe_make_executable() abort "{{{2
     augroup my_make_executable
         au! BufWritePost <buffer>
-        au  BufWritePost <buffer> call s:make_executable()
-        au  BufWritePost <buffer> exe 'au! my_make_executable' | aug! my_make_executable
+        au  BufWritePost <buffer> sil! call s:make_executable()
+            \ | exe 'au! my_make_executable' | aug! my_make_executable
     augroup END
 endfu
 
