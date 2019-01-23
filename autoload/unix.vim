@@ -246,9 +246,9 @@ fu! s:should_write_buffer(seen) abort "{{{1
     " 'buftype' is a buffer-local option, whose value determines the type of
     " buffer. We want to write a buffer currently displayed in a window, iff:
     "
-    "         • it is a regular buffer (&bt = '')
+    "         - it is a regular buffer (&bt = '')
     "
-    "         • an autocmd listening to `BufWriteCmd` determines how it must be written
+    "         - an autocmd listening to `BufWriteCmd` determines how it must be written
     "           (&bt = 'acwrite')
 
     if !&readonly
