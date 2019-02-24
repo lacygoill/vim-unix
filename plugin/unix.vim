@@ -122,9 +122,9 @@ com! -bar Wall  call unix#wall()
 "
 " The full message looks something like this:
 "
-"         W11: Warning: File "/tmp/file" has changed since editing started
-"         See ":help W11" for more info.
-"         [O]K, (L)oad File:
+" > W12: Warning: File "/etc/apt/sources.list" has changed and the buffer was changed in Vim as well
+" > See ":help W12" for more info.
+" > [O]K, (L)oad File:
 "
 " If you press `O`, the buffer will be written.
 " If you press `L`, the file will be reloaded.
@@ -132,25 +132,25 @@ com! -bar Wall  call unix#wall()
 " In this particular case, whatever you answer shouldn't matter.
 " The file and the buffer contain the same text.
 "
-" If  you've  set  'autoread',  there  should be  no  message,  and  Vim  should
+" If  you've set  `'autoread'`,  there  should be  no  message,  and Vim  should
 " automatically write the buffer.
+"}}}
+" Why `setl nomod`?{{{
+"
+" I don't remember what issue it solved, but I keep it because I've noticed that
+" it bypasses the W12 warning.
 "}}}
 
 "                 ┌ write the buffer on the standard input of a shell command (:h w_c)
 "                 │ and execute the latter
 "                 │
-"                 │   ┌ raise the right of the `tee` process so that it can write in
+"                 │   ┌ raise the rights of the `tee` process so that it can write in
 "                 │   │ a file owned by any user
 "                 ├─┐ │
 com! -bar W  exe 'w !sudo tee >/dev/null %' | setl nomod
 "                             ├────────┘ └ but write in the current file
 "                             │
 "                             └ don't write in the terminal
-
-" In Neovim, `:W` doesn't work, but `:SudoWrite` works.
-if has('nvim')
-    com! -bar W SudoWrite
-endif
 
 " Mappings {{{1
 
