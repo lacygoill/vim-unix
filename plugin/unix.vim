@@ -246,6 +246,9 @@ fu! s:maybe_read_template() abort "{{{2
     \   && filereadable(s:template_dir.'by_name/scripts.txt')
         exe 'keepalt read '.s:template_dir.'by_name/scripts.txt'
         1d_
+
+    elseif expand('%:p:h') is# '' . $HOME . '/.zsh/my-completions'
+        call setline(1, ['#compdef ' . expand('%:t')[1:], '', ''])
     endif
 endfu
 
