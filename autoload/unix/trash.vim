@@ -45,7 +45,7 @@ fu! unix#trash#put(bang) abort "{{{1
     endif
 
     " now, try to put the file in a trash can
-    sil call system('trash-put '.file)
+    sil call system('trash-put '.shellescape(file))
     if v:shell_error
         call system('')
         return 'echoerr '.string('Failed to delete '.file)
