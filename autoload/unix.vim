@@ -180,8 +180,8 @@ fu! unix#move(dst, bang) abort "{{{1
     " Try to rename current file.
     " What are the differences between `:saveas` and `rename()`:
     "
-    "       `rename()` gets rid of the old file, after the renaming; `:saveas` does NOT
-    "       `rename()` can move a file to a different filesystem; `:saveas` ?
+    "    - `rename()` gets rid of the old file, after the renaming; `:saveas` does *not*
+    "    - `rename()` can move a file to a different filesystem; `:saveas` ?
     elseif rename(src, dst)
         " If a problem occurred, inform us.
         return 'echoerr '.string('Failed to rename '.string(src).' to '.string(dst))
