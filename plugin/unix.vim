@@ -204,11 +204,7 @@ fu! s:make_executable() abort "{{{2
 endfu
 
 fu! s:maybe_make_executable() abort "{{{2
-    augroup my_make_executable
-        au! BufWritePost <buffer>
-        au  BufWritePost <buffer> sil! call s:make_executable()
-            \ | exe 'au! my_make_executable' | aug! my_make_executable
-    augroup END
+    au BufWritePost <buffer> ++once sil! call s:make_executable()
 endfu
 
 fu! s:maybe_read_template() abort "{{{2
