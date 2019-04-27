@@ -19,7 +19,6 @@ fu! unix#share#main(lnum1, lnum2) abort
     "                                       This enables uploading of files.
     "}}}
     echom url
-    " You can open  the url directly (enter  tmux copy mode), or  from a preview
-    " window by pressing `!m` to read your messages.
+    call system('xdg-open ' . shellescape(url))
 endfu
 
