@@ -86,6 +86,8 @@ com! -bang -bar -nargs=1 -complete=custom,unix#rename_complete  Rename  Mv<bang>
 " Usage:
 " Select  some  text, and  execute  `:'<,'>Share`  to  upload the  selection  on
 " `0x0.st`, or just execute `:Share` to upload the whole current file.
+" TODO: Consider using this alternative site: http://ix.io/
+" It seems to offer more features.
 com! -bar -range=%  Share  call unix#share#main(<line1>, <line2>)
 
 com! -bang -bar -complete=file -nargs=?  SudoEdit  call unix#sudo#edit(<q-args>, <bang>0)
@@ -250,6 +252,7 @@ fu! s:maybe_read_template() abort "{{{2
     " useful to get a mini tmux.conf when debugging tmux
     elseif expand('%:t') is# 'tmux.conf'
         call setline(1, [
+        \ 'set -g prefix M-space',
         \ 'bind -T root M-l next',
         \ 'bind -T root M-h prev',
         \ 'bind -T copy-mode-vi v send -X begin-selection',
