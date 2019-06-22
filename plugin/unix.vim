@@ -253,6 +253,9 @@ fu! s:maybe_read_template() abort "{{{2
     elseif expand('%:t') is# 'tmux.conf'
         call setline(1, [
         \ 'set -g prefix M-space',
+        \ 'set -g status-keys emacs',
+        \ 'set -s history-file "$HOME/.tmux/command_history"',
+        \ 'set -g history-limit 50000',
         \ 'bind -T root M-l next',
         \ 'bind -T root M-h prev',
         \ 'bind -T copy-mode-vi v send -X begin-selection',
