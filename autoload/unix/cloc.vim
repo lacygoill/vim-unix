@@ -34,7 +34,8 @@
 
 fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     if !executable('cloc')
-        echom '`cloc` is not installed, or it''s not in the $PATH of the current user'
+        " We need `:unsilent` because we may call this function with `:silent`.
+        unsilent echom '`cloc` is not installed, or it''s not in the $PATH of the current user'
         return
     endif
     if !empty(a:path)
@@ -147,10 +148,12 @@ fu! unix#cloc#count_lines_in_func() abort "{{{1
     norm ]M
     let lnum2 = line('.')-1
     sil call unix#cloc#main(lnum1,lnum2,'')
-    let blank_cnt = get(get(g:cloc_results, ft, {}), 'blank', 0)
-    let comment_cnt = get(get(g:cloc_results, ft, {}), 'comment', 0)
-    let code_cnt = get(get(g:cloc_results, ft, {}), 'code', 0)
-    echo printf('blank: %s   comment: %s   code: %s', blank_cnt, comment_cnt, code_cnt)
+    if exists('g:cloc_results')
+        let blank_cnt = get(get(g:cloc_results, ft, {}), 'blank', 0)
+        let comment_cnt = get(get(g:cloc_results, ft, {}), 'comment', 0)
+        let code_cnt = get(get(g:cloc_results, ft, {}), 'code', 0)
+        echo printf('blank: %s   comment: %s   code: %s', blank_cnt, comment_cnt, code_cnt)
+    endif
     call winrestview(view)
 endfu
 
