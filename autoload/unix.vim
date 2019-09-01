@@ -227,17 +227,16 @@ fu! unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
     " TODO:
     " Should we use this? Or the next commented `map()`?
     "
-    " Source:
-    "     https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
-    call map(files, {i,v -> simplify(v) !=# simplify(expand('%:p'))
+    " Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
+    call map(files, {_,v -> simplify(v) !=# simplify(expand('%:p'))
                         \ ?     v
                         \ : !empty(fnamemodify(v, ':p:t:r'))
                         \ ?     fnamemodify(v, ':r').'.'
                         \ :     v
                         \ })
 
-    " call map(files, { i,v ->   v[strlen(prefix) : -1]
-    " \                        . (isdirectory(v) ? '/' : '') })
+    " call map(files, {_,v ->  v[strlen(prefix) : -1]
+    " \                       . (isdirectory(v) ? '/' : '')})
 
     return join(files, "\n")
 endfu

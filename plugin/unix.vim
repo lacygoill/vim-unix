@@ -219,7 +219,7 @@ fu! s:maybe_read_template() abort "{{{2
 
     " Get all the filetypes for which we have a template.
     let filetypes = glob(s:template_dir.'by_filetype/*', 0, 1)
-    call map(filetypes, {i,v -> fnamemodify(v, ':t:r')})
+    call map(filetypes, {_,v -> fnamemodify(v, ':t:r')})
 
     if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.'by_filetype/'.&ft.'.txt')
         "    ┌ don't use the template file as the alternate file for the current window{{{

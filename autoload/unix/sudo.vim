@@ -35,7 +35,7 @@ fu! s:silent_sudo_cmd(editor) abort "{{{1
 
     elseif !empty($SUDO_ASKPASS)
     \ ||   filereadable('/etc/sudo.conf')
-    \ &&   len(filter(readfile('/etc/sudo.conf', 50), {i,v -> v =~# '^Path askpass '}))
+    \ &&   len(filter(readfile('/etc/sudo.conf', 50), {_,v -> v =~# '^Path askpass '}))
         return ['silent', cmd.' -A']
 
     else

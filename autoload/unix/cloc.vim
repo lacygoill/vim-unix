@@ -112,8 +112,8 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     " more than 2 consecutive spaces in their name…
 
     let output_cloc = map(filter(split(output_cloc, '\n'),
-    \                            { i,v -> v =~# '\d\+' }),
-    \                     { i,v -> split(v, '\s\{2,}\ze\d') })
+    \                            {_,v -> v =~# '\d\+'}),
+    \                     {_,v -> split(v, '\s\{2,}\ze\d')})
 
     let g:cloc_results = {}
     let keys           = ['files', 'blank', 'comment', 'code']
