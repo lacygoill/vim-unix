@@ -19,6 +19,6 @@ fu! unix#share#main(lnum1, lnum2) abort
     "                                       This enables uploading of files.
     "}}}
     echom url
-    call system('xdg-open ' . shellescape(url))
+    sil call system('xdg-open ' . shellescape(url))
 endfu
 

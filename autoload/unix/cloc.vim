@@ -61,16 +61,16 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         " We could use this code instead:
         "
         "     let lines = shellescape(join(getline(a:lnum1,a:lnum2), "\n"))
-        "     echo system('echo '.lines.' | cloc --stdin-name=foo.'.&ft.' -')
+        "     sil let out = system('echo '.lines.' | cloc --stdin-name=foo.'.&ft.' -')
+        "     echo out
         "
         " But because of the previous limit:
-        "
-        "     http://stackoverflow.com/a/19355351
+        " http://stackoverflow.com/a/19355351
         "
         " … the command would error out when send too much text.
         " The error would like like this:
         "
-        "     E484: Can't open file /tmp/user/1000/vsgRgDU/97
+        "     E484: Can't open file /tmp/user/1000/vsgRgDU/97~
         "
         " Currently, on my system, it seems to error out somewhere above 120KB.
         " In a file, to go the 120 000th byte, use the normal `go` command and hit
