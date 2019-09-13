@@ -59,10 +59,10 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
 
     try
         " TODO:
-        " Make `$ find` ignore files matching 'wig'.
+        " Make `find(1)` ignore files matching 'wig'.
         " https://stackoverflow.com/a/22558474/9477010
         let &l:grepprg = a:prg
-        "                ┌ the output of `$ find` and `$ locate` will just contain file names
+        "                ┌ the output of `find(1)` and `locate(1)` will just contain file names
         "                │
         setl grepformat=%f
         " The default value of 'sp' ('2>&1| tee') causes the error messages

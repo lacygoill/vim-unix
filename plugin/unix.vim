@@ -12,8 +12,8 @@ let s:template_dir = $HOME.'/.vim/template/'
 " error message in case of an issue (useful for example with `:Cp`).
 
 " TODO:
-" Integrate `$ fd`  (`:Fd`). In an interactive usage, we use  it much more often
-" than `$ find`, because its syntax is shorter and easier.
+" Integrate `fd(1)` (`:Fd`). In an interactive usage,  we use it much more often
+" than `find(1)`, because its syntax is shorter and easier.
 
 " Autocmds "{{{1
 

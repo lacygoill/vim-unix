@@ -19,8 +19,8 @@
 "}}}
 
 
-" If you're only interested in the variable and don't want to see the output
-" of `$ cloc`, execute the command silently:
+" If you're only interested in the variable  and don't want to see the output of
+" `cloc`, execute the command silently:
 "
 "     :sil Cloc [/path]
 
@@ -100,16 +100,16 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     " `map()`           replaces the lines with (sub)lists, each item being a number
     "                   (number of blank lines, lines of code, comments, files)
 
-    " We ask `map()` to split all the lines in the output of `$ cloc`
-    " using the pattern `\s\{2,}\ze\d`.
+    " We ask `map()`  to split all the  lines in the output of  `cloc` using the
+    " pattern `\s\{2,}\ze\d`.
     " Why `\s\{2,}` and not simply `\s\+`?
     "
     " Because there are some programming languages which contain a number in
     " their name.
-    " For example, in the source code of `$ cloc`, we find `Fortran 77` and
-    " `Fortran 99`. With `\s\+`, we would split in the middle of the language.
-    " With `\s\{2,}`, it shouldn't occur, unless some weird languages use
-    " more than 2 consecutive spaces in their name…
+    " For  example, in  the source  code  of `cloc`,  we find  `Fortran 77`  and
+    " `Fortran 99`. With `\s\+`,  we would split in the middle  of the language.
+    " With `\s\{2,}`, it  shouldn't occur, unless some weird  languages use more
+    " than 2 consecutive spaces in their name…
 
     let output_cloc = map(filter(split(output_cloc, '\n'),
     \                            {_,v -> v =~# '\d\+'}),
