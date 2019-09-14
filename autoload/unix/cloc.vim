@@ -138,11 +138,11 @@ endfu
 
 fu! unix#cloc#count_lines_in_func() abort "{{{1
     let ft = get({'vim': 'vim script', 'sh': 'Bourne Shell',}, &ft, '')
-    if ft is# ''
-        echo 'non supported filetype'
-        return
-    endif
+    if ft is# '' | echo 'non supported filetype' | return | endif
     let view = winsaveview()
+    " TODO: If the first line of the function is not visible (above first screen
+    " line),  the screen  seems  to  "flash". Find a  way  to  prevent Vim  from
+    " redrawing the screen when executing `[m` and `]M`.
     norm [m
     let lnum1 = line('.')+1
     norm ]M
