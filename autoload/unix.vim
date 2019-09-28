@@ -53,8 +53,8 @@ fu! unix#cp(dst, bang) abort "{{{1
 endfu
 
 fu! unix#grep(prg, pat, bang) abort "{{{1
-    let grepprg    = &l:grepprg
-    let grepformat = &l:grepformat
+    let [grepprg, bufnr] = [&l:grepprg, bufnr('%')]
+    let grepformat = &grepformat
     let shellpipe  = &shellpipe
 
     try
@@ -70,7 +70,7 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
         " It's noise, so we get rid of them by temporarily tweaking 'sp'.
         let &shellpipe = '| tee'
         " FIXME:
-        " Don't use `:grep`, it makes the screen flash. Use `cgetexpr` instead.
+        " Don't use `:grep`, it makes the screen flicker. Use `cgetexpr` instead.
         " Look at what we did in `myfuncs#op_grep()`.
 
         "            ┌ don't jump to first match, we want to decide ourselves
@@ -107,9 +107,9 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
     catch
         return lg#catch_error()
     finally
-        let &l:grepprg    = grepprg
-        let &l:grepformat = grepformat
-        let &shellpipe    = shellpipe
+        call setbufvar(bufnr, '&grepprg', grepprg)
+        let &grepformat = grepformat
+        let &shellpipe  = shellpipe
     endtry
 endfu
 
@@ -245,10 +245,10 @@ fu! s:should_write_buffer(seen) abort "{{{1
     " 'buftype' is a buffer-local option, whose value determines the type of
     " buffer. We want to write a buffer currently displayed in a window, iff:
     "
-    "         - it is a regular buffer (&bt = '')
+    "    - it is a regular buffer (&bt = '')
     "
-    "         - an autocmd listening to `BufWriteCmd` determines how it must be written
-    "           (&bt = 'acwrite')
+    "    - an autocmd listening to `BufWriteCmd` determines how it must be written
+    "      (&bt = 'acwrite')
 
     if !&readonly
   \ && &modifiable

@@ -79,9 +79,9 @@ com! -bang -bar -nargs=1 -complete=file  Mv  exe unix#move(<q-args>, <bang>0)
 "                                         ┌ FIXME: what does it do?
 "                                         │
 com! -bang -bar -nargs=1 -complete=custom,unix#rename_complete  Rename  Mv<bang> %:h/<args>
-"                                                                                └─┤ ├────┘
-"                                                        directory of current file ┘ │
-"                                                                    new chosen name ┘
+"                                                                                └─┤ └────┤
+"                                                        directory of current file ┘      │
+"                                                                         new chosen name ┘
 
 " Usage:
 " Select  some  text, and  execute  `:'<,'>Share`  to  upload the  selection  on
