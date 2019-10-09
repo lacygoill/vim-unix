@@ -45,7 +45,7 @@ endfu
 
 fu! s:sudo_edit_init() abort "{{{1
     let files = split($SUDO_COMMAND, ' ')[1:-1]
-    if len(files) ==# argc()
+    if len(files) == argc()
         for i in range(argc())
             exe 'autocmd BufEnter '.fnameescape(argv(i))
                         \ 'if empty(&ft) || &ft is "conf"'
@@ -85,8 +85,8 @@ endfu
 
 fu! s:sudo_write_cmd() abort "{{{1
     let [silent, cmd] = s:silent_sudo_cmd('tee')
-    let cmd .= ' "%" >/dev/null'
-    let cmd .= ' 2> '.s:error_file
+    let cmd ..= ' "%" >/dev/null'
+    let cmd ..= ' 2> '.s:error_file
     exe silent 'write !'.cmd
     let error = s:sudo_error()
     if !empty(error)

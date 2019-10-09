@@ -33,7 +33,7 @@ endfu
 fu! unix#cp(dst, bang) abort "{{{1
     let src = expand('%:p')
     let dir = expand('%:p:h')
-    let dst = stridx(a:dst, '/') ==# 0
+    let dst = stridx(a:dst, '/') == 0
           \ ?     a:dst
           \ :     dir.'/'.simplify(a:dst)
 
@@ -139,13 +139,13 @@ fu! unix#move(dst, bang) abort "{{{1
     "  │                   ┌ or a future directory (we're going to create it)
     "  ├──────────────┐    ├────────────────┐
     if isdirectory(dst) || dst[-1:-1] is# '/'
-        "          ┌ make sure there's a slash
-        "          │ between the directory and the filename
-        "          ├─────────────────────────────┐
-        let dst .= (dst[-1:-1] is# '/' ? '' : '/').fnamemodify(src, ':t')
-        "                                          ├────────────────────┘
-        "                                          └ add the current filename
-        "                                            to complete the destination
+        "           ┌ make sure there's a slash
+        "           │ between the directory and the filename
+        "           ├─────────────────────────────┐
+        let dst ..= (dst[-1:-1] is# '/' ? '' : '/').fnamemodify(src, ':t')
+        "                                           ├────────────────────┘
+        "                                           └ add the current filename
+        "                                             to complete the destination
     endif
 
     " If the directory of the destination doesn't exist, create it.
@@ -228,7 +228,7 @@ fu! unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
     " Should we use this? Or the next commented `map()`?
     "
     " Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
-    call map(files, {_,v -> simplify(v) !=# simplify(expand('%:p'))
+    call map(files, {_,v -> simplify(v) isnot# simplify(expand('%:p'))
                         \ ?     v
                         \ : !empty(fnamemodify(v, ':p:t:r'))
                         \ ?     fnamemodify(v, ':r').'.'
