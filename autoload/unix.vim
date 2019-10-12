@@ -3,7 +3,7 @@ if exists('g:autoloaded_unix')
 endif
 let g:autoloaded_unix = 1
 
-fu! unix#chmod(flags) abort "{{{1
+fu unix#chmod(flags) abort "{{{1
     sil let output = systemlist('chmod '.a:flags.' '.expand('%:p:S'))
 
     " reload buffer to avoid a (delayed) message such as:
@@ -26,11 +26,11 @@ fu! unix#chmod(flags) abort "{{{1
     " executed non silently.
 endfu
 
-fu! s:command_unavailable(cmd) abort "{{{1
+fu s:command_unavailable(cmd) abort "{{{1
     return 'echoerr '.string(a:cmd.' is not executable; install the trash-cli package')
 endfu
 
-fu! unix#cp(dst, bang) abort "{{{1
+fu unix#cp(dst, bang) abort "{{{1
     let src = expand('%:p')
     let dir = expand('%:p:h')
     let dst = stridx(a:dst, '/') == 0
@@ -52,7 +52,7 @@ fu! unix#cp(dst, bang) abort "{{{1
     endif
 endfu
 
-fu! unix#grep(prg, pat, bang) abort "{{{1
+fu unix#grep(prg, pat, bang) abort "{{{1
     let [grepprg, bufnr] = [&l:grepprg, bufnr('%')]
     let grepformat = &grepformat
     let shellpipe  = &shellpipe
@@ -113,7 +113,7 @@ fu! unix#grep(prg, pat, bang) abort "{{{1
     endtry
 endfu
 
-fu! unix#mkdir(dir, bang) abort "{{{1
+fu unix#mkdir(dir, bang) abort "{{{1
     let dest = empty(a:dir)
            \ ?     expand('%:p:h')
            \ : a:dir[0] is# '/'
@@ -127,7 +127,7 @@ fu! unix#mkdir(dir, bang) abort "{{{1
     endtry
 endfu
 
-fu! unix#move(dst, bang) abort "{{{1
+fu unix#move(dst, bang) abort "{{{1
     let src = expand('%:p')
     let dst = fnamemodify(a:dst, ':p')
 
@@ -220,7 +220,7 @@ fu! unix#move(dst, bang) abort "{{{1
     endif
 endfu
 
-fu! unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
+fu unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
     let prefix = expand('%:p:h').'/'
     let files  = glob(prefix.a:arglead.'*', 0, 1)
 
@@ -241,7 +241,7 @@ fu! unix#rename_complete(arglead, _cmdline, _pos) abort "{{{1
     return join(files, "\n")
 endfu
 
-fu! s:should_write_buffer(seen) abort "{{{1
+fu s:should_write_buffer(seen) abort "{{{1
     " 'buftype' is a buffer-local option, whose value determines the type of
     " buffer. We want to write a buffer currently displayed in a window, iff:
     "
@@ -259,7 +259,7 @@ fu! s:should_write_buffer(seen) abort "{{{1
     endif
 endfu
 
-fu! unix#wall() abort "{{{1
+fu unix#wall() abort "{{{1
     let cur_winid = win_getid()
     let seen = {}
     if !&readonly && !empty(expand('%'))

@@ -32,7 +32,7 @@
 " TODO:
 " Use the `--csv` option. It makes the output easier to parse.
 
-fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
+fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     if !executable('cloc')
         " We need `:unsilent` because we may call this function with `:silent`.
         unsilent echom '`cloc` is not installed, or it''s not in the $PATH of the current user'
@@ -116,7 +116,12 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     \                     {_,v -> split(v, '\s\{2,}\ze\d')})
 
     let g:cloc_results = {}
-    let keys           = ['files', 'blank', 'comment', 'code']
+    let keys =<< trim END
+        files
+        blank
+        comment
+        code
+    END
 
     for values_on_line in output_cloc
         " `i`    is going to index the `keys` list
@@ -136,7 +141,7 @@ fu! unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     echo to_display
 endfu
 
-fu! unix#cloc#count_lines_in_func() abort "{{{1
+fu unix#cloc#count_lines_in_func() abort "{{{1
     let ft = get({'vim': 'vim script', 'sh': 'Bourne Shell',}, &ft, '')
     if ft is# '' | echo 'non supported filetype' | return | endif
     let view = winsaveview()

@@ -1,4 +1,4 @@
-fu! unix#trash#list() abort "{{{1
+fu unix#trash#list() abort "{{{1
     if !executable('trash-list')
         return s:command_unavailable('trash-list')
     endif
@@ -14,7 +14,7 @@ fu! unix#trash#list() abort "{{{1
     return ''
 endfu
 
-fu! unix#trash#put(bang) abort "{{{1
+fu unix#trash#put(bang) abort "{{{1
     let file = expand('%:p')
     if empty(file)
         return ''
@@ -54,7 +54,7 @@ fu! unix#trash#put(bang) abort "{{{1
     return a:bang ? 'e' : ''
 endfu
 
-fu! unix#trash#restore() abort "{{{1
+fu unix#trash#restore() abort "{{{1
     " `:!` can't be interactive in Neovim
     " See:
     "     https://github.com/neovim/neovim/issues/1496

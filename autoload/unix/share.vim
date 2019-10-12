@@ -1,4 +1,4 @@
-fu! unix#share#main(lnum1, lnum2) abort
+fu unix#share#main(lnum1, lnum2) abort
     " For more info on how the web service `0x0` works, see:{{{
     "
     "     https://0x0.st/
