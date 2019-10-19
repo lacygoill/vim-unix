@@ -195,7 +195,7 @@ fu s:make_executable() abort "{{{2
             " Usually,  plugins'  authors don't  seem  to  care about  resetting
             " `v:shell_error`:
             "
-            "         vim /v:shell_error/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
+            "     vim /v:shell_error/gj ~/.vim/**/*.vim ~/.vim/**/vim.snippets ~/.vim/vimrc
             "
             " But, better be safe than sorry.
             "
