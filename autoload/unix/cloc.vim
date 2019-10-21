@@ -117,10 +117,10 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
 
     let g:cloc_results = {}
     let keys =<< trim END
-    files
-    blank
-    comment
-    code
+        files
+        blank
+        comment
+        code
     END
 
     for values_on_line in output_cloc
