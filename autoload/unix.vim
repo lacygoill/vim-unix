@@ -157,16 +157,16 @@ fu unix#move(dst, bang) abort "{{{1
 
     " `:Mv` and `:Rename` should behave like `:saveas`.
     "
-    "         :Mv     existing_file    ✘
-    "         :Rename existing_file    ✘
-    "         :saveas existing_file    ✘
+    "     :Mv     existing_file    ✘
+    "     :Rename existing_file    ✘
+    "     :saveas existing_file    ✘
     "
     " The operation shouldn't overwrite the file.
     " Except if we added a bang:
     "
-    "         :Mv!     existing_file   ✔
-    "         :Rename! existing_file   ✔
-    "         :saveas! existing_file   ✔
+    "     :Mv!     existing_file   ✔
+    "     :Rename! existing_file   ✔
+    "     :saveas! existing_file   ✔
 
     " The destination is occupied by an existing file, and no bang was added.
     " The command must fail.
@@ -194,28 +194,34 @@ fu unix#move(dst, bang) abort "{{{1
         " FIXME:
         " Why this command? Maybe to trigger one (some?, all?) of those events:
         "
-        "         BufNew
-        "         BufFilePre
-        "         BufFilePost
-        "         BufAdd
-        "         BufCreate
-        "         BufWrite
-        "         BufWritePre
-        "         BufWritePost
+        "     BufNew
+        "     BufFilePre
+        "     BufFilePost
+        "     BufAdd
+        "     BufCreate
+        "     BufWrite
+        "     BufWritePre
+        "     BufWritePost
         exe 'keepalt saveas! '.fnameescape(dst)
 
         " Get rid of old buffer (it's not linked to a file anymore).
         " But only if it's not the current one.
         " It could be the current one if we execute, by accident:
         "
-        "         :Mv     /path/to/current/file
-        "         :Rename current_filename
+        "     :Mv     /path/to/current/file
+        "     :Rename current_filename
         if src isnot# expand('%:p')
             exe 'bw '.fnameescape(src)
         endif
 
-        " detect the filetype to get syntax highlighting and load ftplugins
+        " Rationale:{{{
+        "
+        " If we change  the filetype of the file (e.g.  `foo.sh` → `foo.py`), we
+        " want to load the right filetype/syntax/indent plugins.
+        "}}}
         filetype detect
+        " re-apply fold settings
+        do <nomodeline> BufWinEnter
         return ''
     endif
 endfu
