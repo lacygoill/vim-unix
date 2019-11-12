@@ -185,8 +185,8 @@ fu s:make_executable() abort "{{{2
             " `v:shell_error` is not writable.
             " So, the only way I can think of is:
             "
-            "         :call system('')
-            "         :!
+            "     :call system('')
+            "     :!
             "}}}
             " Is it necessary?{{{
             "
