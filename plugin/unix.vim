@@ -69,7 +69,20 @@ com -bar -range=% -nargs=? -complete=file Cloc call unix#cloc#main(<line1>,<line
 com -bang -bar -nargs=1 -complete=file Cp exe unix#cp(<q-args>, <bang>0)
 
 com -bang -bar -complete=file -nargs=+ Find call unix#grep('find', <q-args>, <bang>0)
-com -bang -bar -complete=file -nargs=+ Locate call unix#grep('locate', <q-args>, <bang>0)
+" Why the bang?{{{
+"
+" fzf.vim installs a `:Locate` command.
+"
+" Usually, this is not an issue, because we configure the plugin to add a prefix
+" to all the commands it installs (`Fz`).
+"
+" But when  we debug some issue,  we may temporarily disable  this configuration
+" (by  removing `~/.vim`  from the  rtp). When that  happens, if  `vim-unix` and
+" `vim-fzf` are both enabled, `E174` is raised.
+"
+"     E174: Command already exists: add ! to replace it~
+"}}}
+com! -bang -bar -complete=file -nargs=+ Locate call unix#grep('locate', <q-args>, <bang>0)
 
 com -bang -bar -nargs=? -complete=dir Mkdir call unix#mkdir(<q-args>, <bang>0)
 
