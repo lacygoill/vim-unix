@@ -145,10 +145,35 @@ fu unix#cloc#count_lines_in_func() abort "{{{1
     let ft = get({'vim': 'vim script', 'sh': 'Bourne Shell',}, &ft, '')
     if ft is# '' | echo 'non supported filetype' | return | endif
     let view = winsaveview()
-    norm [m
-    let lnum1 = line('.')+1
-    norm ]M
-    let lnum2 = line('.')-1
+    let [g, lnum1, lnum2] = [0, 0, 0]
+    " The loop handles the case where there is a nested function between us and the start of the function.{{{
+    "
+    "     fu Func()
+    "         " some code
+    "         fu NestedFunc()
+    "             " some code
+    "         endfu
+    "         " we are here
+    "     endfu
+    "
+    " The  condition of  the loop  tries  to make  sure that  our original  line
+    " position is inside the found function.
+    "}}}
+    while (view.lnum < lnum1 || view.lnum > lnum2) && g < 9
+        " if there is a nested function
+        if g
+            " move just above (to ignore it next time we search for the body of the current function)
+            norm %
+            norm! k
+        endif
+        norm [m
+        let lnum1 = line('.')
+        norm %
+        let lnum2 = line('.')
+        let g += 1
+    endwhile
+    let lnum1 += 1
+    let lnum2 -= 1
     sil call unix#cloc#main(lnum1,lnum2,'')
     if exists('g:cloc_results')
         let blank_cnt = get(get(g:cloc_results, ft, {}), 'blank', 0)
