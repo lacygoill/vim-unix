@@ -168,7 +168,7 @@ fu unix#cloc#count_lines_in_func() abort "{{{1
         endif
         norm [m
         let lnum1 = line('.')
-        norm %
+        norm g%
         let lnum2 = line('.')
         let g += 1
     endwhile
