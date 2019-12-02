@@ -49,7 +49,7 @@ fu s:sudo_edit_init() abort "{{{1
         for i in range(argc())
             exe 'autocmd BufEnter '.fnameescape(argv(i))
                         \ 'if empty(&ft) || &ft is "conf"'
-                        \ '|doautocmd filetypedetect BufReadPost '.fnameescape(files[i])
+                        \ '|do filetypedetect BufReadPost '.fnameescape(files[i])
                         \ '|endif'
         endfor
     endif
@@ -72,7 +72,7 @@ endfu
 fu s:sudo_read_cmd() abort "{{{1
     sil %d_
     let [silent, cmd] = s:silent_sudo_cmd('cat')
-    sil exe printf('read !%s "%%" 2>%s', cmd, s:error_file)
+    sil exe printf('read !%s %%:p:S 2>%s', cmd, s:error_file)
     let exit_status = v:shell_error
     " reset `v:shell_error`
     call system('')
@@ -85,7 +85,7 @@ endfu
 
 fu s:sudo_write_cmd() abort "{{{1
     let [silent, cmd] = s:silent_sudo_cmd('tee')
-    let cmd ..= ' "%" >/dev/null'
+    let cmd ..= ' %:p:S >/dev/null'
     let cmd ..= ' 2> '.s:error_file
     exe silent 'write !'.cmd
     let error = s:sudo_error()

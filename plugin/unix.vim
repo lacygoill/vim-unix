@@ -103,8 +103,8 @@ com -bang -bar -nargs=1 -complete=custom,unix#rename_complete Rename Mv<bang> %:
 " It seems to offer more features.
 com -bar -range=% Share call unix#share#main(<line1>, <line2>)
 
-com -bang -bar -complete=file -nargs=?  SudoEdit  call unix#sudo#edit(<q-args>, <bang>0)
-com -bar  SudoWrite callunix#sudo#setup(expand('%:p')) | w!
+com -bang -bar -complete=file -nargs=? SudoEdit call unix#sudo#edit(<q-args>, <bang>0)
+com -bar SudoWrite call unix#sudo#setup(expand('%:p')) | w!
 
 " TODO:
 " Are `:SudoWrite` and `:W` doing the same thing?
@@ -160,13 +160,13 @@ com -bar Wall call unix#wall()
 " it bypasses the W12 warning.
 "}}}
 
-"               ┌ write the buffer on the standard input of a shell command (:h w_c)
+"               ┌ write the buffer on the standard input of a shell command (`:h w_c`)
 "               │ and execute the latter
 "               │
 "               │   ┌ raise the rights of the `tee` process so that it can write in
 "               │   │ a file owned by any user
 "               ├─┐ │
-com -bar W exe 'w !sudo tee >/dev/null %' | setl nomod
+com -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomod
 "                           ├────────┘ └ but write in the current file
 "                           │
 "                           └ don't write in the terminal
