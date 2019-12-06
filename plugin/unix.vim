@@ -64,12 +64,39 @@ augroup END
 
 com -bar -nargs=1 Chmod exe unix#chmod(<q-args>)
 
-com -bar -range=% -nargs=? -complete=file Cloc call unix#cloc#main(<line1>,<line2>,<q-args>)
+" Do not give the `-complete=[file|dir]` attribute to any command.{{{
+"
+" It makes  Vim automatically expand special  characters such as `%`,  which can
+" give unexpected results, and possibly destroy valuable data.
+"
+" MWE:
+"
+"     com -complete=file -nargs=1 Cmd call Func(<args>)
+"     fu Func(arg)
+"         echo a:arg
+"     endfu
+"     Cmd 'A%B'
+"     Aunix.vimB~
+"
+" ---
+"
+" In the past, we used it for these commands:
+"
+"     Cloc
+"     Cp
+"     Find
+"     Locate
+"     Mkdir (only one to which we gave `-complete=dir`)
+"     Mv
+"     SudoEdit
+"}}}
+" TODO: Should we give it to harmless commands (i.e. commands which don't rename/(re)move/copy files)?
+com -bar -range=% -nargs=? Cloc call unix#cloc#main(<line1>,<line2>,<q-args>)
 
-com -bang -bar -nargs=1 -complete=file Cp exe unix#cp(<q-args>, <bang>0)
+com -bang -bar -nargs=1 Cp exe unix#cp(<q-args>, <bang>0)
 
-com -bang -bar -complete=file -nargs=+ Find call unix#grep('find', <q-args>, <bang>0)
-" Why the bang?{{{
+com -bar -nargs=+ Find call unix#grep('find', <q-args>)
+" Why the bang after `com`?{{{
 "
 " fzf.vim installs a `:Locate` command.
 "
@@ -82,13 +109,13 @@ com -bang -bar -complete=file -nargs=+ Find call unix#grep('find', <q-args>, <ba
 "
 "     E174: Command already exists: add ! to replace it~
 "}}}
-com! -bang -bar -complete=file -nargs=+ Locate call unix#grep('locate', <q-args>, <bang>0)
+com! -bar -nargs=+ Locate call unix#grep('locate', <q-args>)
 
-com -bang -bar -nargs=? -complete=dir Mkdir call unix#mkdir(<q-args>, <bang>0)
+com -bang -bar -nargs=? Mkdir call unix#mkdir(<q-args>, <bang>0)
 
 " `:Mv` allows us to move the current file to any location.
 " `:Rename` allows us to rename the current file inside the current directory.
-com -bang -bar -nargs=1 -complete=file Mv exe unix#move(<q-args>, <bang>0)
+com -bang -bar -nargs=1 Mv exe unix#move(<q-args>, <bang>0)
 "                                        ┌ FIXME: what does it do?
 "                                        │
 com -bang -bar -nargs=1 -complete=custom,unix#rename_complete Rename Mv<bang> %:h/<args>
@@ -103,7 +130,7 @@ com -bang -bar -nargs=1 -complete=custom,unix#rename_complete Rename Mv<bang> %:
 " It seems to offer more features.
 com -bar -range=% Share call unix#share#main(<line1>, <line2>)
 
-com -bang -bar -complete=file -nargs=? SudoEdit call unix#sudo#edit(<q-args>, <bang>0)
+com -bang -bar -nargs=? SudoEdit call unix#sudo#edit(<q-args>, <bang>0)
 com -bar SudoWrite call unix#sudo#setup(expand('%:p')) | w!
 
 " TODO:
