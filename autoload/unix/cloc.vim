@@ -42,14 +42,14 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         if a:path =~# '^http'
             let tempdir = tempname()
             let cmd = a:path =~# 'bitbucket' ? 'hg' : 'git'
-            sil let git_output = system(cmd.' clone '.a:path.' '.tempdir)
+            sil let git_output = system(cmd..' clone '..a:path..' '..tempdir)
             let to_scan = tempdir
         else
             let to_scan = a:path
         endif
     else
         let file    = tempname()
-        let to_scan = file.'.'.(empty(expand('%:e')) ? &ft : expand('%:e'))
+        let to_scan = file..'.'..(empty(expand('%:e')) ? &ft : expand('%:e'))
         let lines   = getline(a:lnum1, a:lnum2)
         call writefile(lines, to_scan)
 
@@ -61,13 +61,13 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         " We could use this code instead:
         "
         "     let lines = shellescape(join(getline(a:lnum1,a:lnum2), "\n"))
-        "     sil let out = system('echo '.lines.' | cloc --stdin-name=foo.'.&ft.' -')
+        "     sil let out = system('echo '..lines..' | cloc --stdin-name=foo.'..&ft..' -')
         "     echo out
         "
         " But because of the previous limit:
         " http://stackoverflow.com/a/19355351
         "
-        " … the command would error out when send too much text.
+        " ... the command would error out when send too much text.
         " The error would like like this:
         "
         "     E484: Can't open file /tmp/user/1000/vsgRgDU/97~
@@ -80,7 +80,7 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         "}}}
     endif
 
-    let cmd = 'cloc --exclude-lang=Markdown --exclude-dir=.cache,t,test '.to_scan
+    let cmd = 'cloc --exclude-lang=Markdown --exclude-dir=.cache,t,test '..to_scan
     " remove the header
     sil let output_cloc = matchstr(system(cmd), '\zs-\+.*')
 
@@ -124,10 +124,9 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
     END
 
     for values_on_line in output_cloc
-        " `i`    is going to index the `keys` list
-        " `dict` is going to store a dictionary containing the numbers
-        "        of lines for a given language
-        let i    = 0
+        " `i` is going to index the `keys` list.
+        " `dict` is going to store a dictionary containing the numbers of lines for a given language.
+        let i = 0
         let dict = {}
 
         for value in values_on_line[1:]

@@ -3,9 +3,9 @@ if exists('g:loaded_unix')
 endif
 let g:loaded_unix = 1
 
-"                                         ┌ if you change the value,
-"                                         │ don't forget to put a slash at the end
-let s:template_dir = $HOME.'/.vim/template/'
+"                                          ┌ if you change the value,
+"                                          │ don't forget to put a slash at the end
+let s:template_dir = $HOME..'/.vim/template/'
 
 " TODO:
 " You shouldn't call `system()`; you should `:echo` it, so that we see the exact
@@ -208,12 +208,12 @@ nno <silent><unique> gl     :<c-u>call unix#cloc#count_lines_in_func()<cr>
 fu s:make_executable() abort "{{{2
     let shebang = matchstr(getline(1), '^#!\S\+')
     if !empty(shebang) && executable('chmod')
-        sil call system('chmod +x '.expand('%:p:S'))
+        sil call system('chmod +x '..expand('%:p:S'))
         if v:shell_error
             echohl ErrorMsg
             " FIXME:
             " Why is `:unsilent` needed?
-            unsilent echom 'Cannot make file executable: '.v:shell_error
+            unsilent echom 'Cannot make file executable: '..v:shell_error
             echohl None
 
             " Why?{{{
@@ -258,35 +258,35 @@ fu s:maybe_read_template() abort "{{{2
     "         /etc/init.d/skeleton
 
     " Get all the filetypes for which we have a template.
-    let filetypes = glob(s:template_dir.'by_filetype/*', 0, 1)
+    let filetypes = glob(s:template_dir..'by_filetype/*', 0, 1)
     call map(filetypes, {_,v -> fnamemodify(v, ':t:r')})
 
-    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir.'by_filetype/'.&ft.'.txt')
+    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir..'by_filetype/'..&ft..'.txt')
         "    ┌ don't use the template file as the alternate file for the current window{{{
         "    │ keep the current one
         "    │
         "    │ Note that `:keepalt` is not useful when you read the output of an
         "    │ external command (`:r !cmd`).
         "    │}}}
-        exe 'keepalt read '.fnameescape(s:template_dir.'by_filetype/'.&ft.'.txt')
+        exe 'keepalt read '..fnameescape(s:template_dir..'by_filetype/'..&ft..'.txt')
         1d_
 
     elseif expand('%:p') =~# '.*/compiler/[^/]*\.vim'
-    \   && filereadable(s:template_dir.'by_name/compiler.txt')
-        call setline(1, ['let current_compiler = '.string(expand('%:p:t:r')), ''])
-        exe 'keepalt 2read '.s:template_dir.'by_name/compiler.txt'
+    \   && filereadable(s:template_dir..'by_name/compiler.txt')
+        call setline(1, ['let current_compiler = '..string(expand('%:p:t:r')), ''])
+        exe 'keepalt 2read '..s:template_dir..'by_name/compiler.txt'
         " If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         " compilers in `$VIMRUNTIME/compiler`.
         " In this case, we need 'current_compiler' to be set.
 
     elseif expand('%:p') =~# '.*/filetype\.vim'
-    \   && filereadable(s:template_dir.'by_name/filetype.txt')
-        exe 'keepalt read '.s:template_dir.'by_name/filetype.txt'
+    \   && filereadable(s:template_dir..'by_name/filetype.txt')
+        exe 'keepalt read '..s:template_dir..'by_name/filetype.txt'
         1d_
 
     elseif expand('%:p') =~# '.*/scripts\.vim'
-    \   && filereadable(s:template_dir.'by_name/scripts.txt')
-        exe 'keepalt read '.s:template_dir.'by_name/scripts.txt'
+    \   && filereadable(s:template_dir..'by_name/scripts.txt')
+        exe 'keepalt read '..s:template_dir..'by_name/scripts.txt'
         1d_
 
     " useful to get a mini tmux.conf when debugging tmux
@@ -312,8 +312,8 @@ fu s:maybe_read_template() abort "{{{2
         \ 'bind p choose-buffer -Z "paste-buffer -p -b ''%%''"',
         \ ])
 
-    elseif expand('%:p:h') is# '' . $HOME . '/.zsh/my-completions'
-        call setline(1, ['#compdef ' . expand('%:t')[1:], '', ''])
+    elseif expand('%:p:h') is# ''..$HOME..'/.zsh/my-completions'
+        call setline(1, ['#compdef '..expand('%:t')[1:], '', ''])
     endif
 endfu
 

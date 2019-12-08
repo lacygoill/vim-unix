@@ -6,7 +6,7 @@ fu unix#trash#list() abort "{{{1
     sil let listing = system('trash-list')
     if v:shell_error
         call system('')
-        return 'echoerr '.string('Failed to list the contents of the trash can')
+        return 'echoerr '..string('Failed to list the contents of the trash can')
     else
         echo listing
     endif
@@ -32,7 +32,7 @@ fu unix#trash#put(bang) abort "{{{1
         "   │
         "   └ Why not `filereadable()`?
         "     Because the alternate “file” could be a buffer.
-            exe 'e '.alternate_file
+            exe 'e '..alternate_file
             bd! #
         else
             bd!
@@ -45,10 +45,10 @@ fu unix#trash#put(bang) abort "{{{1
     endif
 
     " now, try to put the file in a trash can
-    sil call system('trash-put '.shellescape(file))
+    sil call system('trash-put '..shellescape(file))
     if v:shell_error
         call system('')
-        return 'echoerr '.string('Failed to delete '.file)
+        return 'echoerr '..string('Failed to delete '..file)
     endif
 
     return a:bang ? 'e' : ''

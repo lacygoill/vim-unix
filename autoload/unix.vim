@@ -6,8 +6,7 @@ let g:autoloaded_unix = 1
 fu unix#chmod(flags) abort "{{{1
     sil let output = systemlist('chmod '..a:flags..' '..expand('%:p:S'))
 
-    " reload buffer to avoid a (delayed) message such as:
-    "         “"/tmp/file" 1L, 6C“
+    " reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
     e
 
     return !empty(output) ? 'echoerr '..string(output[0]) : ''
