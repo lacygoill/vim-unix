@@ -100,11 +100,11 @@ fu unix#grep(prg, args) abort "{{{1
     "         redraw!
     "
     "         " No need to inform  our custom autocmds, responsible for dealing with
-    "         " qf windows (opening, layout, …), that we have just populated a qfl:
+    "         " qf windows (opening, layout, ...), that we have just populated a qfl:
     "         "
     "         "         do <nomodeline> QuickFixCmdPost cwindow
     "         "
-    "         " … because `:vimgrep` has already triggered `QuickFixCmdPost`.
+    "         " ... because `:vimgrep` has already triggered `QuickFixCmdPost`.
     "
     "         if !empty(getqflist())
     "             call setqflist([], 'a', { 'title': '$ '.a:prg.' '.a:pat })
