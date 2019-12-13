@@ -90,6 +90,18 @@ com -bar -nargs=1 Chmod exe unix#chmod(<q-args>)
 "     Mv
 "     SudoEdit
 "}}}
+" TODO: Actually, we need to give `-complete=file` to `:Mv`, otherwise `:Rename` doesn't work as expected.{{{
+"
+" Without, `%:h` is not expanded.
+" Is there another way to expand `%:h`?
+" If not, should we give back `-complete=file` to all relevant commands?
+"
+" ---
+"
+" If you use `-complete=file_in_path` instead, `%:h` is still not expanded.
+" Why?
+" Idk, but the issue may depend on the cwd...
+"}}}
 " TODO: Should we give it to harmless commands (i.e. commands which don't rename/(re)move/copy files)?
 com -bar -range=% -nargs=? Cloc call unix#cloc#main(<line1>,<line2>,<q-args>)
 
@@ -115,7 +127,7 @@ com -bang -bar -nargs=? Mkdir call unix#mkdir(<q-args>, <bang>0)
 
 " `:Mv` allows us to move the current file to any location.
 " `:Rename` allows us to rename the current file inside the current directory.
-com -bang -bar -nargs=1 Mv exe unix#move(<q-args>, <bang>0)
+com -bang -bar -complete=file -nargs=1 Mv exe unix#move(<q-args>, <bang>0)
 "                                        ┌ FIXME: what does it do?
 "                                        │
 com -bang -bar -nargs=1 -complete=custom,unix#rename_complete Rename Mv<bang> %:h/<args>

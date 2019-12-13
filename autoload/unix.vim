@@ -93,7 +93,7 @@ fu unix#grep(prg, args) abort "{{{1
     "         "            ┌ don't jump to first match, we want to decide ourselves
     "         "            │ whether to jump
     "         "            │
-    "         sil exe 'grep! '.a:pat
+    "         sil exe 'grep! '..a:pat
     "         " │
     "         " └ bypass prompt “Press ENTER or type command to continue“
     "         " FIXME:
