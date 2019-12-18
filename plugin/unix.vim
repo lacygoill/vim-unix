@@ -262,7 +262,7 @@ fu s:make_executable() abort "{{{2
 endfu
 
 fu s:maybe_make_executable() abort "{{{2
-    au BufWritePost <buffer> ++once sil! call s:make_executable()
+    au BufWritePost <buffer> ++once call s:make_executable()
 endfu
 
 fu s:maybe_read_template() abort "{{{2
