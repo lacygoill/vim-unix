@@ -95,6 +95,7 @@ com -bar -nargs=1 Chmod exe unix#chmod(<q-args>)
 " Without, `%:h` is not expanded.
 " Is there another way to expand `%:h`?
 " If not, should we give back `-complete=file` to all relevant commands?
+" Update: Could we use `expandcmd()` to manually expand `%:h`?
 "
 " ---
 "
