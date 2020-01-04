@@ -56,11 +56,10 @@ fu unix#grep(prg, args) abort "{{{1
     " Make `find(1)` ignore files matching 'wig'.
     " https://stackoverflow.com/a/22558474/9477010
     let cmd = a:prg..' '..a:args..' 2>/dev/null'
-    let qfl = getqflist({'lines': systemlist(cmd), 'efm': '%f'}).items
-    if empty(qfl) | return | endif
+    let items = getqflist({'lines': systemlist(cmd), 'efm': '%f'}).items
+    if empty(items) | return | endif
 
-    call setqflist(qfl)
-    call setqflist([], 'a', {'title': '$ '..cmd})
+    call setqflist([], ' ', {'items': items, 'title': '$ '..cmd})
 
     do <nomodeline> QuickFixCmdPost cwindow
     if &bt is# 'quickfix'
