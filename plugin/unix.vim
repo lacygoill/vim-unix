@@ -302,28 +302,31 @@ fu s:maybe_read_template() abort "{{{2
         exe 'keepalt read '..s:template_dir..'by_name/scripts.txt'
         1d_
 
-    " useful to get a mini tmux.conf when debugging tmux
+    " useful to get a mini `tmux.conf` when debugging tmux
     elseif expand('%:t') is# 'tmux.conf'
-        call setline(1, [
-        \ 'set -g prefix M-space',
-        \ 'set -g status-keys emacs',
-        \ 'set -s history-file "$HOME/.tmux/command_history"',
-        \ 'set -g history-limit 50000',
-        \ 'bind -T root M-l next',
-        \ 'bind -T root M-h prev',
-        \ 'bind -T copy-mode-vi v send -X begin-selection',
-        \ 'bind -T copy-mode-vi V send -X select-line',
-        \ 'bind -T root M-s copy-mode',
-        \ 'bind M-space last-pane',
-        \ 'bind | splitw  -h -c ''#{pane_current_path}''',
-        \ 'bind _ splitw -fv -c ''#{pane_current_path}''',
-        \ 'bind h select-pane -L',
-        \ 'bind j select-pane -D',
-        \ 'bind k select-pane -U',
-        \ 'bind l select-pane -R',
-        \ 'bind C-p paste-buffer -p',
-        \ 'bind p choose-buffer -Z "paste-buffer -p -b ''%%''"',
-        \ ])
+        let lines =<< trim END
+            set -g prefix M-space
+            set -g status-keys emacs
+            set -s history-file "$HOME/.config/tmux/command_history"
+            set -g history-limit 50000
+            bind -T root M-l next
+            bind -T root M-h prev
+            bind -T root ¹ next
+            bind -T root ² prev
+            bind -T copy-mode-vi v send -X begin-selection
+            bind -T copy-mode-vi V send -X select-line
+            bind -T root M-s copy-mode
+            bind M-space last-pane
+            bind | splitw  -h -c ''#{pane_current_path}''
+            bind _ splitw -fv -c ''#{pane_current_path}''
+            bind h select-pane -L
+            bind j select-pane -D
+            bind k select-pane -U
+            bind l select-pane -R
+            bind C-p paste-buffer -p
+            bind p choose-buffer -Z "paste-buffer -p -b ''%%''"
+        END
+        call setline(1, lines)
 
     elseif expand('%:p:h') is# ''..$HOME..'/.zsh/my-completions'
         call setline(1, ['#compdef '..expand('%:t')[1:], '', ''])
