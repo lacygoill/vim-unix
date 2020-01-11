@@ -314,10 +314,10 @@ fu unix#wall() abort "{{{1
         let seen[bufnr('%')] = 1
         write
     endif
-    sil! tabdo windo if s:should_write_buffer(seen)
-                 \ |     write
-                 \ |     let seen[bufnr('%')] = 1
-                 \ | endif
+    tabdo windo if s:should_write_buffer(seen)
+            \ |     write
+            \ |     let seen[bufnr('%')] = 1
+            \ | endif
     call win_gotoid(cur_winid)
 endfu
 
