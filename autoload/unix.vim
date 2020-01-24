@@ -16,7 +16,7 @@ fu unix#chmod(flags) abort "{{{1
     "     if !empty(output)
     "         'echoerr '.string(output[0])
     "     else
-    "         call timer_start(0, {_ -> execute('redraw!', '')})
+    "         call timer_start(0, {-> execute('redraw!', '')})
     "         return ''
     "     endif
     "
