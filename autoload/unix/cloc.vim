@@ -141,6 +141,14 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
 endfu
 
 fu unix#cloc#count_lines_in_func() abort "{{{1
+    " Sometimes, when I press `gl` in a function, the command-line displays that it contains 0 lines of code!{{{
+    "
+    " That's probably because `%` fails to jump on `endfu` when the cursor is on `fu`.
+    " See: https://github.com/andymass/vim-matchup/issues/54
+    "
+    " Try to avoid using a variable name matching `fu\%[nction]`.
+    " Otherwise, you'll have to just accept that it's not 100% reliable.
+    "}}}
     let ft = get({'vim': 'vim script', 'sh': 'Bourne Shell',}, &ft, '')
     if ft is# '' | echo 'non supported filetype' | return | endif
     let view = winsaveview()
