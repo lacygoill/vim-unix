@@ -121,7 +121,7 @@ fu unix#grep(prg, args) abort "{{{1
     "             endif
     "         endif
     "     catch
-    "         return lg#catch_error()
+    "         return lg#catch()
     "     finally
     "         call setbufvar(bufnr, '&grepprg', grepprg)
     "         let &grepformat = grepformat
@@ -165,7 +165,7 @@ fu unix#mkdir(dir, bang) abort "{{{1
     try
         call mkdir(dest, a:bang ? 'p' : '')
     catch
-        return lg#catch_error()
+        return lg#catch()
     endtry
 endfu
 
