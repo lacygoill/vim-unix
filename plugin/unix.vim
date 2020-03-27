@@ -221,7 +221,7 @@ nno <silent><unique> gl     :<c-u>call unix#cloc#count_lines_in_func()<cr>
 fu s:make_executable() abort "{{{2
     let shebang = matchstr(getline(1), '^#!\S\+')
     if !empty(shebang) && executable('chmod')
-        sil call system('chmod +x '..expand('%:p:S'))
+        sil call system('chmod +x '..expand('<afile>:p:S'))
         if v:shell_error
             echohl ErrorMsg
             " FIXME:
@@ -284,26 +284,26 @@ fu s:maybe_read_template() abort "{{{2
         exe 'keepalt read '..fnameescape(s:template_dir..'by_filetype/'..&ft..'.txt')
         1d_
 
-    elseif expand('%:p') =~# '.*/compiler/[^/]*\.vim'
+    elseif expand('<afile>:p') =~# '.*/compiler/[^/]*\.vim'
     \   && filereadable(s:template_dir..'by_name/compiler.txt')
-        call setline(1, ['let current_compiler = '..string(expand('%:p:t:r')), ''])
+        call setline(1, ['let current_compiler = '..string(expand('<afile>:p:t:r')), ''])
         exe 'keepalt 2read '..s:template_dir..'by_name/compiler.txt'
         " If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         " compilers in `$VIMRUNTIME/compiler`.
         " In this case, we need 'current_compiler' to be set.
 
-    elseif expand('%:p') =~# '.*/filetype\.vim'
+    elseif expand('<afile>:p') =~# '.*/filetype\.vim'
     \   && filereadable(s:template_dir..'by_name/filetype.txt')
         exe 'keepalt read '..s:template_dir..'by_name/filetype.txt'
         1d_
 
-    elseif expand('%:p') =~# '.*/scripts\.vim'
+    elseif expand('<afile>:p') =~# '.*/scripts\.vim'
     \   && filereadable(s:template_dir..'by_name/scripts.txt')
         exe 'keepalt read '..s:template_dir..'by_name/scripts.txt'
         1d_
 
     " useful to get a mini `tmux.conf` when debugging tmux
-    elseif expand('%:t') is# 'tmux.conf'
+    elseif expand('<afile>:t') is# 'tmux.conf'
         let lines =<< trim END
             set -g prefix M-space
             set -g status-keys emacs
@@ -328,8 +328,8 @@ fu s:maybe_read_template() abort "{{{2
         END
         call setline(1, lines)
 
-    elseif expand('%:p:h') is# ''..$HOME..'/.zsh/my-completions'
-        call setline(1, ['#compdef '..expand('%:t')[1:], '', ''])
+    elseif expand('<afile>:p:h') is# ''..$HOME..'/.zsh/my-completions'
+        call setline(1, ['#compdef '..expand('<afile>:t')[1:], '', ''])
     endif
 endfu
 
