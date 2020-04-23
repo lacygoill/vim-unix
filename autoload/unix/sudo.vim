@@ -29,7 +29,7 @@ endfu
 
 fu s:silent_sudo_cmd(editor) abort "{{{1
     let cmd = 'env SUDO_EDITOR='..a:editor..' VISUAL='..a:editor..' sudo -e'
-    let local_nvim = has('nvim') && len($DISPLAY..$SECURITYSESSIONID)
+    let local_nvim = has('nvim') && strlen($DISPLAY..$SECURITYSESSIONID)
     if !has('gui_running') && !local_nvim
         return ['silent', cmd]
 
@@ -63,7 +63,7 @@ fu s:sudo_error() abort "{{{1
     let error = join(readfile(s:error_file), ' | ')
     if error =~# '^sudo' || v:shell_error
         call system('')
-        return len(error) ? error : 'Error invoking sudo'
+        return strlen(error) ? error : 'Error invoking sudo'
     else
         return error
     endif
