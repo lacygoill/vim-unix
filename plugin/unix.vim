@@ -181,9 +181,9 @@ com -bar Wall call unix#wall()
 "
 " The full message looks something like this:
 "
-" > W12: Warning: File "/etc/apt/sources.list" has changed and the buffer was changed in Vim as well
-" > See ":help W12" for more info.
-" > [O]K, (L)oad File:
+" >     W12: Warning: File "/etc/apt/sources.list" has changed and the buffer was changed in Vim as well
+" >     See ":help W12" for more info.
+" >     [O]K, (L)oad File:
 "
 " If you press `O`, the buffer will be written.
 " If you press `L`, the file will be reloaded.
@@ -203,7 +203,7 @@ com -bar Wall call unix#wall()
 "               ┌ write the buffer on the standard input of a shell command (`:h w_c`)
 "               │ and execute the latter
 "               │
-"               │   ┌ raise the rights of the `tee` process so that it can write in
+"               │   ┌ raise the rights of the `tee(1)` process so that it can write in
 "               │   │ a file owned by any user
 "               ├─┐ │
 com -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomod
