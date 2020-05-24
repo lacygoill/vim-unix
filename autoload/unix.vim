@@ -4,6 +4,7 @@ endif
 let g:autoloaded_unix = 1
 
 fu unix#chmod(flags) abort "{{{1
+    " TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
     sil let output = systemlist('chmod '..a:flags..' '..expand('%:p:S'))
 
     " reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
