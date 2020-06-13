@@ -55,15 +55,6 @@ fu unix#trash#put(bang) abort "{{{1
 endfu
 
 fu unix#trash#restore() abort "{{{1
-    " `:!` can't be interactive in Neovim
-    " See: https://github.com/neovim/neovim/issues/1496
-    if !has('nvim')
-        !rlwrap restore-trash
-    else
-        new
-        let id = termopen('/bin/zsh')
-        call chansend(id, ['rlwrap restore-trash', ''])
-        startinsert
-    endif
+    !rlwrap restore-trash
 endfu
 

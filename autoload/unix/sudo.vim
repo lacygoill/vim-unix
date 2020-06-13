@@ -29,8 +29,7 @@ endfu
 
 fu s:silent_sudo_cmd(editor) abort "{{{1
     let cmd = 'env SUDO_EDITOR='..a:editor..' VISUAL='..a:editor..' sudo -e'
-    let local_nvim = has('nvim') && strlen($DISPLAY..$SECURITYSESSIONID)
-    if !has('gui_running') && !local_nvim
+    if !has('gui_running')
         return ['silent', cmd]
 
     elseif !empty($SUDO_ASKPASS)
@@ -39,7 +38,7 @@ fu s:silent_sudo_cmd(editor) abort "{{{1
         return ['silent', cmd..' -A']
 
     else
-        return [local_nvim ? 'silent' : '', cmd]
+        return ['', cmd]
     endif
 endfu
 
