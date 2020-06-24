@@ -214,7 +214,7 @@ com -bar W exe 'w !sudo tee >/dev/null %:p:S' | setl nomod
 
 nno <silent><unique> g<c-l> :<c-u>Cloc<cr>
 xno <silent><unique> g<c-l> :Cloc<cr>
-nno <silent><unique> gl     :<c-u>call unix#cloc#count_lines_in_func()<cr>
+nno <silent><unique> gl :<c-u>call unix#cloc#count_lines_in_func()<cr>
 
 " Functions {{{1
 fu s:make_executable() abort "{{{2
