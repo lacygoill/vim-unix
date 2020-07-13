@@ -281,7 +281,7 @@ fu s:maybe_read_template() abort "{{{2
         "    │ external command (`:r !cmd`).
         "    │}}}
         exe 'keepalt read '..fnameescape(s:template_dir..'by_filetype/'..&ft..'.txt')
-        1d_
+        keepj 1d_
 
     elseif expand('<afile>:p') =~# '.*/compiler/[^/]*\.vim'
     \   && filereadable(s:template_dir..'by_name/compiler.txt')
@@ -294,12 +294,12 @@ fu s:maybe_read_template() abort "{{{2
     elseif expand('<afile>:p') =~# '.*/filetype\.vim'
     \   && filereadable(s:template_dir..'by_name/filetype.txt')
         exe 'keepalt read '..s:template_dir..'by_name/filetype.txt'
-        1d_
+        keepj 1d_
 
     elseif expand('<afile>:p') =~# '.*/scripts\.vim'
     \   && filereadable(s:template_dir..'by_name/scripts.txt')
         exe 'keepalt read '..s:template_dir..'by_name/scripts.txt'
-        1d_
+        keepj 1d_
 
     " useful to get a mini `tmux.conf` when debugging tmux
     elseif expand('<afile>:t') is# 'tmux.conf'

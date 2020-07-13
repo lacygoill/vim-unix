@@ -69,13 +69,13 @@ fu s:sudo_error() abort "{{{1
 endfu
 
 fu s:sudo_read_cmd() abort "{{{1
-    sil %d_
+    sil keepj %d_
     let [silent, cmd] = s:silent_sudo_cmd('cat')
     sil exe printf('read !%s %%:p:S 2>%s', cmd, s:error_file)
     let exit_status = v:shell_error
     " reset `v:shell_error`
     call system('')
-    sil 1d_
+    sil keepj 1d_
     setl nomodified
     if exit_status
         return 'echoerr '..string(s:sudo_error())
