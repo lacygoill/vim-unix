@@ -107,7 +107,7 @@ fu unix#grep(prg, args) abort "{{{1
     "         " ... because `:vimgrep` has already triggered `QuickFixCmdPost`.
     "
     "         if !empty(getqflist())
-    "             call setqflist([], 'a', { 'title': '$ '.a:prg.' '.a:pat })
+    "             call setqflist([], 'a', { 'title': '$ ' .. a:prg .. ' ' .. a:pat })
     "
     "             if &bt is# 'quickfix'
     "                 call qf#set_matches('eunuch:grep', 'Conceal', 'double_bar')
