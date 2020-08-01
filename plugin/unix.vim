@@ -125,8 +125,8 @@ com! -bar -nargs=+ Locate call unix#grep('locate', <q-args>)
 
 com -bang -bar -nargs=? Mkdir call unix#mkdir(<q-args>, <bang>0)
 
-" `:Mv` allows us to move the current file to any location.
-" `:Rename` allows us to rename the current file inside the current directory.
+" `:Mv` lets us move the current file to any location.
+" `:Rename` lets us rename the current file inside the current directory.
 com -bang -bar -complete=file -nargs=1 Mv exe unix#move(<q-args>, <bang>0)
 "                                        ┌ FIXME: what does it do?
 "                                        │
@@ -172,7 +172,7 @@ com -bar Wall call unix#wall()
 
 " What's the purpose of `:W`?{{{
 "
-" It allows us to write a file for which we don't have write access to.
+" It lets us write a file for which we don't have write access to.
 " This happens when we  try to edit a root file in a  Vim session started from a
 " regular user.
 "}}}
