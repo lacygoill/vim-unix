@@ -3,19 +3,21 @@ if exists('g:autoloaded_unix')
 endif
 let g:autoloaded_unix = 1
 
+import Catch from 'lg.vim'
+
 fu unix#chmod(flags) abort "{{{1
     " TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
-    sil let output = systemlist('chmod '..a:flags..' '..expand('%:p:S'))
+    sil let output = systemlist('chmod ' .. a:flags .. ' ' .. expand('%:p:S'))
 
     " reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
     e
 
-    return !empty(output) ? 'echoerr '..string(output[0]) : ''
+    return !empty(output) ? 'echoerr ' .. string(output[0]) : ''
 
     " Alternative:
     "
     "     if !empty(output)
-    "         'echoerr '..string(output[0])
+    "         'echoerr ' .. string(output[0])
     "     else
     "         call timer_start(0, {-> execute('redraw!', '')})
     "         return ''
@@ -27,28 +29,28 @@ fu unix#chmod(flags) abort "{{{1
 endfu
 
 fu s:command_unavailable(cmd) abort "{{{1
-    return 'echoerr '..string(a:cmd..' is not executable; install the trash-cli package')
+    return 'echoerr ' .. string(a:cmd .. ' is not executable; install the trash-cli package')
 endfu
 
 fu unix#cp(dst, bang) abort "{{{1
     let src = expand('%:p')
     let dir = expand('%:p:h')
     let dst = stridx(a:dst, '/') == 0
-          \ ?     a:dst
-          \ :     dir..'/'..simplify(a:dst)
+        \ ?     a:dst
+        \ :     dir .. '/' .. simplify(a:dst)
 
     if filereadable(dst) && !a:bang
-        return 'echoerr '..string(string(dst)..' already exists; add a bang to overwrite it')
+        return 'echoerr ' .. (string(dst) .. ' already exists; add a bang to overwrite it')->string()
     endif
-    sil call system('cp -L'..(a:bang ? '' : 'n')..'p '..shellescape(src)..' '..shellescape(dst))
-    "                    │                   │     │
-    "                    │                   │     └ same as --preserve=mode,ownership,timestamps
-    "                    │                   └ do not overwrite an existing file
+    sil call system('cp -L' .. (a:bang ? '' : 'n') .. 'p ' .. shellescape(src) .. ' ' .. shellescape(dst))
+    "                    │                     │       │
+    "                    │                     │       └ same as --preserve=mode,ownership,timestamps
+    "                    │                     └ do not overwrite an existing file
     "                    └ follow symbolic links
 
     if v:shell_error
         call system('')
-        return 'echoerr '..string('Failed to copy '..string(src)..' to '..string(dst))
+        return 'echoerr ' .. string('Failed to copy ' .. string(src) .. ' to ' .. string(dst))
     endif
 endfu
 
@@ -56,11 +58,11 @@ fu unix#grep(prg, args) abort "{{{1
     " TODO:
     " Make `find(1)` ignore files matching 'wig'.
     " https://stackoverflow.com/a/22558474/9477010
-    let cmd = a:prg..' '..a:args..' 2>/dev/null'
+    let cmd = a:prg .. ' ' .. a:args .. ' 2>/dev/null'
     let items = getqflist({'lines': systemlist(cmd), 'efm': '%f'}).items
     if empty(items) | return | endif
 
-    call setqflist([], ' ', {'items': items, 'title': '$ '..cmd})
+    call setqflist([], ' ', {'items': items, 'title': '$ ' .. cmd})
 
     do <nomodeline> QuickFixCmdPost cwindow
     if &bt is# 'quickfix'
@@ -72,7 +74,7 @@ fu unix#grep(prg, args) abort "{{{1
     "
     "     let [grepprg, bufnr] = [&l:grepprg, bufnr('%')]
     "     let grepformat = &grepformat
-    "     let shellpipe  = &shellpipe
+    "     let shellpipe = &shellpipe
     "
     "     try
     "         " TODO:
@@ -87,13 +89,13 @@ fu unix#grep(prg, args) abort "{{{1
     "         " It's noise, so we get rid of them by temporarily tweaking 'sp'.
     "         let &shellpipe = '| tee'
     "         " FIXME:
-    "         " Don't use `:grep`, it makes the screen flicker. Use `cgetexpr` instead.
+    "         " Don't use `:grep`, it makes the screen flicker.  Use `cgetexpr` instead.
     "         " Look at what we did in `myfuncs#op_grep()`.
     "
     "         "            ┌ don't jump to first match, we want to decide ourselves
     "         "            │ whether to jump
     "         "            │
-    "         sil exe 'grep! '..a:pat
+    "         sil exe 'grep! ' .. a:pat
     "         " │
     "         " └ bypass prompt “Press ENTER or type command to continue“
     "         " FIXME:
@@ -106,7 +108,7 @@ fu unix#grep(prg, args) abort "{{{1
     "         "
     "         " ... because `:vimgrep` has already triggered `QuickFixCmdPost`.
     "
-    "         if !empty(getqflist())
+    "         if !getqflist()->empty()
     "             call setqflist([], 'a', { 'title': '$ ' .. a:prg .. ' ' .. a:pat })
     "
     "             if &bt is# 'quickfix'
@@ -122,11 +124,11 @@ fu unix#grep(prg, args) abort "{{{1
     "             endif
     "         endif
     "     catch
-    "         return lg#catch()
+    "         return s:Catch()
     "     finally
     "         call setbufvar(bufnr, '&grepprg', grepprg)
     "         let &grepformat = grepformat
-    "         let &shellpipe  = shellpipe
+    "         let &shellpipe = shellpipe
     "     endtry
     "}}}
     " TODO: Study the old code to understand why `:grep` was really a bad choice.{{{
@@ -135,7 +137,7 @@ fu unix#grep(prg, args) abort "{{{1
     " that  it runs  `:!` which  means  that Vim  automatically expands  special
     " characters,  which means  that you  need to  protect them,  which is  hard
     " because  `a:pat` is  not  necessarily  a pattern,  it  could be  arbitrary
-    " arguments  passed to  `$ find`. So  you would  first need  to extract  the
+    " arguments passed  to `$  find`.  So  you would first  need to  extract the
     " pattern from the arguments...
     "
     " ---
@@ -158,15 +160,15 @@ endfu
 
 fu unix#mkdir(dir, bang) abort "{{{1
     let dest = empty(a:dir)
-           \ ?     expand('%:p:h')
-           \ : a:dir[0] is# '/'
-           \ ?     a:dir
-           \ :     expand('%:p')..a:dir
+        \ ?     expand('%:p:h')
+        \ : a:dir[0] is# '/'
+        \ ?     a:dir
+        \ :     expand('%:p') .. a:dir
 
     try
         call mkdir(dest, a:bang ? 'p' : '')
     catch
-        return lg#catch()
+        return s:Catch()
     endtry
 endfu
 
@@ -185,18 +187,18 @@ fu unix#move(dst, bang) abort "{{{1
         "           ┌ make sure there's a slash
         "           │ between the directory and the filename
         "           ├─────────────────────────────┐
-        let dst ..= (dst[-1:-1] is# '/' ? '' : '/')..fnamemodify(src, ':t')
-        "                                            ├────────────────────┘
-        "                                            └ add the current filename
-        "                                              to complete the destination
+        let dst ..= (dst[-1:-1] is# '/' ? '' : '/') .. fnamemodify(src, ':t')
+        "                                              ├────────────────────┘
+        "                                              └ add the current filename
+        "                                                to complete the destination
     endif
 
     " If the directory of the destination doesn't exist, create it.
-    if !isdirectory(fnamemodify(dst, ':h'))
-        call mkdir(fnamemodify(dst, ':h'), 'p')
+    if !fnamemodify(dst, ':h')->isdirectory()
+        call fnamemodify(dst, ':h')->mkdir('p')
     endif
 
-    let dst = substitute(simplify(dst), '^\.\/', '', '')
+    let dst = simplify(dst)->substitute('^\.\/', '', '')
 
     " `:Mv` and `:Rename` should behave like `:saveas`.
     "
@@ -214,7 +216,7 @@ fu unix#move(dst, bang) abort "{{{1
     " The destination is occupied by an existing file, and no bang was added.
     " The command must fail.
     if filereadable(dst) && !a:bang
-        return 'keepalt saveas '..fnameescape(dst)
+        return 'keepalt saveas ' .. fnameescape(dst)
         "       │
         "       └ even though `:saveas` is going to fail, it will still
         "         change the alternate file for the current window (`dst`);
@@ -227,7 +229,7 @@ fu unix#move(dst, bang) abort "{{{1
     "    - `rename()` can move a file to a different filesystem; `:saveas` ?
     elseif rename(src, dst)
         " If a problem occurred, inform us.
-        return 'echoerr '..string('Failed to rename '..string(src)..' to '..string(dst))
+        return 'echoerr ' .. string('Failed to rename ' .. string(src) .. ' to ' .. string(dst))
     else
         " If no pb occurred execute `:saveas! dst`.
         "
@@ -245,7 +247,7 @@ fu unix#move(dst, bang) abort "{{{1
         "     BufWrite
         "     BufWritePre
         "     BufWritePost
-        exe 'keepalt saveas! '..fnameescape(dst)
+        exe 'keepalt saveas! ' .. fnameescape(dst)
 
         " Get rid of old buffer (it's not linked to a file anymore).
         " But only if it's not the current one.
@@ -254,7 +256,7 @@ fu unix#move(dst, bang) abort "{{{1
         "     :Mv     /path/to/current/file
         "     :Rename current_filename
         if src isnot# expand('%:p')
-            exe 'bw '..fnameescape(src)
+            exe 'bw ' .. fnameescape(src)
         endif
 
         " Rationale:{{{
@@ -270,29 +272,28 @@ fu unix#move(dst, bang) abort "{{{1
 endfu
 
 fu unix#rename_complete(arglead, _l, _p) abort "{{{1
-    let prefix = expand('%:p:h')..'/'
-    let files  = glob(prefix..a:arglead..'*', 0, 1)
+    let prefix = expand('%:p:h') .. '/'
+    let files = glob(prefix .. a:arglead .. '*', 0, 1)
 
     " TODO:
     " Should we use this? Or the next commented `map()`?
     "
     " Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
-    call map(files, {_,v -> simplify(v) isnot# simplify(expand('%:p'))
-                        \ ?     v
-                        \ : !empty(fnamemodify(v, ':p:t:r'))
-                        \ ?     fnamemodify(v, ':r')..'.'
-                        \ :     v
-                        \ })
+    call map(files, {_, v -> simplify(v) isnot# expand('%:p')->simplify()
+        \ ?     v
+        \ : !fnamemodify(v, ':p:t:r')->empty()
+        \ ?     fnamemodify(v, ':r') .. '.'
+        \ :     v
+        \ })
 
-    " call map(files, {_,v ->  v[strlen(prefix) : -1]
-    " \                       . (isdirectory(v) ? '/' : '')})
+    " call map(files, {_, v -> v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : '')})
 
     return join(files, "\n")
 endfu
 
 fu s:should_write_buffer(seen) abort "{{{1
-    " 'buftype' is a buffer-local option, whose value determines the type of
-    " buffer. We want to write a buffer currently displayed in a window, iff:
+    " `'buftype'` is a  buffer-local option, whose value determines  the type of
+    " buffer.  We want to write a buffer currently displayed in a window, iff:
     "
     "    - it is a regular buffer (&bt = '')
     "
@@ -301,8 +302,8 @@ fu s:should_write_buffer(seen) abort "{{{1
 
     if !&readonly
   \ && &modifiable
-  \ && &bt is# '' || &bt is# 'acwrite'
-  \ && !empty(expand('%'))
+  \ && &bt == '' || &bt is# 'acwrite'
+  \ && !expand('%')->empty()
   \ && !has_key(a:seen, bufnr('%'))
         return 1
     endif
@@ -311,14 +312,14 @@ endfu
 fu unix#wall() abort "{{{1
     let cur_winid = win_getid()
     let seen = {}
-    if !&readonly && !empty(expand('%'))
+    if !&readonly && !expand('%')->empty()
         let seen[bufnr('%')] = 1
         write
     endif
     tabdo windo if s:should_write_buffer(seen)
-            \ |     write
-            \ |     let seen[bufnr('%')] = 1
-            \ | endif
+        \ |     write
+        \ |     let seen[bufnr('%')] = 1
+        \ | endif
     call win_gotoid(cur_winid)
 endfu
 

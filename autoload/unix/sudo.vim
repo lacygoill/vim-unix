@@ -6,10 +6,11 @@ let g:autoloaded_unix#sudo = 1
 let s:error_file = tempname()
 
 fu unix#sudo#edit(file, bang) abort "{{{1
-    call unix#sudo#setup(fnamemodify(empty(a:file) ? expand('%') : a:file, ':p'))
+    let file = (empty(a:file) ? expand('%') : a:file)->fnamemodify(':p')
+    call unix#sudo#setup(file)
 
     if !&modified || !empty(a:file)
-        exe 'e'..(a:bang ? '!' : '')..' '..a:file
+        exe 'e' .. (a:bang ? '!' : '') .. ' ' .. a:file
     endif
 
     if empty(a:file) || expand('%:p') is# fnamemodify(a:file, ':p')
@@ -18,24 +19,24 @@ fu unix#sudo#edit(file, bang) abort "{{{1
 endfu
 
 fu unix#sudo#setup(file) abort "{{{1
-    if !filereadable(a:file) && !exists('#BufReadCmd#'..fnameescape(a:file))
-        exe 'au BufReadCmd '..fnameescape(a:file)..' exe s:sudo_read_cmd()'
+    if !filereadable(a:file) && !exists('#BufReadCmd#' .. fnameescape(a:file))
+        exe 'au BufReadCmd ' .. fnameescape(a:file) .. ' exe s:sudo_read_cmd()'
     endif
-    if !filewritable(a:file) && !exists('#BufWriteCmd#'..fnameescape(a:file))
-        exe 'au BufReadPost '..fnameescape(a:file)..' set noreadonly'
-        exe 'au BufWriteCmd '..fnameescape(a:file)..' exe s:sudo_write_cmd()'
+    if !filewritable(a:file) && !exists('#BufWriteCmd#' .. fnameescape(a:file))
+        exe 'au BufReadPost ' .. fnameescape(a:file) .. ' set noreadonly'
+        exe 'au BufWriteCmd ' .. fnameescape(a:file) .. ' exe s:sudo_write_cmd()'
     endif
 endfu
 
 fu s:silent_sudo_cmd(editor) abort "{{{1
-    let cmd = 'env SUDO_EDITOR='..a:editor..' VISUAL='..a:editor..' sudo -e'
+    let cmd = 'env SUDO_EDITOR=' .. a:editor .. ' VISUAL=' .. a:editor .. ' sudo -e'
     if !has('gui_running')
         return ['silent', cmd]
 
     elseif !empty($SUDO_ASKPASS)
-    \ ||   filereadable('/etc/sudo.conf')
-    \ &&   len(filter(readfile('/etc/sudo.conf', 50), {_,v -> v =~# '^Path askpass '}))
-        return ['silent', cmd..' -A']
+    \ || filereadable('/etc/sudo.conf')
+    \ && readfile('/etc/sudo.conf', 50)->filter({_, v -> v =~# '^Path askpass '})->len()
+        return ['silent', cmd .. ' -A']
 
     else
         return ['', cmd]
@@ -45,10 +46,10 @@ endfu
 fu s:sudo_edit_init() abort "{{{1
     let files = split($SUDO_COMMAND, ' ')[1:-1]
     if len(files) == argc()
-        for i in range(argc())
-            exe 'autocmd BufEnter '..fnameescape(argv(i))
+        for i in argc()->range()
+            exe 'autocmd BufEnter ' .. argv(i)->fnameescape()
                         \ 'if empty(&ft) || &ft is "conf"'
-                        \ '|do filetypedetect BufReadPost '..fnameescape(files[i])
+                        \ '|do filetypedetect BufReadPost ' .. fnameescape(files[i])
                         \ '|endif'
         endfor
     endif
@@ -59,7 +60,7 @@ if $SUDO_COMMAND =~# '^sudoedit '
 endif
 
 fu s:sudo_error() abort "{{{1
-    let error = join(readfile(s:error_file), ' | ')
+    let error = readfile(s:error_file)->join(' | ')
     if error =~# '^sudo' || v:shell_error
         call system('')
         return strlen(error) ? error : 'Error invoking sudo'
@@ -78,18 +79,18 @@ fu s:sudo_read_cmd() abort "{{{1
     sil keepj 1d_
     setl nomodified
     if exit_status
-        return 'echoerr '..string(s:sudo_error())
+        return 'echoerr ' .. s:sudo_error()->string()
     endif
 endfu
 
 fu s:sudo_write_cmd() abort "{{{1
     let [silent, cmd] = s:silent_sudo_cmd('tee')
     let cmd ..= ' %:p:S >/dev/null'
-    let cmd ..= ' 2> '..s:error_file
-    exe silent 'write !'..cmd
+    let cmd ..= ' 2> ' .. s:error_file
+    exe silent 'write !' .. cmd
     let error = s:sudo_error()
     if !empty(error)
-        return 'echoerr '..string(error)
+        return 'echoerr ' .. string(error)
     else
         setl nomodified
         return ''

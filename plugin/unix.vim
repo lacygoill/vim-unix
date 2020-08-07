@@ -3,16 +3,16 @@ if exists('g:loaded_unix')
 endif
 let g:loaded_unix = 1
 
-"                                          ┌ if you change the value,
-"                                          │ don't forget to put a slash at the end
-let s:template_dir = $HOME..'/.vim/template/'
+"                                            ┌ if you change the value,
+"                                            │ don't forget to put a slash at the end
+let s:template_dir = $HOME .. '/.vim/template/'
 
 " TODO:
 " You shouldn't call `system()`; you should `:echo` it, so that we see the exact
 " error message in case of an issue (useful for example with `:Cp`).
 
 " TODO:
-" Integrate `fd(1)` (`:Fd`). In an interactive usage,  we use it much more often
+" Integrate `fd(1)` (`:Fd`).  In an interactive usage, we use it much more often
 " than `find(1)`, because its syntax is shorter and easier.
 
 " Autocmds "{{{1
@@ -39,7 +39,7 @@ augroup END
 " MWE:
 "
 "         com -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
-"         nno  <silent>  cd  :<c-u>call Func()<cr>
+"         nno <silent> cd :<c-u>call Func()<cr>
 "         fu Func() abort
 "             sp
 "             e /tmp/file
@@ -51,11 +51,11 @@ augroup END
 "
 "         sil! Chmod 123
 "
-" But still, you would have to remember  that your command needs it. It can make
+" But still, you would have to remember that your command needs it.  It can make
 " you lose time in needless debugging.
 " Besides, you shouldn't bring inconsistency:
 " a  default Ex  command doesn't  need `:silent!`  unless it  encounters a  real
-" error. Yours should behave in the same way.
+" error.  Yours should behave in the same way.
 " }}}
 " FIXME:
 " For this reason, should we refactor all our plugins to remove `return 'echoerr
@@ -116,7 +116,7 @@ com -bar -nargs=+ Find call unix#grep('find', <q-args>)
 " to all the commands it installs (`Fz`).
 "
 " But when  we debug some issue,  we may temporarily disable  this configuration
-" (by  removing `~/.vim`  from the  rtp). When that  happens, if  `vim-unix` and
+" (by removing  `~/.vim` from the  rtp).  When  that happens, if  `vim-unix` and
 " `vim-fzf` are both enabled, `E174` is raised.
 "
 "     E174: Command already exists: add ! to replace it~
@@ -143,7 +143,7 @@ com -bang -bar -nargs=1 -complete=custom,unix#rename_complete Rename Mv<bang> %:
 com -bar -range=% Share call unix#share#main(<line1>, <line2>)
 
 com -bang -bar -nargs=? SudoEdit call unix#sudo#edit(<q-args>, <bang>0)
-com -bar SudoWrite call unix#sudo#setup(expand('%:p')) | w!
+com -bar SudoWrite call expand('%:p')->unix#sudo#setup() | w!
 
 " TODO:
 " Are `:SudoWrite` and `:W` doing the same thing?
@@ -218,14 +218,14 @@ nno <silent><unique> gl :<c-u>call unix#cloc#count_lines_in_func()<cr>
 
 " Functions {{{1
 fu s:make_executable() abort "{{{2
-    let shebang = matchstr(getline(1), '^#!\S\+')
+    let shebang = getline(1)->matchstr('^#!\S\+')
     if !empty(shebang) && executable('chmod')
-        sil call system('chmod +x '..expand('<afile>:p:S'))
+        sil call system('chmod +x ' .. expand('<afile>:p:S'))
         if v:shell_error
             echohl ErrorMsg
             " FIXME:
             " Why is `:unsilent` needed?
-            unsilent echom 'Cannot make file executable: '..v:shell_error
+            unsilent echom 'Cannot make file executable: ' .. v:shell_error
             echohl None
 
             " Why?{{{
@@ -270,35 +270,35 @@ fu s:maybe_read_template() abort "{{{2
     "         /etc/init.d/skeleton
 
     " Get all the filetypes for which we have a template.
-    let filetypes = glob(s:template_dir..'by_filetype/*', 0, 1)
-    call map(filetypes, {_,v -> fnamemodify(v, ':t:r')})
+    let filetypes = glob(s:template_dir .. 'by_filetype/*', 0, 1)
+    call map(filetypes, {_, v -> fnamemodify(v, ':t:r')})
 
-    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir..'by_filetype/'..&ft..'.txt')
+    if index(filetypes, &ft) >= 0 && filereadable(s:template_dir .. 'by_filetype/' .. &ft .. '.txt')
         "    ┌ don't use the template file as the alternate file for the current window{{{
         "    │ keep the current one
         "    │
         "    │ Note that `:keepalt` is not useful when you read the output of an
         "    │ external command (`:r !cmd`).
         "    │}}}
-        exe 'keepalt read '..fnameescape(s:template_dir..'by_filetype/'..&ft..'.txt')
+        exe 'keepalt read ' .. fnameescape(s:template_dir .. 'by_filetype/' .. &ft .. '.txt')
         keepj 1d_
 
     elseif expand('<afile>:p') =~# '.*/compiler/[^/]*\.vim'
-    \   && filereadable(s:template_dir..'by_name/compiler.txt')
-        call setline(1, ['let current_compiler = '..string(expand('<afile>:p:t:r')), ''])
-        exe 'keepalt 2read '..s:template_dir..'by_name/compiler.txt'
+    \ && filereadable(s:template_dir .. 'by_name/compiler.txt')
+        call setline(1, ['let current_compiler = ' .. expand('<afile>:p:t:r')->string(), ''])
+        exe 'keepalt 2read ' .. s:template_dir .. 'by_name/compiler.txt'
         " If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         " compilers in `$VIMRUNTIME/compiler`.
         " In this case, we need 'current_compiler' to be set.
 
     elseif expand('<afile>:p') =~# '.*/filetype\.vim'
-    \   && filereadable(s:template_dir..'by_name/filetype.txt')
-        exe 'keepalt read '..s:template_dir..'by_name/filetype.txt'
+    \ && filereadable(s:template_dir .. 'by_name/filetype.txt')
+        exe 'keepalt read ' .. s:template_dir .. 'by_name/filetype.txt'
         keepj 1d_
 
     elseif expand('<afile>:p') =~# '.*/scripts\.vim'
-    \   && filereadable(s:template_dir..'by_name/scripts.txt')
-        exe 'keepalt read '..s:template_dir..'by_name/scripts.txt'
+    \ && filereadable(s:template_dir .. 'by_name/scripts.txt')
+        exe 'keepalt read ' .. s:template_dir .. 'by_name/scripts.txt'
         keepj 1d_
 
     " useful to get a mini `tmux.conf` when debugging tmux
@@ -327,8 +327,8 @@ fu s:maybe_read_template() abort "{{{2
         END
         call setline(1, lines)
 
-    elseif expand('<afile>:p:h') is# ''..$HOME..'/.zsh/my-completions'
-        call setline(1, ['#compdef '..expand('<afile>:t')[1:], '', ''])
+    elseif expand('<afile>:p:h') == '' .. $HOME .. '/.zsh/my-completions'
+        call setline(1, ['#compdef ' .. expand('<afile>:t')[1:], '', ''])
     endif
 endfu
 
