@@ -127,7 +127,7 @@ com -bang -bar -nargs=? Mkdir call unix#mkdir(<q-args>, <bang>0)
 
 " `:Mv` lets us move the current file to any location.
 " `:Rename` lets us rename the current file inside the current directory.
-com -bang -bar -complete=file -nargs=1 Mv exe unix#move(<q-args>, <bang>0)
+com -bang -bar -nargs=1 -complete=file Mv exe unix#move(<q-args>, <bang>0)
 "                                        ┌ FIXME: what does it do?
 "                                        │
 com -bang -bar -nargs=1 -complete=custom,unix#rename_complete Rename Mv<bang> %:h/<args>
@@ -180,9 +180,9 @@ com -bar Wall call unix#wall()
 "
 " The full message looks something like this:
 "
-" >     W12: Warning: File "/etc/apt/sources.list" has changed and the buffer was changed in Vim as well
-" >     See ":help W12" for more info.
-" >     [O]K, (L)oad File:
+"    > W12: Warning: File "/etc/apt/sources.list" has changed and the buffer was changed in Vim as well
+"    > See ":help W12" for more info.
+"    > [O]K, (L)oad File:
 "
 " If you press `O`, the buffer will be written.
 " If you press `L`, the file will be reloaded.

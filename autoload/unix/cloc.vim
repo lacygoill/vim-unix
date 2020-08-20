@@ -51,6 +51,21 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         let file = tempname()
         let to_scan = file .. '.' .. (expand('%:e')->empty() ? &ft : expand('%:e'))
         let lines = getline(a:lnum1, a:lnum2)
+        " TODO: Currently, `cloc(1)` does not recognize the new Vim9 comment leader (`#`).{{{
+        "
+        " As a result, it parses any Vim9 commented line as a line of code.
+        " This makes the results wrong.
+        "
+        " We temporarily fix that by replacing `#` with `"`.
+        "
+        " In the future, consider opening an issue here:
+        " https://github.com/AlDanial/cloc/issues
+        "
+        " I don't do it now, because Vim9 is still in development.
+        " Maybe cloc's developer  will refuse to do anything  until the language
+        " is officially released.
+        "}}}
+        call map(lines, {_, v -> substitute(v, '^\s*\zs#{\@!', '"', '')})
         call writefile(lines, to_scan)
 
         " In a string, it seems that `.` can match anything including a newline.
