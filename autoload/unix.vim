@@ -145,10 +145,10 @@ fu unix#grep(prg, args) abort "{{{1
     " Remember that `:grep`  is shitty because it causes the  screen to flicker,
     " due to the combination of `:silent` and `:redraw`:
     "
-    "     nno cd :sil exe 'grep! foobar' <bar> redraw!<cr>
-    "             │                            │
-    "             │                            └ needed to redraw screen
-    "             └ needed to avoid seeing the terminal screen
+    "     nno cd <cmd>sil exe 'grep! foobar' <bar> redraw!<cr>
+    "                 │                            │
+    "                 │                            └ needed to redraw screen
+    "                 └ needed to avoid seeing the terminal screen
     "
     " ---
     "

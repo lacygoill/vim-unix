@@ -24,32 +24,32 @@ augroup END
 
 " Commands {{{1
 
-" Do NOT replace `:exe` with `:echoerr`{{{
+" Do *not* replace `:exe` with `:echoerr`{{{
 "
-"                                  ┌ ✔
-"                                  │
-"         com -bar -nargs=1 Chmod  exe     unix#chmod(<q-args>)
-"         com -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
-"                                  │
-"                                  └ ✘
+"                              ┌ ✔
+"                              │
+"     com -bar -nargs=1 Chmod  exe     unix#chmod(<q-args>)
+"     com -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
+"                              │
+"                              └ ✘
 "
 " Because with `:echoerr`,  if you execute the command from  a function, it will
 " raise an error.
 "
 " MWE:
 "
-"         com -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
-"         nno <silent> cd :<c-u>call Func()<cr>
-"         fu Func() abort
-"             sp
-"             e /tmp/file
-"             " Error detected while processing function Func:
-"             Chmod 123
-"         endfu
+"     com -bar -nargs=1 Chmod echoerr unix#chmod(<q-args>)
+"     nno cd <cmd>call Func()<cr>
+"     fu Func() abort
+"         sp
+"         e /tmp/file
+"         " Error detected while processing function Func:
+"         Chmod 123
+"     endfu
 "
 " You could use `:silent!`:
 "
-"         sil! Chmod 123
+"     sil! Chmod 123
 "
 " But still, you would have to remember that your command needs it.  It can make
 " you lose time in needless debugging.
@@ -213,9 +213,9 @@ com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(1) | setl
 
 " Mappings {{{1
 
-nno <silent><unique> g<c-l> :<c-u>Cloc<cr>
-xno <silent><unique> g<c-l> :Cloc<cr>
-nno <silent><unique> gl :<c-u>call unix#cloc#count_lines_in_func()<cr>
+nno <unique> g<c-l> <cmd>Cloc<cr>
+xno <unique> g<c-l> <c-\><c-n><cmd>*Cloc<cr>
+nno <unique> gl <cmd>call unix#cloc#count_lines_in_func()<cr>
 
 " Functions {{{1
 fu s:make_executable() abort "{{{2
