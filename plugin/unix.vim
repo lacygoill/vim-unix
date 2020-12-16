@@ -17,7 +17,7 @@ let s:template_dir = $HOME .. '/.vim/template/'
 
 " Autocmds "{{{1
 
-augroup my_unix | au!
+augroup MyUnix | au!
     au BufNewFile * call s:maybe_read_template()
                 \ | call s:maybe_make_executable()
 augroup END
