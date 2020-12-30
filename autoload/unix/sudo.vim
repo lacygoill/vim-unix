@@ -44,7 +44,7 @@ fu s:silent_sudo_cmd(editor) abort "{{{1
 endfu
 
 fu s:sudo_edit_init() abort "{{{1
-    let files = split($SUDO_COMMAND, ' ')[1:-1]
+    let files = split($SUDO_COMMAND, ' ')[1 : -1]
     if len(files) == argc()
         for i in argc()->range()
             exe 'autocmd BufEnter ' .. argv(i)->fnameescape()

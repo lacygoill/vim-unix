@@ -329,7 +329,7 @@ fu s:maybe_read_template() abort "{{{2
         call setline(1, lines)
 
     elseif expand('<afile>:p:h') == '' .. $HOME .. '/.zsh/my-completions'
-        call setline(1, ['#compdef ' .. expand('<afile>:t')[1:], '', ''])
+        call setline(1, ['#compdef ' .. expand('<afile>:t')[1 :], '', ''])
     endif
 endfu
 

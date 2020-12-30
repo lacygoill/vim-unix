@@ -90,7 +90,7 @@ fu unix#grep(prg, args) abort "{{{1
     "         let &shellpipe = '| tee'
     "         " FIXME:
     "         " Don't use `:grep`, it makes the screen flicker.  Use `cgetexpr` instead.
-    "         " Look at what we did in `myfuncs#op_grep()`.
+    "         " Look at what we did in `myfuncs#opGrep()`.
     "
     "         "            ┌ don't jump to first match, we want to decide ourselves
     "         "            │ whether to jump
@@ -182,15 +182,15 @@ fu unix#move(dst, bang) abort "{{{1
     "  ┌ the destination is an existing directory
     "  │
     "  │                   ┌ or a future directory (we're going to create it)
-    "  ├──────────────┐    ├────────────────┐
-    if isdirectory(dst) || dst[-1:-1] is# '/'
+    "  ├──────────────┐    ├──────────────────┐
+    if isdirectory(dst) || dst[-1 : -1] is# '/'
         "           ┌ make sure there's a slash
         "           │ between the directory and the filename
-        "           ├─────────────────────────────┐
-        let dst ..= (dst[-1:-1] is# '/' ? '' : '/') .. fnamemodify(src, ':t')
-        "                                              ├────────────────────┘
-        "                                              └ add the current filename
-        "                                                to complete the destination
+        "           ├───────────────────────────────┐
+        let dst ..= (dst[-1 : -1] is# '/' ? '' : '/') .. fnamemodify(src, ':t')
+        "                                                ├────────────────────┘
+        "                                                └ add the current filename
+        "                                                  to complete the destination
     endif
 
     " If the directory of the destination doesn't exist, create it.

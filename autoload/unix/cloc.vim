@@ -144,7 +144,7 @@ fu unix#cloc#main(lnum1,lnum2,path) abort "{{{1
         let i = 0
         let dict = {}
 
-        for value in values_on_line[1:]
+        for value in values_on_line[1 :]
             let dict[keys[i]] = eval(value)
             let i += 1
         endfor
