@@ -66,8 +66,8 @@ fu unix#grep(prg, args) abort "{{{1
 
     do <nomodeline> QuickFixCmdPost cwindow
     if &bt is# 'quickfix'
-        call qf#set_matches('unix:grep', 'Conceal', 'double_bar')
-        call qf#create_matches()
+        call qf#setMatches('unix:grep', 'Conceal', 'double_bar')
+        call qf#createMatches()
     endif
 
     " Old Code:{{{
@@ -112,8 +112,8 @@ fu unix#grep(prg, args) abort "{{{1
     "             call setqflist([], 'a', { 'title': '$ ' .. a:prg .. ' ' .. a:pat })
     "
     "             if &bt is# 'quickfix'
-    "                 call qf#set_matches('eunuch:grep', 'Conceal', 'double_bar')
-    "                 call qf#create_matches()
+    "                 call qf#setMatches('eunuch:grep', 'Conceal', 'double_bar')
+    "                 call qf#createMatches()
     "             endif
     "
     "             " If we didn't use a bang when we executed `:Locate` or `:Find`, and
