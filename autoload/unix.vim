@@ -1,325 +1,328 @@
-if exists('g:autoloaded_unix')
-    finish
-endif
-let g:autoloaded_unix = 1
+vim9 noclear
+
+if exists('loaded') | finish | endif
+var loaded = true
 
 import Catch from 'lg.vim'
 
-fu unix#chmod(flags) abort "{{{1
-    " TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
-    sil let output = systemlist('chmod ' .. a:flags .. ' ' .. expand('%:p:S'))
+def unix#chmod(flags: string): string #{{{1
+    # TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
+    sil var output = systemlist('chmod ' .. flags .. ' ' .. expand('%:p:S'))
 
-    " reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
+    # reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
     e
 
     return !empty(output) ? 'echoerr ' .. string(output[0]) : ''
 
-    " Alternative:
-    "
-    "     if !empty(output)
-    "         'echoerr ' .. string(output[0])
-    "     else
-    "         call timer_start(0, {-> execute('redraw!', '')})
-    "         return ''
-    "     endif
-    "
-    " This code erases the command when it succeeds.
-    " You  need the  bang after  `:redraw`, and  it seems  that it  needs to  be
-    " executed non silently.
-endfu
+    # Alternative:
+    #
+    #     if !empty(output)
+    #         'echoerr ' .. string(output[0])
+    #     else
+    #         call timer_start(0, {-> execute('redraw!', '')})
+    #         return ''
+    #     endif
+    #
+    # This code erases the command when it succeeds.
+    # You  need the  bang after  `:redraw`, and  it seems  that it  needs to  be
+    # executed non silently.
+enddef
 
-fu s:command_unavailable(cmd) abort "{{{1
-    return 'echoerr ' .. string(a:cmd .. ' is not executable; install the trash-cli package')
-endfu
+def unix#cp(arg_dst: string, bang: bool): string #{{{1
+    var src = expand('%:p')
+    var dir = expand('%:p:h')
+    var dst = stridx(arg_dst, '/') == 0
+        ?     arg_dst
+        :     dir .. '/' .. simplify(arg_dst)
 
-fu unix#cp(dst, bang) abort "{{{1
-    let src = expand('%:p')
-    let dir = expand('%:p:h')
-    let dst = stridx(a:dst, '/') == 0
-        \ ?     a:dst
-        \ :     dir .. '/' .. simplify(a:dst)
-
-    if filereadable(dst) && !a:bang
+    if filereadable(dst) && !bang
         return 'echoerr ' .. (string(dst) .. ' already exists; add a bang to overwrite it')->string()
     endif
-    sil call system('cp -L' .. (a:bang ? '' : 'n') .. 'p ' .. shellescape(src) .. ' ' .. shellescape(dst))
-    "                    │                     │       │
-    "                    │                     │       └ same as --preserve=mode,ownership,timestamps
-    "                    │                     └ do not overwrite an existing file
-    "                    └ follow symbolic links
+    sil system('cp -L' .. (bang ? '' : 'n') .. 'p ' .. shellescape(src) .. ' ' .. shellescape(dst))
+    #               │                   │       │
+    #               │                   │       └ same as --preserve=mode,ownership,timestamps
+    #               │                   └ do not overwrite an existing file
+    #               └ follow symbolic links
 
     if v:shell_error
-        call system('')
+        system('')
         return 'echoerr ' .. string('Failed to copy ' .. string(src) .. ' to ' .. string(dst))
     endif
-endfu
+    return ''
+enddef
 
-fu unix#grep(prg, args) abort "{{{1
-    " TODO:
-    " Make `find(1)` ignore files matching 'wig'.
-    " https://stackoverflow.com/a/22558474/9477010
-    let cmd = a:prg .. ' ' .. a:args .. ' 2>/dev/null'
-    let items = getqflist({'lines': systemlist(cmd), 'efm': '%f'}).items
-    if empty(items) | return | endif
+def unix#grep(prg: string, args: string) #{{{1
+    # TODO:
+    # Make `find(1)` ignore files matching 'wig'.
+    # https://stackoverflow.com/a/22558474/9477010
+    var cmd = prg .. ' ' .. args .. ' 2>/dev/null'
+    var items = getqflist({lines: systemlist(cmd), efm: '%f'}).items
+    if empty(items)
+        return
+    endif
 
-    call setqflist([], ' ', {'items': items, 'title': '$ ' .. cmd})
+    setqflist([], ' ', {items: items, title: '$ ' .. cmd})
 
     do <nomodeline> QuickFixCmdPost cwindow
-    if &bt is# 'quickfix'
-        call qf#setMatches('unix:grep', 'Conceal', 'double_bar')
-        call qf#createMatches()
+    if &bt == 'quickfix'
+        qf#setMatches('unix:grep', 'Conceal', 'double_bar')
+        qf#createMatches()
     endif
 
-    " Old Code:{{{
-    "
-    "     let [grepprg, bufnr] = [&l:grepprg, bufnr('%')]
-    "     let grepformat = &grepformat
-    "     let shellpipe = &shellpipe
-    "
-    "     try
-    "         " TODO:
-    "         " Make `find(1)` ignore files matching 'wig'.
-    "         " https://stackoverflow.com/a/22558474/9477010
-    "         let &l:grepprg = a:prg
-    "         "                ┌ the output of `find(1)` and `locate(1)` will just contain file names
-    "         "                │
-    "         setl grepformat=%f
-    "         " The default value of 'sp' ('2>&1| tee') causes the error messages
-    "         " (ex: “permission denied“) to be included in the output of `:grep`.
-    "         " It's noise, so we get rid of them by temporarily tweaking 'sp'.
-    "         let &shellpipe = '| tee'
-    "         " FIXME:
-    "         " Don't use `:grep`, it makes the screen flicker.  Use `cgetexpr` instead.
-    "         " Look at what we did in `myfuncs#opGrep()`.
-    "
-    "         "            ┌ don't jump to first match, we want to decide ourselves
-    "         "            │ whether to jump
-    "         "            │
-    "         sil exe 'grep! ' .. a:pat
-    "         " │
-    "         " └ bypass prompt “Press ENTER or type command to continue“
-    "         " FIXME:
-    "         redraw!
-    "
-    "         " No need to inform  our custom autocmds, responsible for dealing with
-    "         " qf windows (opening, layout, ...), that we have just populated a qfl:
-    "         "
-    "         "         do <nomodeline> QuickFixCmdPost cwindow
-    "         "
-    "         " ... because `:vimgrep` has already triggered `QuickFixCmdPost`.
-    "
-    "         if !getqflist()->empty()
-    "             call setqflist([], 'a', { 'title': '$ ' .. a:prg .. ' ' .. a:pat })
-    "
-    "             if &bt is# 'quickfix'
-    "                 call qf#setMatches('eunuch:grep', 'Conceal', 'double_bar')
-    "                 call qf#createMatches()
-    "             endif
-    "
-    "             " If we didn't use a bang when we executed `:Locate` or `:Find`, and
-    "             " the command found sth, jump to the first match.
-    "             " We give to a bang the same meaning as Vim does with `:grep` or `:make`.
-    "             if !a:bang
-    "                 cfirst
-    "             endif
-    "         endif
-    "     catch
-    "         return s:Catch()
-    "     finally
-    "         call setbufvar(bufnr, '&grepprg', grepprg)
-    "         let &grepformat = grepformat
-    "         let &shellpipe = shellpipe
-    "     endtry
-    "}}}
-    " TODO: Study the old code to understand why `:grep` was really a bad choice.{{{
-    "
-    " Hint: In addition to all the comments  it contains, there is also the fact
-    " that  it runs  `:!` which  means  that Vim  automatically expands  special
-    " characters,  which means  that you  need to  protect them,  which is  hard
-    " because  `a:pat` is  not  necessarily  a pattern,  it  could be  arbitrary
-    " arguments passed  to `$  find`.  So  you would first  need to  extract the
-    " pattern from the arguments...
-    "
-    " ---
-    "
-    " Remember that `:grep`  is shitty because it causes the  screen to flicker,
-    " due to the combination of `:silent` and `:redraw`:
-    "
-    "     nno cd <cmd>sil exe 'grep! foobar' <bar> redraw!<cr>
-    "                 │                            │
-    "                 │                            └ needed to redraw screen
-    "                 └ needed to avoid seeing the terminal screen
-    "
-    " ---
-    "
-    " Also, study why `getqflist()` + `setqflist()` is probably better than `:cexpr`.
-    " When should we use one or the other?
-    " Review our usage of `:grep` and `:cexpr` (and all the variants) everywhere.
-    "}}}
-endfu
+    # Old Code:{{{
+    #
+    #     var grepprg = &l:grepprg
+    #     var bufnr = bufnr('%')
+    #     var grepformat = &grepformat
+    #     var shellpipe = &shellpipe
+    #
+    #     try
+    #         # TODO:
+    #         # Make `find(1)` ignore files matching 'wig'.
+    #         # https://stackoverflow.com/a/22558474/9477010
+    #         &l:grepprg = prg
+    #         #                ┌ the output of `find(1)` and `locate(1)` will just contain file names
+    #         #                │
+    #         setl grepformat=%f
+    #         # The default value of 'sp' ('2>&1| tee') causes the error messages
+    #         # (ex: “permission denied“) to be included in the output of `:grep`.
+    #         # It's noise, so we get rid of them by temporarily tweaking 'sp'.
+    #         &shellpipe = '| tee'
+    #         # FIXME:
+    #         # Don't use `:grep`, it makes the screen flicker.  Use `cgetexpr` instead.
+    #         # Look at what we did in `myfuncs#opGrep()`.
+    #
+    #         #            ┌ don't jump to first match, we want to decide ourselves
+    #         #            │ whether to jump
+    #         #            │
+    #         sil exe 'grep! ' .. pat
+    #         # │
+    #         # └ bypass prompt “Press ENTER or type command to continue“
+    #         # FIXME:
+    #         redraw!
+    #
+    #         # No need to inform  our custom autocmds, responsible for dealing with
+    #         # qf windows (opening, layout, ...), that we have just populated a qfl:
+    #         #
+    #         #     do <nomodeline> QuickFixCmdPost cwindow
+    #         #
+    #         # ... because `:vimgrep` has already triggered `QuickFixCmdPost`.
+    #
+    #         if !getqflist()->empty()
+    #             setqflist([], 'a', {title: '$ ' .. prg .. ' ' .. pat})
+    #
+    #             if &bt == 'quickfix'
+    #                 qf#setMatches('eunuch:grep', 'Conceal', 'double_bar')
+    #                 qf#createMatches()
+    #             endif
+    #
+    #             # If we didn't use a bang when we executed `:Locate` or `:Find`, and
+    #             # the command found sth, jump to the first match.
+    #             # We give to a bang the same meaning as Vim does with `:grep` or `:make`.
+    #             if !bang
+    #                 cfirst
+    #             endif
+    #         endif
+    #     catch
+    #         return Catch()
+    #     finally
+    #         setbufvar(bufnr, '&grepprg', grepprg)
+    #         &grepformat = grepformat
+    #         &shellpipe = shellpipe
+    #     endtry
+    #}}}
+    # TODO: Study the old code to understand why `:grep` was really a bad choice.{{{
+    #
+    # Hint: In addition to all the comments  it contains, there is also the fact
+    # that  it runs  `:!` which  means  that Vim  automatically expands  special
+    # characters,  which means  that you  need to  protect them,  which is  hard
+    # because  `a:pat` is  not  necessarily  a pattern,  it  could be  arbitrary
+    # arguments passed  to `$  find`.  So  you would first  need to  extract the
+    # pattern from the arguments...
+    #
+    # ---
+    #
+    # Remember that `:grep`  is shitty because it causes the  screen to flicker,
+    # due to the combination of `:silent` and `:redraw`:
+    #
+    #     nno cd <cmd>sil exe 'grep! foobar' <bar> redraw!<cr>
+    #                 │                            │
+    #                 │                            └ needed to redraw screen
+    #                 └ needed to avoid seeing the terminal screen
+    #
+    # ---
+    #
+    # Also, study why `getqflist()` + `setqflist()` is probably better than `:cexpr`.
+    # When should we use one or the other?
+    # Review our usage of `:grep` and `:cexpr` (and all the variants) everywhere.
+    #}}}
+enddef
 
-fu unix#mkdir(dir, bang) abort "{{{1
-    let dest = empty(a:dir)
-        \ ?     expand('%:p:h')
-        \ : a:dir[0] is# '/'
-        \ ?     a:dir
-        \ :     expand('%:p') .. a:dir
+def unix#mkdir(dir: string, bang: bool) #{{{1
+    var dest = empty(dir)
+        ?     expand('%:p:h')
+        : dir[0] == '/'
+        ?     dir
+        :     expand('%:p') .. dir
 
     try
-        call mkdir(dest, a:bang ? 'p' : '')
+        mkdir(dest, bang ? 'p' : '')
     catch
-        return s:Catch()
+        Catch()
     endtry
-endfu
+enddef
 
-fu unix#move(dst, bang) abort "{{{1
-    let src = expand('%:p')
-    let dst = fnamemodify(a:dst, ':p')
+def unix#move(arg_dst: string, bang: bool): string #{{{1
+    var src = expand('%:p')
+    var dst = fnamemodify(arg_dst, ':p')
 
-    " If the destination is a directory, it must be completed, by appending
-    " the current filename.
+    # If the destination is a directory, it must be completed, by appending
+    # the current filename.
 
-    "  ┌ the destination is an existing directory
-    "  │
-    "  │                   ┌ or a future directory (we're going to create it)
-    "  ├──────────────┐    ├──────────────────┐
-    if isdirectory(dst) || dst[-1 : -1] is# '/'
-        "           ┌ make sure there's a slash
-        "           │ between the directory and the filename
-        "           ├───────────────────────────────┐
-        let dst ..= (dst[-1 : -1] is# '/' ? '' : '/') .. fnamemodify(src, ':t')
-        "                                                ├────────────────────┘
-        "                                                └ add the current filename
-        "                                                  to complete the destination
+    #  ┌ the destination is an existing directory
+    #  │
+    #  │                   ┌ or a future directory (we're going to create it)
+    #  ├──────────────┐    ├─────────────────┐
+    if isdirectory(dst) || dst[-1 : -1] == '/'
+        #       ┌ make sure there's a slash
+        #       │ between the directory and the filename
+        #       ├──────────────────────────────┐
+        dst ..= (dst[-1 : -1] == '/' ? '' : '/') .. fnamemodify(src, ':t')
+        #                                           ├────────────────────┘
+        #                                           └ add the current filename
+        #                                             to complete the destination
     endif
 
-    " If the directory of the destination doesn't exist, create it.
+    # If the directory of the destination doesn't exist, create it.
     if !fnamemodify(dst, ':h')->isdirectory()
-        call fnamemodify(dst, ':h')->mkdir('p')
+        fnamemodify(dst, ':h')->mkdir('p')
     endif
 
-    let dst = simplify(dst)->substitute('^\.\/', '', '')
+    dst = simplify(dst)->substitute('^\.\/', '', '')
 
-    " `:Mv` and `:Rename` should behave like `:saveas`.
-    "
-    "     :Mv     existing_file    ✘
-    "     :Rename existing_file    ✘
-    "     :saveas existing_file    ✘
-    "
-    " The operation shouldn't overwrite the file.
-    " Except if we added a bang:
-    "
-    "     :Mv!     existing_file   ✔
-    "     :Rename! existing_file   ✔
-    "     :saveas! existing_file   ✔
+    # `:Mv` and `:Rename` should behave like `:saveas`.
+    #
+    #     :Mv     existing_file    ✘
+    #     :Rename existing_file    ✘
+    #     :saveas existing_file    ✘
+    #
+    # The operation shouldn't overwrite the file.
+    # Except if we added a bang:
+    #
+    #     :Mv!     existing_file   ✔
+    #     :Rename! existing_file   ✔
+    #     :saveas! existing_file   ✔
 
-    " The destination is occupied by an existing file, and no bang was added.
-    " The command must fail.
-    if filereadable(dst) && !a:bang
+    # The destination is occupied by an existing file, and no bang was added.
+    # The command must fail.
+    if filereadable(dst) && !bang
         return 'keepalt saveas ' .. fnameescape(dst)
-        "       │
-        "       └ even though `:saveas` is going to fail, it will still
-        "         change the alternate file for the current window (`dst`);
-        "         we don't want that
+        #       │
+        #       └ even though `:saveas` is going to fail, it will still
+        #         change the alternate file for the current window (`dst`);
+        #         we don't want that
 
-    " Try to rename current file.
-    " What are the differences between `:saveas` and `rename()`:
-    "
-    "    - `rename()` gets rid of the old file, after the renaming; `:saveas` does *not*
-    "    - `rename()` can move a file to a different filesystem; `:saveas` ?
+    # Try to rename current file.
+    # What are the differences between `:saveas` and `rename()`:
+    #
+    #    - `rename()` gets rid of the old file, after the renaming; `:saveas` does *not*
+    #    - `rename()` can move a file to a different filesystem; `:saveas` ?
     elseif rename(src, dst) != 0
-        " If a problem occurred, inform us.
+        # If a problem occurred, inform us.
         return 'echoerr ' .. string('Failed to rename ' .. string(src) .. ' to ' .. string(dst))
     else
-        " If no pb occurred execute `:saveas! dst`.
-        "
-        " FIXME:
-        " Why set the buffer as modified?
+        # If no pb occurred execute `:saveas! dst`.
+        #
+        # FIXME:
+        # Why set the buffer as modified?
         setl modified
-        " FIXME:
-        " Why this command? Maybe to trigger one (some?, all?) of those events:
-        "
-        "     BufNew
-        "     BufFilePre
-        "     BufFilePost
-        "     BufAdd
-        "     BufCreate
-        "     BufWrite
-        "     BufWritePre
-        "     BufWritePost
+        # FIXME:
+        # Why this command? Maybe to trigger one (some?, all?) of those events:
+        #
+        #     BufNew
+        #     BufFilePre
+        #     BufFilePost
+        #     BufAdd
+        #     BufCreate
+        #     BufWrite
+        #     BufWritePre
+        #     BufWritePost
         exe 'keepalt saveas! ' .. fnameescape(dst)
 
-        " Get rid of old buffer (it's not linked to a file anymore).
-        " But only if it's not the current one.
-        " It could be the current one if we execute, by accident:
-        "
-        "     :Mv     /path/to/current/file
-        "     :Rename current_filename
-        if src isnot# expand('%:p')
+        # Get rid of old buffer (it's not linked to a file anymore).
+        # But only if it's not the current one.
+        # It could be the current one if we execute, by accident:
+        #
+        #     :Mv     /path/to/current/file
+        #     :Rename current_filename
+        if src != expand('%:p')
             exe 'bw ' .. fnameescape(src)
         endif
 
-        " Rationale:{{{
-        "
-        " If we change  the filetype of the file (e.g.  `foo.sh` → `foo.py`), we
-        " want to load the right filetype/syntax/indent plugins.
-        "}}}
+        # Rationale:{{{
+        #
+        # If we change  the filetype of the file (e.g.  `foo.sh` → `foo.py`), we
+        # want to load the right filetype/syntax/indent plugins.
+        #}}}
         filetype detect
-        " re-apply fold settings
+        # re-apply fold settings
         do <nomodeline> BufWinEnter
         return ''
     endif
-endfu
+enddef
 
-fu unix#rename_complete(arglead, _l, _p) abort "{{{1
-    let prefix = expand('%:p:h') .. '/'
-    let files = glob(prefix .. a:arglead .. '*', 0, 1)
+def unix#renameComplete(arglead: string, ...l: any): string #{{{1
+    var prefix = expand('%:p:h') .. '/'
+    var files = glob(prefix .. arglead .. '*', false, true)
 
-    " TODO:
-    " Should we use this? Or the next commented `map()`?
-    "
-    " Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
-    call map(files, {_, v -> simplify(v) isnot# expand('%:p')->simplify()
-        \ ?     v
-        \ : !fnamemodify(v, ':p:t:r')->empty()
-        \ ?     fnamemodify(v, ':r') .. '.'
-        \ :     v
-        \ })
+    # TODO:
+    # Should we use this? Or the next commented `map()`?
+    #
+    # Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
+    map(files, (_, v) => simplify(v) != expand('%:p')->simplify()
+        ?     v
+        : !fnamemodify(v, ':p:t:r')->empty()
+        ?     fnamemodify(v, ':r') .. '.'
+        :     v
+        )
 
-    " call map(files, {_, v -> v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : '')})
+    #     map(files, (_, v) => v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : ''))
 
     return join(files, "\n")
-endfu
+enddef
 
-fu s:should_write_buffer(seen) abort "{{{1
-    " `'buftype'` is a  buffer-local option, whose value determines  the type of
-    " buffer.  We want to write a buffer currently displayed in a window, iff:
-    "
-    "    - it is a regular buffer (&bt = '')
-    "
-    "    - an autocmd listening to `BufWriteCmd` determines how it must be written
-    "      (&bt = 'acwrite')
+def ShouldWriteBuffer(seen: dict<bool>): bool #{{{1
+    # `'buftype'` is a  buffer-local option, whose value determines  the type of
+    # buffer.  We want to write a buffer currently displayed in a window, iff:
+    #
+    #    - it is a regular buffer (&bt = '')
+    #
+    #    - an autocmd listening to `BufWriteCmd` determines how it must be written
+    #      (&bt = 'acwrite')
 
     if !&readonly
-  \ && &modifiable
-  \ && &bt == '' || &bt is# 'acwrite'
-  \ && !expand('%')->empty()
-  \ && !has_key(a:seen, bufnr('%'))
-        return 1
+    && &modifiable
+    && (&bt == '' || &bt == 'acwrite')
+    && !expand('%')->empty()
+    && !has_key(seen, bufnr('%'))
+        return true
     endif
-endfu
+    return false
+enddef
 
-fu unix#wall() abort "{{{1
-    let cur_winid = win_getid()
-    let seen = {}
+def unix#wall() #{{{1
+    var cur_winid = win_getid()
+    seen = {}
     if !&readonly && !expand('%')->empty()
-        let seen[bufnr('%')] = 1
+        seen[bufnr('%')] = true
         write
     endif
-    tabdo windo if s:should_write_buffer(seen)
-        \ |     write
-        \ |     let seen[bufnr('%')] = 1
-        \ | endif
-    call win_gotoid(cur_winid)
-endfu
+    tabdo windo if ShouldWriteBuffer(seen)
+          |     write
+          |     seen[bufnr('%')] = true
+          | endif
+    win_gotoid(cur_winid)
+enddef
+
+var seen: dict<bool>
 

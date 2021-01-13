@@ -1,99 +1,106 @@
-if exists('g:autoloaded_unix#sudo')
-    finish
-endif
-let g:autoloaded_unix#sudo = 1
+vim9 noclear
 
-let s:error_file = tempname()
+if exists('loaded') | finish | endif
+var loaded = true
 
-fu unix#sudo#edit(file, bang) abort "{{{1
-    let file = (empty(a:file) ? expand('%') : a:file)->fnamemodify(':p')
-    call unix#sudo#setup(file)
+const ERROR_FILE = tempname()
 
-    if !&modified || !empty(a:file)
-        exe 'e' .. (a:bang ? '!' : '') .. ' ' .. a:file
+# Interface {{{1
+def unix#sudo#edit(file: string, bang: bool) #{{{2
+    var _file = (empty(file) ? expand('%') : file)->fnamemodify(':p')
+    unix#sudo#setup(_file)
+
+    if !&modified || !empty(file)
+        exe 'e' .. (bang ? '!' : '') .. ' ' .. file
     endif
 
-    if empty(a:file) || expand('%:p') is# fnamemodify(a:file, ':p')
+    if empty(file) || expand('%:p') == fnamemodify(file, ':p')
         set noreadonly
     endif
-endfu
+enddef
 
-fu unix#sudo#setup(file) abort "{{{1
-    if !filereadable(a:file) && !exists('#BufReadCmd#' .. fnameescape(a:file))
-        exe 'au BufReadCmd ' .. fnameescape(a:file) .. ' exe s:sudo_read_cmd()'
+def unix#sudo#setup(file: string) #{{{2
+    if !filereadable(file) && !exists('#BufReadCmd#' .. fnameescape(file))
+        exe 'au BufReadCmd ' .. fnameescape(file) .. ' exe SudoReadCmd()'
     endif
-    if !filewritable(a:file) && !exists('#BufWriteCmd#' .. fnameescape(a:file))
-        exe 'au BufReadPost ' .. fnameescape(a:file) .. ' set noreadonly'
-        exe 'au BufWriteCmd ' .. fnameescape(a:file) .. ' exe s:sudo_write_cmd()'
+    if !filewritable(file) && !exists('#BufWriteCmd#' .. fnameescape(file))
+        exe 'au BufReadPost ' .. fnameescape(file) .. ' set noreadonly'
+        exe 'au BufWriteCmd ' .. fnameescape(file) .. ' exe SudoWriteCmd()'
     endif
-endfu
-
-fu s:silent_sudo_cmd(editor) abort "{{{1
-    let cmd = 'env SUDO_EDITOR=' .. a:editor .. ' VISUAL=' .. a:editor .. ' sudo -e'
+enddef
+#}}}1
+# Core {{{1
+def SilentSudoCmd(editor: string): list<string> #{{{2
+    var cmd = 'env SUDO_EDITOR=' .. editor .. ' VISUAL=' .. editor .. ' sudo -e'
     if !has('gui_running')
         return ['silent', cmd]
 
     elseif !empty($SUDO_ASKPASS)
-    \ || filereadable('/etc/sudo.conf')
-    \ && readfile('/etc/sudo.conf', 50)->filter({_, v -> v =~# '^Path askpass '})->len()
+        || filereadable('/etc/sudo.conf')
+        && readfile('/etc/sudo.conf', 50)->filter((_, v) => v =~ '^Path askpass ')->len()
         return ['silent', cmd .. ' -A']
 
     else
         return ['', cmd]
     endif
-endfu
+enddef
 
-fu s:sudo_edit_init() abort "{{{1
+def SudoEditInit() #{{{2
     let files = split($SUDO_COMMAND, ' ')[1 : -1]
     if len(files) == argc()
         for i in argc()->range()
             exe 'autocmd BufEnter ' .. argv(i)->fnameescape()
-                        \ 'if empty(&ft) || &ft is "conf"'
-                        \ '|do filetypedetect BufReadPost ' .. fnameescape(files[i])
-                        \ '|endif'
+                .. 'if empty(&ft) || &ft is "conf"'
+                .. '|do filetypedetect BufReadPost ' .. fnameescape(files[i])
+                .. '|endif'
         endfor
     endif
-endfu
+enddef
 
-if $SUDO_COMMAND =~# '^sudoedit '
-    call s:sudo_edit_init()
+if $SUDO_COMMAND =~ '^sudoedit '
+    SudoEditInit()
 endif
 
-fu s:sudo_error() abort "{{{1
-    let error = readfile(s:error_file)->join(' | ')
-    if error =~# '^sudo' || v:shell_error
-        call system('')
+def SudoError(): string #{{{2
+    var error = readfile(ERROR_FILE)->join(' | ')
+    if error =~ '^sudo' || v:shell_error
+        system('')
         return strlen(error) ? error : 'Error invoking sudo'
     else
         return error
     endif
-endfu
+enddef
 
-fu s:sudo_read_cmd() abort "{{{1
-    sil keepj %d_
-    let [silent, cmd] = s:silent_sudo_cmd('cat')
-    sil exe printf('read !%s %%:p:S 2>%s', cmd, s:error_file)
-    let exit_status = v:shell_error
-    " reset `v:shell_error`
-    call system('')
-    sil keepj 1d_
+def SudoReadCmd(): string #{{{2
+    sil keepj :%d _
+    var silent: string
+    var cmd: string
+    [silent, cmd] = SilentSudoCmd('cat')
+    sil exe printf('read !%s %%:p:S 2>%s', cmd, ERROR_FILE)
+    var exit_status = v:shell_error
+    # reset `v:shell_error`
+    system('')
+    sil keepj :1d _
     setl nomodified
     if exit_status
-        return 'echoerr ' .. s:sudo_error()->string()
+        return 'echoerr ' .. SudoError()->string()
     endif
-endfu
+    return ''
+enddef
 
-fu s:sudo_write_cmd() abort "{{{1
-    let [silent, cmd] = s:silent_sudo_cmd('tee')
-    let cmd ..= ' %:p:S >/dev/null'
-    let cmd ..= ' 2> ' .. s:error_file
+def SudoWriteCmd(): string #{{{2
+    var silent: string
+    var cmd: string
+    [silent, cmd] = SilentSudoCmd('tee')
+    cmd ..= ' %:p:S >/dev/null'
+    cmd ..= ' 2> ' .. ERROR_FILE
     exe silent 'write !' .. cmd
-    let error = s:sudo_error()
+    var error = SudoError()
     if !empty(error)
         return 'echoerr ' .. string(error)
     else
         setl nomodified
         return ''
     endif
-endfu
+enddef
 
