@@ -3,9 +3,9 @@ vim9 noclear
 if exists('loaded') | finish | endif
 var loaded = true
 
-#                                             ┌ if you change the value,
-#                                             │ don't forget to put a slash at the end
-const TEMPLATE_DIR = $HOME .. '/.vim/template/'
+#                                                     ┌ if you change the value,
+#                                                     │ don't forget to put a slash at the end
+const TEMPLATE_DIR: string = $HOME .. '/.vim/template/'
 
 # TODO:
 # You shouldn't call `system()`; you should `:echo` it, so that we see the exact
@@ -219,7 +219,7 @@ nno <unique> gl <cmd>call unix#cloc#countLinesInFunc()<cr>
 
 # Functions {{{1
 def MakeExecutable() #{{{2
-    var shebang = getline(1)->matchstr('^#!\S\+')
+    var shebang: string = getline(1)->matchstr('^#!\S\+')
     if empty(shebang) || !executable('chmod')
         return
     endif
@@ -274,7 +274,7 @@ def MaybeReadTemplate() #{{{2
     #     /etc/init.d/skeleton
 
     # Get all the filetypes for which we have a template.
-    var filetypes = glob(TEMPLATE_DIR .. 'by_filetype/*', false, true)
+    var filetypes: list<string> = glob(TEMPLATE_DIR .. 'by_filetype/*', false, true)
         ->map((_, v) => fnamemodify(v, ':t:r'))
 
     if index(filetypes, &ft) >= 0
@@ -308,7 +308,7 @@ def MaybeReadTemplate() #{{{2
 
     # useful to get a mini `tmux.conf` when debugging tmux
     elseif expand('<afile>:t') == 'tmux.conf'
-        var lines =<< trim END
+        var lines: list<string> =<< trim END
             set -g prefix M-space
             set -g status-keys emacs
             set -s history-file "$HOME/.config/tmux/command_history"

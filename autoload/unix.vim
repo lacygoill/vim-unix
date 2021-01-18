@@ -7,7 +7,7 @@ import Catch from 'lg.vim'
 
 def unix#chmod(flags: string): string #{{{1
     # TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
-    sil var output = systemlist('chmod ' .. flags .. ' ' .. expand('%:p:S'))
+    sil var output: list<string> = systemlist('chmod ' .. flags .. ' ' .. expand('%:p:S'))
 
     # reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
     e
@@ -29,9 +29,9 @@ def unix#chmod(flags: string): string #{{{1
 enddef
 
 def unix#cp(arg_dst: string, bang: bool): string #{{{1
-    var src = expand('%:p')
-    var dir = expand('%:p:h')
-    var dst = stridx(arg_dst, '/') == 0
+    var src: string = expand('%:p')
+    var dir: string = expand('%:p:h')
+    var dst: string = stridx(arg_dst, '/') == 0
         ?     arg_dst
         :     dir .. '/' .. simplify(arg_dst)
 
@@ -55,8 +55,8 @@ def unix#grep(prg: string, args: string) #{{{1
     # TODO:
     # Make `find(1)` ignore files matching 'wig'.
     # https://stackoverflow.com/a/22558474/9477010
-    var cmd = prg .. ' ' .. args .. ' 2>/dev/null'
-    var items = getqflist({lines: systemlist(cmd), efm: '%f'}).items
+    var cmd: string = prg .. ' ' .. args .. ' 2>/dev/null'
+    var items: list<dict<any>> = getqflist({lines: systemlist(cmd), efm: '%f'}).items
     if empty(items)
         return
     endif
@@ -71,10 +71,10 @@ def unix#grep(prg: string, args: string) #{{{1
 
     # Old Code:{{{
     #
-    #     var grepprg = &l:grepprg
-    #     var bufnr = bufnr('%')
-    #     var grepformat = &grepformat
-    #     var shellpipe = &shellpipe
+    #     var grepprg: string = &l:grepprg
+    #     var bufnr: number = bufnr('%')
+    #     var grepformat: string = &grepformat
+    #     var shellpipe: string = &shellpipe
     #
     #     try
     #         # TODO:
@@ -159,7 +159,7 @@ def unix#grep(prg: string, args: string) #{{{1
 enddef
 
 def unix#mkdir(dir: string, bang: bool) #{{{1
-    var dest = empty(dir)
+    var dest: string = empty(dir)
         ?     expand('%:p:h')
         : dir[0] == '/'
         ?     dir
@@ -169,12 +169,13 @@ def unix#mkdir(dir: string, bang: bool) #{{{1
         mkdir(dest, bang ? 'p' : '')
     catch
         Catch()
+        return
     endtry
 enddef
 
 def unix#move(arg_dst: string, bang: bool): string #{{{1
-    var src = expand('%:p')
-    var dst = fnamemodify(arg_dst, ':p')
+    var src: string = expand('%:p')
+    var dst: string = fnamemodify(arg_dst, ':p')
 
     # If the destination is a directory, it must be completed, by appending
     # the current filename.
@@ -272,8 +273,8 @@ def unix#move(arg_dst: string, bang: bool): string #{{{1
 enddef
 
 def unix#renameComplete(arglead: string, ...l: any): string #{{{1
-    var prefix = expand('%:p:h') .. '/'
-    var files = glob(prefix .. arglead .. '*', false, true)
+    var prefix: string = expand('%:p:h') .. '/'
+    var files: list<string> = glob(prefix .. arglead .. '*', false, true)
 
     # TODO:
     # Should we use this? Or the next commented `map()`?
@@ -311,7 +312,7 @@ def ShouldWriteBuffer(seen: dict<bool>): bool #{{{1
 enddef
 
 def unix#wall() #{{{1
-    var cur_winid = win_getid()
+    var cur_winid: number = win_getid()
     seen = {}
     if !&readonly && !expand('%')->empty()
         seen[bufnr('%')] = true

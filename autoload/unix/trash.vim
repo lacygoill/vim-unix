@@ -9,7 +9,7 @@ def unix#trash#list(): string #{{{2
         return CommandUnavailable('trash-list')
     endif
 
-    sil var listing = system('trash-list')
+    sil var listing: string = system('trash-list')
     if v:shell_error
         system('')
         return 'echoerr ' .. string('Failed to list the contents of the trash can')
@@ -21,7 +21,7 @@ def unix#trash#list(): string #{{{2
 enddef
 
 def unix#trash#put(bang: bool): string #{{{2
-    var file = expand('%:p')
+    var file: string = expand('%:p')
     if empty(file)
         return ''
     endif
@@ -33,7 +33,7 @@ def unix#trash#put(bang: bool): string #{{{2
     if !bang
         # First try to unload the buffer.
         # But before that, load the alternate file, if there's one.
-        var alternate_file = expand('#:p')
+        var alternate_file: string = expand('#:p')
         if !empty(alternate_file)
         #   │
         #   └ Why not `filereadable()`?

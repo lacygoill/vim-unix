@@ -46,17 +46,17 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
     var to_scan: string
     if !empty(path)
         if path =~ '^http'
-            var tempdir = tempname()
-            var cmd = path =~ 'bitbucket' ? 'hg' : 'git'
-            sil var git_output = system(cmd .. ' clone ' .. path .. ' ' .. tempdir)
+            var tempdir: string = tempname()
+            var cmd: string = path =~ 'bitbucket' ? 'hg' : 'git'
+            sil var git_output: string = system(cmd .. ' clone ' .. path .. ' ' .. tempdir)
             to_scan = tempdir
         else
             to_scan = path
         endif
     else
-        var file = tempname()
+        var file: string = tempname()
         to_scan = file .. '.' .. (expand('%:e')->empty() ? &ft : expand('%:e'))
-        var lines = getline(lnum1, lnum2)
+        var lines: list<string> = getline(lnum1, lnum2)
         # TODO: Currently, `cloc(1)` does not recognize the new Vim9 comment leader (`#`).{{{
         #
         # As a result, it parses any Vim9 commented line as a line of code.
@@ -81,8 +81,8 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
         #
         # We could use this code instead:
         #
-        #     var lines = getline(lnum1, lnum2)->join("\n")->shellescape()
-        #     sil var out = system('echo ' .. lines .. ' | cloc --stdin-name=foo.' .. &ft .. ' -')
+        #     var lines: string = getline(lnum1, lnum2)->join("\n")->shellescape()
+        #     sil var out: string = system('echo ' .. lines .. ' | cloc --stdin-name=foo.' .. &ft .. ' -')
         #     echo out
         #
         # But because of the previous limit:
@@ -101,8 +101,8 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
         #}}}
     endif
 
-    var cmd = 'cloc --exclude-lang=Markdown --exclude-dir=.cache,t,test ' .. to_scan
-    sil var output_cloc = system(cmd)
+    var cmd: string = 'cloc --exclude-lang=Markdown --exclude-dir=.cache,t,test ' .. to_scan
+    sil var output_cloc: list<string> = system(cmd)
         # remove the header
         ->matchstr('\zs-\+.*')
         ->split('\n')
@@ -118,9 +118,9 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
     # We delay the display of the output to  the very end of the function, to be
     # sure the code generating `g:cloc_results` is processed.
     #}}}
-    var to_display = output_cloc
+    var to_display: list<string> = output_cloc
 
-    var stats = output_cloc
+    var stats: list<list<string>> = output_cloc
         ->copy()
         ->filter((_, v) => v =~ '\d\+')
         # Why `\s\{2,}` and not simply `\s\+`?{{{
@@ -135,7 +135,7 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
         ->mapnew((_, v) => split(v, '\s\{2,}\ze\d'))
 
     g:cloc_results = {}
-    var keys =<< trim END
+    var keys: list<string> =<< trim END
         files
         blank
         comment
@@ -145,8 +145,8 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
     for values_on_line in stats
         # `i` is going to index the `keys` list.
         # `dict` is going to store a dictionary containing the numbers of lines for a given language.
-        var i = 0
-        var dict = {}
+        var i: number = 0
+        var dict: dict<number> = {}
 
         for value in values_on_line[1 :]
             dict[keys[i]] = eval(value)
@@ -168,15 +168,15 @@ def unix#cloc#countLinesInFunc() #{{{1
     # Try to avoid using a variable name matching `fu\%[nction]`.
     # Otherwise, you'll have to just accept that it's not 100% reliable.
     #}}}
-    var ft = get({vim: 'vim script', sh: 'Bourne Shell'}, &ft, '')
+    var ft: string = get({vim: 'vim script', sh: 'Bourne Shell'}, &ft, '')
     if ft == ''
         echo 'non supported filetype'
         return
     endif
-    var view = winsaveview()
-    var g = 0
-    var lnum1 = 0
-    var lnum2 = 0
+    var view: dict<number> = winsaveview()
+    var g: number = 0
+    var lnum1: number = 0
+    var lnum2: number = 0
     # The loop handles the case where there is a nested function between us and the start of the function.{{{
     #
     #     def Func()
@@ -207,9 +207,9 @@ def unix#cloc#countLinesInFunc() #{{{1
     lnum2 -= 1
     sil unix#cloc#main(lnum1, lnum2, '')
     if exists('g:cloc_results')
-        var blank_cnt = get(g:cloc_results, ft, {})->get('blank', 0)
-        var comment_cnt = get(g:cloc_results, ft, {})->get('comment', 0)
-        var code_cnt = get(g:cloc_results, ft, {})->get('code', 0)
+        var blank_cnt: number = get(g:cloc_results, ft, {})->get('blank', 0)
+        var comment_cnt: number = get(g:cloc_results, ft, {})->get('comment', 0)
+        var code_cnt: number = get(g:cloc_results, ft, {})->get('code', 0)
         echo printf('blank: %s   comment: %s   code: %s', blank_cnt, comment_cnt, code_cnt)
     endif
     winrestview(view)

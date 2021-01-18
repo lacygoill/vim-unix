@@ -1,3 +1,8 @@
+vim9 noclear
+
+if exists('loaded') | finish | endif
+var loaded = true
+
 def unix#share#main(lnum1: number, lnum2: number)
     # For more info on how the web service `0x0` works, see:{{{
     #
@@ -7,16 +12,17 @@ def unix#share#main(lnum1: number, lnum2: number)
     # Especially the first link.
     #}}}
 
-    var lines = getline(lnum1, lnum2)
-    sil var url = system("curl -F'file=@-' https://0x0.st", lines)->split('\n')->get(-1, '')
-    #                           │      ││{{{
-    #                           │      │└ standard input
-    #                           │      │
-    #                           │      └ force the 'content' part to be a file
-    #                           │
-    #                           └ Let curl emulate a filled-in form
-    #                             in which a user has pressed the submit button.
-    #                             This enables uploading of files.
+    var lines: list<string> = getline(lnum1, lnum2)
+    sil var url: string = system(
+        "curl -F'file=@-' https://0x0.st", lines)->split('\n')->get(-1, '')
+    #          │      ││{{{
+    #          │      │└ standard input
+    #          │      │
+    #          │      └ force the 'content' part to be a file
+    #          │
+    #          └ Let curl emulate a filled-in form
+    #            in which a user has pressed the submit button.
+    #            This enables uploading of files.
     #}}}
     echom url
     sil system('xdg-open ' .. shellescape(url))
