@@ -5,14 +5,16 @@ var loaded = true
 
 import Catch from 'lg.vim'
 
-def unix#chmod(flags: string): string #{{{1
+def unix#chmod(flags: string) #{{{1
     # TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
     sil var output: list<string> = systemlist('chmod ' .. flags .. ' ' .. expand('%:p:S'))
 
     # reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
     e
 
-    return !empty(output) ? 'echoerr ' .. string(output[0]) : ''
+    if !empty(output)
+        output[0]->Error()
+    endif
 
     # Alternative:
     #
@@ -28,7 +30,7 @@ def unix#chmod(flags: string): string #{{{1
     # executed non silently.
 enddef
 
-def unix#cp(arg_dst: string, bang: bool): string #{{{1
+def unix#cp(arg_dst: string, bang: bool) #{{{1
     var src: string = expand('%:p')
     var dir: string = expand('%:p:h')
     var dst: string = stridx(arg_dst, '/') == 0
@@ -36,7 +38,8 @@ def unix#cp(arg_dst: string, bang: bool): string #{{{1
         :     dir .. '/' .. simplify(arg_dst)
 
     if filereadable(dst) && !bang
-        return 'echoerr ' .. (string(dst) .. ' already exists; add a bang to overwrite it')->string()
+        Error(string(dst) .. ' already exists; add a bang to overwrite it')
+        return
     endif
     sil system('cp -L' .. (bang ? '' : 'n') .. 'p ' .. shellescape(src) .. ' ' .. shellescape(dst))
     #               │                   │       │
@@ -46,9 +49,8 @@ def unix#cp(arg_dst: string, bang: bool): string #{{{1
 
     if v:shell_error
         system('')
-        return 'echoerr ' .. string('Failed to copy ' .. string(src) .. ' to ' .. string(dst))
+        Error('Failed to copy ' .. string(src) .. ' to ' .. string(dst))
     endif
-    return ''
 enddef
 
 def unix#grep(prg: string, args: string) #{{{1
@@ -173,7 +175,7 @@ def unix#mkdir(dir: string, bang: bool) #{{{1
     endtry
 enddef
 
-def unix#move(arg_dst: string, bang: bool): string #{{{1
+def unix#move(arg_dst: string, bang: bool) #{{{1
     var src: string = expand('%:p')
     var dst: string = fnamemodify(arg_dst, ':p')
 
@@ -217,11 +219,12 @@ def unix#move(arg_dst: string, bang: bool): string #{{{1
     # The destination is occupied by an existing file, and no bang was added.
     # The command must fail.
     if filereadable(dst) && !bang
-        return 'keepalt saveas ' .. fnameescape(dst)
-        #       │
-        #       └ even though `:saveas` is going to fail, it will still
-        #         change the alternate file for the current window (`dst`);
-        #         we don't want that
+        exe 'keepalt saveas ' .. fnameescape(dst)
+        #    │
+        #    └ even though `:saveas` is going to fail, it will still
+        #      change the alternate file for the current window (`dst`);
+        #      we don't want that
+        return
 
     # Try to rename current file.
     # What are the differences between `:saveas` and `rename()`:
@@ -230,7 +233,8 @@ def unix#move(arg_dst: string, bang: bool): string #{{{1
     #    - `rename()` can move a file to a different filesystem; `:saveas` ?
     elseif rename(src, dst) != 0
         # If a problem occurred, inform us.
-        return 'echoerr ' .. string('Failed to rename ' .. string(src) .. ' to ' .. string(dst))
+        Error('Failed to rename ' .. string(src) .. ' to ' .. string(dst))
+        return
     else
         # If no pb occurred execute `:saveas! dst`.
         #
@@ -268,7 +272,6 @@ def unix#move(arg_dst: string, bang: bool): string #{{{1
         filetype detect
         # re-apply fold settings
         do <nomodeline> BufWinEnter
-        return ''
     endif
 enddef
 
@@ -326,4 +329,10 @@ def unix#wall() #{{{1
 enddef
 
 var seen: dict<bool>
+
+def Error(msg: string) #{{{2
+    echohl ErrorMsg
+    echom msg
+    echohl NONE
+enddef
 

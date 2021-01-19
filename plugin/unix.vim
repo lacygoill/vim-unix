@@ -24,43 +24,7 @@ augroup END
 
 # Commands {{{1
 
-# Do *not* replace `:exe` with `:echoerr`{{{
-#
-#                              ┌ ✔
-#                              │
-#     com -bar -nargs=1 Chmod  exe     unix#chmod(<q-args>)
-#     com -bar -nargs=1 Chmod  echoerr unix#chmod(<q-args>)
-#                              │
-#                              └ ✘
-#
-# Because with `:echoerr`,  if you execute the command from  a function, it will
-# raise an error.
-#
-# MWE:
-#
-#     com -bar -nargs=1 Chmod echoerr unix#chmod(<q-args>)
-#     nno cd <cmd>call Func()<cr>
-#     fu Func() abort
-#         sp
-#         e /tmp/file
-#         " Error detected while processing function Func:
-#         Chmod 123
-#     endfu
-#
-# You could use `:silent!`:
-#
-#     sil! Chmod 123
-#
-# But still, you would have to remember that your command needs it.  It can make
-# you lose time in needless debugging.
-# Besides, you shouldn't bring inconsistency:
-# a  default Ex  command doesn't  need `:silent!`  unless it  encounters a  real
-# error.  Yours should behave in the same way.
-# }}}
-# FIXME:
-# For this reason, should we refactor all our plugins to remove `return 'echoerr ...'`?
-
-com -bar -nargs=1 Chmod exe unix#chmod(<q-args>)
+com -bar -nargs=1 Chmod unix#chmod(<q-args>)
 
 # Do not give the `-complete=[file|dir]` attribute to any command.{{{
 #
@@ -105,7 +69,7 @@ com -bar -nargs=1 Chmod exe unix#chmod(<q-args>)
 # Update: I gave it back to `:SudoEdit`; I think it should be harmless there (plus it's really useful).
 com -bar -range=% -nargs=? Cloc unix#cloc#main(<line1>, <line2>, <q-args>)
 
-com -bang -bar -nargs=1 Cp exe unix#cp(<q-args>, <bang>0)
+com -bang -bar -nargs=1 Cp unix#cp(<q-args>, <bang>0)
 
 com -bar -nargs=+ Find unix#grep('find', <q-args>)
 # Why the bang after `com`?{{{
@@ -127,7 +91,7 @@ com -bang -bar -nargs=? Mkdir unix#mkdir(<q-args>, <bang>0)
 
 # `:Mv` lets us move the current file to any location.
 # `:Rename` lets us rename the current file inside the current directory.
-com -bang -bar -nargs=1 -complete=file Mv exe unix#move(<q-args>, <bang>0)
+com -bang -bar -nargs=1 -complete=file Mv unix#move(<q-args>, <bang>0)
 #                                        ┌ FIXME: what does it do?
 #                                        │
 com -bang -bar -nargs=1 -complete=custom,unix#renameComplete Rename Mv<bang> %:h/<args>
@@ -158,8 +122,8 @@ com -bar SudoWrite expand('%:p')->unix#sudo#setup() | w!
 # `:Tp!` deletes the current file and RELOADS the buffer.
 # As a result, we can restart the creation of a new file with the same name.
 #}}}
-com -bar -bang Tp exe unix#trash#put(<bang>0)
-com -bar       Tl exe unix#trash#list()
+com -bar -bang Tp unix#trash#put(<bang>0)
+com -bar       Tl unix#trash#list()
 #              └ Warning:{{{
 #
 #               It could conflict with the default `:tl[ast]` command.

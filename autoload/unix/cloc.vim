@@ -192,7 +192,7 @@ def unix#cloc#countLinesInFunc() #{{{1
     #}}}
     while (view.lnum < lnum1 || view.lnum > lnum2) && g < 9
         # if there is a nested function
-        if g
+        if g != 0
             # move just above (to ignore it next time we search for the body of the current function)
             norm %
             norm! k

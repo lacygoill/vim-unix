@@ -4,9 +4,10 @@ if exists('loaded') | finish | endif
 var loaded = true
 
 # Interface {{{1
-def unix#trash#list(): string #{{{2
+def unix#trash#list() #{{{2
     if !executable('trash-list')
-        return CommandUnavailable('trash-list')
+        Error('trash-list is not executable; install the trash-cli package')
+        return
     endif
 
     sil var listing: string = system('trash-list')
@@ -16,18 +17,17 @@ def unix#trash#list(): string #{{{2
     else
         echo listing
     endif
-
-    return ''
 enddef
 
-def unix#trash#put(bang: bool): string #{{{2
+def unix#trash#put(bang: bool) #{{{2
     var file: string = expand('%:p')
     if empty(file)
-        return ''
+        return
     endif
 
     if !executable('trash-put')
-        return CommandUnavailable('trash-put')
+        Error('trash-put is not executable; install the trash-cli package')
+        return
     endif
 
     if !bang
@@ -46,7 +46,7 @@ def unix#trash#put(bang: bool): string #{{{2
 
         # if it's still loaded, stop
         if bufloaded(file)
-            return ''
+            return
         endif
     endif
 
@@ -54,10 +54,13 @@ def unix#trash#put(bang: bool): string #{{{2
     sil system('trash-put ' .. shellescape(file))
     if v:shell_error
         system('')
-        return 'echoerr ' .. string('Failed to delete ' .. file)
+        Error('Failed to delete ' .. file)
+        return
     endif
 
-    return bang ? 'e' : ''
+    if bang
+        e
+    endif
 enddef
 
 def unix#trash#restore() #{{{2
@@ -65,8 +68,9 @@ def unix#trash#restore() #{{{2
 enddef
 #}}}1
 # Utilities {{{1
-def CommandUnavailable(cmd: string): string #{{{2
-    return 'echoerr '
-        .. string(cmd .. ' is not executable; install the trash-cli package')
+def Error(msg: string) #{{{2
+    echohl ErrorMsg
+    echom msg
+    echohl NONE
 enddef
 
