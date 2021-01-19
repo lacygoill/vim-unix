@@ -13,7 +13,8 @@ def unix#trash#list() #{{{2
     sil var listing: string = system('trash-list')
     if v:shell_error
         system('')
-        return 'echoerr ' .. string('Failed to list the contents of the trash can')
+        Error('Failed to list the contents of the trash can')
+        return
     else
         echo listing
     endif
