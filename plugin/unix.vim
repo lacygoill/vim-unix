@@ -285,14 +285,14 @@ def MaybeReadTemplate() #{{{2
             bind -T copy-mode-vi V send -X select-line
             bind -T root M-s copy-mode
             bind M-space last-pane
-            bind | splitw  -h -c ''#{pane_current_path}''
-            bind _ splitw -fv -c ''#{pane_current_path}''
+            bind | splitw  -h -c '#{pane_current_path}'
+            bind _ splitw -fv -c '#{pane_current_path}'
             bind h select-pane -L
             bind j select-pane -D
             bind k select-pane -U
             bind l select-pane -R
             bind C-p paste-buffer -p
-            bind p choose-buffer -Z "paste-buffer -p -b ''%%''"
+            bind p choose-buffer -Z "paste-buffer -p -b '%%'"
         END
         setline(1, lines)
 
