@@ -71,7 +71,7 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
         # Maybe cloc's developer  will refuse to do anything  until the language
         # is officially released.
         #}}}
-        map(lines, (_, v) => substitute(v, '^\s*\zs#{\@!', '"', ''))
+        map(lines, (_, v) => substitute(v, '^\s*\zs#', '"', ''))
         writefile(lines, to_scan)
 
         # In a string, it seems that `.` can match anything including a newline.
