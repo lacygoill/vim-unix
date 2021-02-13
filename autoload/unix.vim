@@ -219,6 +219,10 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
     # The destination is occupied by an existing file, and no bang was added.
     # The command must fail.
     if filereadable(dst) && !bang
+        # TODO: Handle this error: "E139: File is loaded in another buffer"
+        # It happens if  the name we pass  to `:Rename` matches a  file which is
+        # loaded  in  the current  Vim  session.   For  example, we  could  make
+        # `:Rename!` wipe this buffer...
         exe 'keepalt saveas ' .. fnameescape(dst)
         #    │
         #    └ even though `:saveas` is going to fail, it will still

@@ -169,7 +169,7 @@ com -bar Wall unix#wall()
 #               │   ┌ raise the rights of the `tee(1)` process so that it can write in
 #               │   │ a file owned by any user
 #               ├─┐ │
-com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(1) | setl nomod
+com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(true) | setl nomod
 #                           ├────────┘              │
 #                           │                       └ but write in the current file
 #                           │
