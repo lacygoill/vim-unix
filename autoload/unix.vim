@@ -281,22 +281,17 @@ enddef
 
 def unix#renameComplete(arglead: string, ...l: any): string #{{{1
     var prefix: string = expand('%:p:h') .. '/'
-    var files: list<string> = glob(prefix .. arglead .. '*', false, true)
-
-    # TODO:
-    # Should we use this? Or the next commented `map()`?
-    #
-    # Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
-    map(files, (_, v) => simplify(v) != expand('%:p')->simplify()
-        ?     v
-        : !fnamemodify(v, ':p:t:r')->empty()
-        ?     fnamemodify(v, ':r') .. '.'
-        :     v
-        )
-
-    #     map(files, (_, v) => v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : ''))
-
-    return join(files, "\n")
+    return glob(prefix .. arglead .. '*', false, true)
+        # Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
+        # TODO: Should we use this other `map()` instead?
+        #     ->map((_, v: string): string => v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : ''))
+        ->map((_, v: string): string => simplify(v) != expand('%:p')->simplify()
+            ?     v
+            : !fnamemodify(v, ':p:t:r')->empty()
+            ?     fnamemodify(v, ':r') .. '.'
+            :     v
+            )
+        ->join("\n")
 enddef
 
 def ShouldWriteBuffer(seen: dict<bool>): bool #{{{1

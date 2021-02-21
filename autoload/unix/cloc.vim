@@ -56,23 +56,23 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
     else
         var file: string = tempname()
         to_scan = file .. '.' .. (expand('%:e')->empty() ? &ft : expand('%:e'))
-        var lines: list<string> = getline(lnum1, lnum2)
-        # TODO: Currently, `cloc(1)` does not recognize the new Vim9 comment leader (`#`).{{{
-        #
-        # As a result, it parses any Vim9 commented line as a line of code.
-        # This makes the results wrong.
-        #
-        # We temporarily fix that by replacing `#` with `"`.
-        #
-        # In the future, consider opening an issue here:
-        # https://github.com/AlDanial/cloc/issues
-        #
-        # I don't do it now, because Vim9 is still in development.
-        # Maybe cloc's developer  will refuse to do anything  until the language
-        # is officially released.
-        #}}}
-        map(lines, (_, v) => substitute(v, '^\s*\zs#', '"', ''))
-        writefile(lines, to_scan)
+        getline(lnum1, lnum2)
+            # TODO: Currently, `cloc(1)` does not recognize the new Vim9 comment leader (`#`).{{{
+            #
+            # As a result, it parses any Vim9 commented line as a line of code.
+            # This makes the results wrong.
+            #
+            # We temporarily fix that by replacing `#` with `"`.
+            #
+            # In the future, consider opening an issue here:
+            # https://github.com/AlDanial/cloc/issues
+            #
+            # I don't do it now, because Vim9 is still in development.
+            # Maybe  cloc's  developer will  refuse  to  do anything  until  the
+            # language is officially released.
+            #}}}
+            ->map((_, v: string): string => substitute(v, '^\s*\zs#', '"', ''))
+            ->writefile(to_scan)
 
         # In a string, it seems that `.` can match anything including a newline.
         # Like `\_.`.
@@ -122,7 +122,7 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
 
     var stats: list<list<string>> = output_cloc
         ->copy()
-        ->filter((_, v) => v =~ '\d\+')
+        ->filter((_, v: string): bool => v =~ '\d\+')
         # Why `\s\{2,}` and not simply `\s\+`?{{{
         #
         # Because there are some programming languages which contain a number in
@@ -132,7 +132,7 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
         # language.   With  `\s\{2,}`, it  shouldn't  occur,  unless some  weird
         # languages use more than 2 consecutive spaces in their name...
         #}}}
-        ->mapnew((_, v) => split(v, '\s\{2,}\ze\d'))
+        ->mapnew((_, v: string): list<string> => split(v, '\s\{2,}\ze\d'))
 
     g:cloc_results = {}
     var keys: list<string> =<< trim END

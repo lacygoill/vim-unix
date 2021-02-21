@@ -239,7 +239,7 @@ def MaybeReadTemplate() #{{{2
 
     # Get all the filetypes for which we have a template.
     var filetypes: list<string> = glob(TEMPLATE_DIR .. 'by_filetype/*', false, true)
-        ->map((_, v) => fnamemodify(v, ':t:r'))
+        ->map((_, v: string): string => fnamemodify(v, ':t:r'))
 
     if index(filetypes, &ft) >= 0
     && filereadable(TEMPLATE_DIR .. 'by_filetype/' .. &ft .. '.txt')

@@ -37,7 +37,9 @@ def SilentSudoCmd(editor: string): list<string> #{{{2
 
     elseif !empty($SUDO_ASKPASS)
         || filereadable('/etc/sudo.conf')
-        && readfile('/etc/sudo.conf', 50)->filter((_, v) => v =~ '^Path askpass ')->len()
+        && readfile('/etc/sudo.conf', 50)
+            ->filter((_, v: string): bool => v =~ '^Path askpass ')
+            ->len()
         return ['silent', cmd .. ' -A']
 
     else
