@@ -238,36 +238,36 @@ def MaybeReadTemplate() #{{{2
     #     /etc/init.d/skeleton
 
     # Get all the filetypes for which we have a template.
-    var filetypes: list<string> = glob(TEMPLATE_DIR .. 'by_filetype/*', false, true)
+    var filetypes: list<string> = glob(TEMPLATE_DIR .. 'byFiletype/*', false, true)
         ->map((_, v: string): string => fnamemodify(v, ':t:r'))
 
     if index(filetypes, &ft) >= 0
-    && filereadable(TEMPLATE_DIR .. 'by_filetype/' .. &ft .. '.txt')
+    && filereadable(TEMPLATE_DIR .. 'byFiletype/' .. &ft .. '.txt')
         #    ┌ don't use the template file as the alternate file for the current window{{{
         #    │ keep the current one
         #    │
         #    │ Note that `:keepalt` is not useful when you read the output of an
         #    │ external command (`:r !cmd`).
         #    │}}}
-        exe 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'by_filetype/' .. &ft .. '.txt')
+        exe 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'byFiletype/' .. &ft .. '.txt')
         keepj :1d _
 
     elseif expand('<afile>:p') =~ '.*/compiler/[^/]*\.vim'
-    && filereadable(TEMPLATE_DIR .. 'by_name/compiler.txt')
+    && filereadable(TEMPLATE_DIR .. 'byName/compiler.txt')
         setline(1, ['let current_compiler = ' .. expand('<afile>:p:t:r')->string(), ''])
-        exe 'keepalt :2read ' .. TEMPLATE_DIR .. 'by_name/compiler.txt'
+        exe 'keepalt :2read ' .. TEMPLATE_DIR .. 'byName/compiler.txt'
         # If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         # compilers in `$VIMRUNTIME/compiler`.
         # In this case, we need 'current_compiler' to be set.
 
     elseif expand('<afile>:p') =~ '.*/filetype\.vim'
-    && filereadable(TEMPLATE_DIR .. 'by_name/filetype.txt')
-        exe 'keepalt read ' .. TEMPLATE_DIR .. 'by_name/filetype.txt'
+    && filereadable(TEMPLATE_DIR .. 'byName/filetype.txt')
+        exe 'keepalt read ' .. TEMPLATE_DIR .. 'byName/filetype.txt'
         keepj :1d _
 
     elseif expand('<afile>:p') =~ '.*/scripts\.vim'
-    && filereadable(TEMPLATE_DIR .. 'by_name/scripts.txt')
-        exe 'keepalt read ' .. TEMPLATE_DIR .. 'by_name/scripts.txt'
+    && filereadable(TEMPLATE_DIR .. 'byName/scripts.txt')
+        exe 'keepalt read ' .. TEMPLATE_DIR .. 'byName/scripts.txt'
         keepj :1d _
 
     # useful to get a mini `tmux.conf` when debugging tmux
