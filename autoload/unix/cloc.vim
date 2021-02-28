@@ -146,7 +146,7 @@ def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
         # `i` is going to index the `keys` list.
         # `dict` is going to store a dictionary containing the numbers of lines for a given language.
         var i: number = 0
-        var dict: dict<number> = {}
+        var dict: dict<number>
 
         for value in values_on_line[1 :]
             dict[keys[i]] = eval(value)

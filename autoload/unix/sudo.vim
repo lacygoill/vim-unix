@@ -6,15 +6,15 @@ var loaded = true
 const ERROR_FILE: string = tempname()
 
 # Interface {{{1
-def unix#sudo#edit(file: string, bang: bool) #{{{2
-    var _file: string = (empty(file) ? expand('%') : file)->fnamemodify(':p')
-    unix#sudo#setup(_file)
+def unix#sudo#edit(arg_file: string, bang: bool) #{{{2
+    var file: string = (empty(arg_file) ? expand('%') : arg_file)->fnamemodify(':p')
+    unix#sudo#setup(file)
 
-    if !&modified || !empty(file)
-        exe 'e' .. (bang ? '!' : '') .. ' ' .. file
+    if !&modified || !empty(arg_file)
+        exe 'e' .. (bang ? '!' : '') .. ' ' .. arg_file
     endif
 
-    if empty(file) || expand('%:p') == fnamemodify(file, ':p')
+    if empty(arg_file) || expand('%:p') == fnamemodify(arg_file, ':p')
         set noreadonly
     endif
 enddef
