@@ -285,13 +285,13 @@ def unix#renameComplete(arglead: string, ...l: any): string #{{{1
         # Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
         # TODO: Should we use this other `map()` instead?
         #     ->map((_, v: string): string => v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : ''))
-        ->map((_, v: string): string => simplify(v) != expand('%:p')->simplify()
+        ->map((_, v: string): string =>
+                simplify(v) != expand('%:p')->simplify()
             ?     v
             : !fnamemodify(v, ':p:t:r')->empty()
             ?     fnamemodify(v, ':r') .. '.'
             :     v
-            )
-        ->join("\n")
+        )->join("\n")
 enddef
 
 def ShouldWriteBuffer(seen: dict<bool>): bool #{{{1
