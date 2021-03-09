@@ -238,8 +238,9 @@ def MaybeReadTemplate() #{{{2
     #     /etc/init.d/skeleton
 
     # Get all the filetypes for which we have a template.
-    var filetypes: list<string> = glob(TEMPLATE_DIR .. 'byFiletype/*', false, true)
-        ->map((_, v: string): string => fnamemodify(v, ':t:r'))
+    var filetypes: list<string> = (TEMPLATE_DIR .. 'byFiletype')
+        ->readdir(true, {sort: 'none'})
+        ->map((_, v: string): string => fnamemodify(v, ':r'))
 
     if index(filetypes, &ft) >= 0
     && filereadable(TEMPLATE_DIR .. 'byFiletype/' .. &ft .. '.txt')
