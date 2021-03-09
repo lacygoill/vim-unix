@@ -67,7 +67,7 @@ def SudoError(): string #{{{2
     var error: string = readfile(ERROR_FILE)->join(' | ')
     if error =~ '^sudo' || v:shell_error
         system('')
-        return strlen(error) ? error : 'Error invoking sudo'
+        return strlen(error) != 0 ? error : 'Error invoking sudo'
     else
         return error
     endif

@@ -185,15 +185,15 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
     #  ┌ the destination is an existing directory
     #  │
     #  │                   ┌ or a future directory (we're going to create it)
-    #  ├──────────────┐    ├─────────────────┐
-    if isdirectory(dst) || dst[-1 : -1] == '/'
+    #  ├──────────────┐    ├────────────┐
+    if isdirectory(dst) || dst[-1] == '/'
         #       ┌ make sure there's a slash
         #       │ between the directory and the filename
-        #       ├──────────────────────────────┐
-        dst ..= (dst[-1 : -1] == '/' ? '' : '/') .. fnamemodify(src, ':t')
-        #                                           ├────────────────────┘
-        #                                           └ add the current filename
-        #                                             to complete the destination
+        #       ├─────────────────────────┐
+        dst ..= (dst[-1] == '/' ? '' : '/') .. fnamemodify(src, ':t')
+        #                                      ├────────────────────┘
+        #                                      └ add the current filename
+        #                                        to complete the destination
     endif
 
     # If the directory of the destination doesn't exist, create it.
@@ -284,7 +284,7 @@ def unix#renameComplete(arglead: string, ...l: any): string #{{{1
     return glob(prefix .. arglead .. '*', false, true)
         # Source: https://github.com/tpope/vim-eunuch/pull/23#issuecomment-365736811
         # TODO: Should we use this other `map()` instead?
-        #     ->map((_, v: string): string => v[strlen(prefix) : -1] .. (isdirectory(v) ? '/' : ''))
+        #     ->map((_, v: string): string => v[strchars(prefix, true) : -1] .. (isdirectory(v) ? '/' : ''))
         ->map((_, v: string): string =>
                 simplify(v) != expand('%:p')->simplify()
             ?     v
