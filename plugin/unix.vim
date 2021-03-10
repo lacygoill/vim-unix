@@ -92,8 +92,6 @@ com -bang -bar -nargs=? Mkdir unix#mkdir(<q-args>, <bang>0)
 # `:Mv` lets us move the current file to any location.
 # `:Rename` lets us rename the current file inside the current directory.
 com -bang -bar -nargs=1 -complete=file Mv unix#move(<q-args>, <bang>0)
-#                                        ┌ FIXME: what does it do?
-#                                        │
 com -bang -bar -nargs=1 -complete=custom,unix#renameComplete Rename Mv<bang> %:h/<args>
 #                                                                            └─┤ └────┤
 #                                                    directory of current file ┘      │
