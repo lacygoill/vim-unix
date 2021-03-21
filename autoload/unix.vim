@@ -282,7 +282,7 @@ enddef
 def unix#renameComplete(arglead: string, ...l: any): string #{{{1
     var prefix: string = expand('%:p:h') .. '/'
     var files: list<string> = glob(prefix .. arglead .. '*', false, true)
-        ->map((_, v: string): string => v[strchars(prefix) :] .. (isdirectory(v) ? '/' : ''))
+        ->map((_, v: string): string => v[strcharlen(prefix) :] .. (isdirectory(v) ? '/' : ''))
     return join(files + ['../'], "\n")
     #                    ^---^
     # TODO: How does Vim handle that?
@@ -301,7 +301,7 @@ def ShouldWriteBuffer(seen: dict<bool>): bool #{{{1
     && &modifiable
     && (&bt == '' || &bt == 'acwrite')
     && !expand('%')->empty()
-    && !has_key(seen, bufnr('%'))
+    && !seen->has_key(bufnr('%'))
         return true
     endif
     return false
