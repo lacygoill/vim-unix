@@ -279,12 +279,12 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
     endif
 enddef
 
-def unix#renameComplete(arglead: string, ...l: any): string #{{{1
+def unix#renameComplete(arglead: string, _, _): string #{{{1
     var prefix: string = expand('%:p:h') .. '/'
     var files: list<string> = glob(prefix .. arglead .. '*', false, true)
         ->map((_, v: string): string => v[strcharlen(prefix) :] .. (isdirectory(v) ? '/' : ''))
-    return join(files + ['../'], "\n")
-    #                    ^---^
+    return (files + ['../'])->join("\n")
+    #                ^---^
     # TODO: How does Vim handle that?
 enddef
 

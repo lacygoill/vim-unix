@@ -37,7 +37,11 @@ var loaded = true
 # TODO:
 # Use the `--csv` option.  It makes the output easier to parse.
 
-def unix#cloc#main(lnum1: number, lnum2: number, path: string) #{{{1
+def unix#cloc#main( #{{{1
+    lnum1: number,
+    lnum2: number,
+    path: string
+)
     if !executable('cloc')
         # We need `:unsilent` because we may call this function with `:silent`.
         unsilent echom '`cloc` is not installed, or it''s not in the $PATH of the current user'
