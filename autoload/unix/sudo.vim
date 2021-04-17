@@ -53,7 +53,7 @@ def SudoEditInit() #{{{2
         for i in argc()->range()
             exe 'autocmd BufEnter ' .. argv(i)->fnameescape()
                 .. 'if empty(&ft) || &ft == "conf"'
-                .. ' |     do filetypedetect BufReadPost ' .. fnameescape(files[i])
+                .. ' |     do filetypedetect BufReadPost ' .. files[i]->fnameescape()
                 .. ' | endif'
         endfor
     endif
