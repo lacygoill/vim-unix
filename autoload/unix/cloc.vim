@@ -59,24 +59,28 @@ def unix#cloc#main( #{{{1
         endif
     else
         var file: string = tempname()
-        to_scan = file .. '.' .. (expand('%:e')->empty() ? &ft : expand('%:e'))
-        getline(lnum1, lnum2)
-            # TODO: Currently, `cloc(1)` does not recognize the new Vim9 comment leader (`#`).{{{
-            #
-            # As a result, it parses any Vim9 commented line as a line of code.
-            # This makes the results wrong.
-            #
-            # We temporarily fix that by replacing `#` with `"`.
-            #
-            # In the future, consider opening an issue here:
-            # https://github.com/AlDanial/cloc/issues
-            #
-            # I don't do it now, because Vim9 is still in development.
-            # Maybe  cloc's  developer will  refuse  to  do anything  until  the
-            # language is officially released.
-            #}}}
-            ->map((_, v: string): string => v->substitute('^\s*\zs#', '"', ''))
-            ->writefile(to_scan)
+        to_scan = file .. '.' .. (expand('%:e')->empty() ? &filetype : expand('%:e'))
+        # TODO: Currently, `cloc(1)` does not recognize the new Vim9 comment leader (`#`).{{{
+        #
+        # As a result, it parses any Vim9 commented line as a line of code.
+        # This makes the results wrong.
+        #
+        # We temporarily fix that by replacing `#` with `"`.
+        #
+        # In the future, consider opening an issue here:
+        # https://github.com/AlDanial/cloc/issues
+        #
+        # I don't do it now, because Vim9 is still in development.
+        # Maybe  cloc's  developer will  refuse  to  do anything  until  the
+        # language is officially released.
+        #}}}
+        if "\n" .. getline(1, 10)->join("\n") =~ '\n\s*vim9\%[script]\>'
+            getline(lnum1, lnum2)
+                ->map((_, v: string): string => v->substitute('^\s*\zs#', '"', ''))
+                ->writefile(to_scan)
+        else
+            getline(lnum1, lnum2)->writefile(to_scan)
+        endif
 
         # In a string, it seems that `.` can match anything including a newline.
         # Like `\_.`.
@@ -86,7 +90,7 @@ def unix#cloc#main( #{{{1
         # We could use this code instead:
         #
         #     var lines: string = getline(lnum1, lnum2)->join("\n")->shellescape()
-        #     sil var out: string = system('echo ' .. lines .. ' | cloc --stdin-name=foo.' .. &ft .. ' -')
+        #     sil var out: string = system('echo ' .. lines .. ' | cloc --stdin-name=foo.' .. &filetype .. ' -')
         #     echo out
         #
         # But because of the previous limit:
@@ -154,7 +158,7 @@ def unix#cloc#main( #{{{1
 
         for value in values_on_line[1 :]
             dict[keys[i]] = eval(value)
-            i += 1
+            ++i
         endfor
 
         g:cloc_results[values_on_line[0]] = dict
@@ -172,7 +176,7 @@ def unix#cloc#countLinesInFunc() #{{{1
     # Try to avoid using a variable name matching `fu\%[nction]`.
     # Otherwise, you'll have to just accept that it's not 100% reliable.
     #}}}
-    var ft: string = get({vim: 'vim script', sh: 'Bourne Shell'}, &ft, '')
+    var ft: string = get({vim: 'vim script', sh: 'Bourne Shell'}, &filetype, '')
     if ft == ''
         echo 'non supported filetype'
         return
@@ -205,10 +209,10 @@ def unix#cloc#countLinesInFunc() #{{{1
         lnum1 = line('.')
         norm g%
         lnum2 = line('.')
-        g += 1
+        ++g
     endwhile
-    lnum1 += 1
-    lnum2 -= 1
+    ++lnum1
+    --lnum2
     sil unix#cloc#main(lnum1, lnum2, '')
     if exists('g:cloc_results')
         var blank_cnt: number = get(g:cloc_results, ft, {})->get('blank', 0)

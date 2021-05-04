@@ -238,17 +238,17 @@ def MaybeReadTemplate() #{{{2
     # Get all the filetypes for which we have a template.
     var filetypes: list<string> = (TEMPLATE_DIR .. 'byFiletype')
         ->readdir(true, {sort: 'none'})
-        ->map((_, v: string): string => fnamemodify(v, ':r'))
+        ->map((_, v: string): string => v->fnamemodify(':r'))
 
-    if index(filetypes, &ft) >= 0
-    && filereadable(TEMPLATE_DIR .. 'byFiletype/' .. &ft .. '.txt')
+    if index(filetypes, &filetype) >= 0
+    && filereadable(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')
         #    ┌ don't use the template file as the alternate file for the current window{{{
         #    │ keep the current one
         #    │
         #    │ Note that `:keepalt` is not useful when you read the output of an
         #    │ external command (`:r !cmd`).
         #    │}}}
-        exe 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'byFiletype/' .. &ft .. '.txt')
+        exe 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')
         keepj :1d _
 
     elseif expand('<afile>:p') =~ '.*/compiler/[^/]*\.vim'

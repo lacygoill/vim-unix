@@ -14,7 +14,7 @@ def unix#sudo#edit(arg_file: string, bang: bool) #{{{2
         exe 'e' .. (bang ? '!' : '') .. ' ' .. arg_file
     endif
 
-    if empty(arg_file) || expand('%:p') == fnamemodify(arg_file, ':p')
+    if empty(arg_file) || expand('%:p') == arg_file->fnamemodify(':p')
         set noreadonly
     endif
 enddef
@@ -52,7 +52,7 @@ def SudoEditInit() #{{{2
     if len(files) == argc()
         for i in argc()->range()
             exe 'autocmd BufEnter ' .. argv(i)->fnameescape()
-                .. 'if empty(&ft) || &ft == "conf"'
+                .. ' if empty(&filetype) || &filetype == "conf"'
                 .. ' |     do filetypedetect BufReadPost ' .. files[i]->fnameescape()
                 .. ' | endif'
         endfor
@@ -78,7 +78,7 @@ def SudoReadCmd(): string #{{{2
     var silent: string
     var cmd: string
     [silent, cmd] = SilentSudoCmd('cat')
-    sil exe printf('read !%s %%:p:S 2>%s', cmd, ERROR_FILE)
+    exe printf('sil read !%s %%:p:S 2>%s', cmd, ERROR_FILE)
     var exit_status: number = v:shell_error
     # reset `v:shell_error`
     system('')

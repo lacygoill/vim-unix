@@ -58,7 +58,7 @@ def unix#grep(prg: string, args: string) #{{{1
     # Make `find(1)` ignore files matching 'wig'.
     # https://stackoverflow.com/a/22558474/9477010
     var cmd: string = prg .. ' ' .. args .. ' 2>/dev/null'
-    var items: list<dict<any>> = getqflist({lines: systemlist(cmd), efm: '%f'}).items
+    sil var items: list<dict<any>> = getqflist({lines: systemlist(cmd), efm: '%f'}).items
     if empty(items)
         return
     endif
@@ -66,7 +66,7 @@ def unix#grep(prg: string, args: string) #{{{1
     setqflist([], ' ', {items: items, title: '$ ' .. cmd})
 
     do <nomodeline> QuickFixCmdPost cwindow
-    if &bt == 'quickfix'
+    if &buftype == 'quickfix'
         qf#setMatches('unix:grep', 'Conceal', 'double_bar')
         qf#createMatches()
     endif
@@ -97,9 +97,9 @@ def unix#grep(prg: string, args: string) #{{{1
     #         #            ┌ don't jump to first match, we want to decide ourselves
     #         #            │ whether to jump
     #         #            │
-    #         sil exe 'grep! ' .. pat
-    #         # │
-    #         # └ bypass prompt “Press ENTER or type command to continue“
+    #         exe 'sil grep! ' .. pat
+    #         #     │
+    #         #     └ bypass prompt “Press ENTER or type command to continue“
     #         # FIXME:
     #         redraw!
     #
@@ -113,7 +113,7 @@ def unix#grep(prg: string, args: string) #{{{1
     #         if !getqflist()->empty()
     #             setqflist([], 'a', {title: '$ ' .. prg .. ' ' .. pat})
     #
-    #             if &bt == 'quickfix'
+    #             if &buftype == 'quickfix'
     #                 qf#setMatches('eunuch:grep', 'Conceal', 'double_bar')
     #                 qf#createMatches()
     #             endif
@@ -147,10 +147,10 @@ def unix#grep(prg: string, args: string) #{{{1
     # Remember that `:grep`  is shitty because it causes the  screen to flicker,
     # due to the combination of `:silent` and `:redraw`:
     #
-    #     nno cd <cmd>sil exe 'grep! foobar' <bar> redraw!<cr>
-    #                 │                            │
-    #                 │                            └ needed to redraw screen
-    #                 └ needed to avoid seeing the terminal screen
+    #     nno cd <cmd>exe 'sil grep! foobar' <bar> redraw!<cr>
+    #                      │                       │
+    #                      │                       └ needed to redraw screen
+    #                      └ needed to avoid seeing the terminal screen
     #
     # ---
     #
@@ -177,7 +177,7 @@ enddef
 
 def unix#move(arg_dst: string, bang: bool) #{{{1
     var src: string = expand('%:p')
-    var dst: string = fnamemodify(arg_dst, ':p')
+    var dst: string = arg_dst->fnamemodify(':p')
 
     # If the destination is a directory, it must be completed, by appending
     # the current filename.
@@ -190,15 +190,15 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         #       ┌ make sure there's a slash
         #       │ between the directory and the filename
         #       ├─────────────────────────┐
-        dst ..= (dst[-1] == '/' ? '' : '/') .. fnamemodify(src, ':t')
+        dst ..= (dst[-1] == '/' ? '' : '/') .. src->fnamemodify(':t')
         #                                      ├────────────────────┘
         #                                      └ add the current filename
         #                                        to complete the destination
     endif
 
     # If the directory of the destination doesn't exist, create it.
-    if !fnamemodify(dst, ':h')->isdirectory()
-        fnamemodify(dst, ':h')->mkdir('p')
+    if !dst->fnamemodify(':h')->isdirectory()
+        dst->fnamemodify(':h')->mkdir('p')
     endif
 
     dst = simplify(dst)->substitute('^\.\/', '', '')
@@ -292,14 +292,14 @@ def ShouldWriteBuffer(seen: dict<bool>): bool #{{{1
     # `'buftype'` is a  buffer-local option, whose value determines  the type of
     # buffer.  We want to write a buffer currently displayed in a window, iff:
     #
-    #    - it is a regular buffer (&bt = '')
+    #    - it is a regular buffer (&buftype = '')
     #
     #    - an autocmd listening to `BufWriteCmd` determines how it must be written
-    #      (&bt = 'acwrite')
+    #      (&buftype = 'acwrite')
 
     if !&readonly
     && &modifiable
-    && (&bt == '' || &bt == 'acwrite')
+    && (&buftype == '' || &buftype == 'acwrite')
     && !expand('%')->empty()
     && !seen->has_key(bufnr('%'))
         return true
