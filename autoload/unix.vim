@@ -265,7 +265,7 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         #     :Mv     /path/to/current/file
         #     :Rename current_filename
         if src != expand('%:p')
-            exe 'bw ' .. fnameescape(src)
+            exe 'sil! bw ' .. fnameescape(src)
         endif
 
         # Rationale:{{{
