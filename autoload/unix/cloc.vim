@@ -99,7 +99,7 @@ def unix#cloc#main( #{{{1
         # ... the command would error out when send too much text.
         # The error would like like this:
         #
-        #     E484: Can't open file /tmp/user/1000/vsgRgDU/97~
+        #     E484: Can't open file /tmp/user/1000/vsgRgDU/97˜
         #
         # Currently, on my system, it seems to error out somewhere above 120KB.
         # In a file, to  go the 120 000th byte, use the  normal `go` command and

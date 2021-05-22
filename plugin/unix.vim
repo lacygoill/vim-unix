@@ -38,7 +38,7 @@ com -bar -nargs=1 Chmod unix#chmod(<q-args>)
 #         echo a:arg
 #     endfu
 #     Cmd 'A%B'
-#     Aunix.vimB~
+#     Aunix.vimB˜
 #
 # ---
 #
@@ -83,7 +83,7 @@ com -bar -nargs=+ Find unix#grep('find', <q-args>)
 # (by removing  `~/.vim` from the  rtp).  When  that happens, if  `vim-unix` and
 # `vim-fzf` are both enabled, `E174` is raised.
 #
-#     E174: Command already exists: add ! to replace it~
+#     E174: Command already exists: add ! to replace it˜
 #}}}
 com! -bar -nargs=+ Locate unix#grep('locate', <q-args>)
 
