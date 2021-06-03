@@ -74,7 +74,7 @@ def unix#cloc#main( #{{{1
         # Maybe  cloc's  developer will  refuse  to  do anything  until  the
         # language is officially released.
         #}}}
-        if "\n" .. getline(1, 10)->join("\n") =~ '\n\s*vim9\%[script]\>'
+        if b:current_syntax == 'vim9'
             getline(lnum1, lnum2)
                 ->map((_, v: string): string => v->substitute('^\s*\zs#', '"', ''))
                 ->writefile(to_scan)
