@@ -15,7 +15,7 @@ const TEMPLATE_DIR: string = $HOME .. '/.vim/template/'
 # Integrate `fd(1)` (`:Fd`).  In an interactive usage, we use it much more often
 # than `find(1)`, because its syntax is shorter and easier.
 
-# Autocmds "{{{1
+# Autocmds {{{1
 
 augroup MyUnix | au!
     au BufNewFile * MaybeReadTemplate()
@@ -80,8 +80,8 @@ com -bar -nargs=+ Find unix#grep('find', <q-args>)
 # to all the commands it installs (`Fz`).
 #
 # But when  we debug some issue,  we may temporarily disable  this configuration
-# (by removing  `~/.vim` from the  rtp).  When  that happens, if  `vim-unix` and
-# `vim-fzf` are both enabled, `E174` is raised.
+# (by removing `~/.vim` from the runtimepath).  When that happens, if `vim-unix`
+# and `vim-fzf` are both enabled, `E174` is raised.
 #
 #     E174: Command already exists: add ! to replace it˜
 #}}}
@@ -155,7 +155,7 @@ com -bar Wall unix#wall()
 # If  you've set  `'autoread'`,  there  should be  no  message,  and Vim  should
 # automatically write the buffer.
 #}}}
-# Why `setl nomod`?{{{
+# Why `&l:modified = false`?{{{
 #
 # I don't remember what issue it solved, but I keep it because I've noticed that
 # it bypasses the W12 warning.
@@ -167,7 +167,7 @@ com -bar Wall unix#wall()
 #               │   ┌ raise the rights of the `tee(1)` process so that it can write in
 #               │   │ a file owned by any user
 #               ├─┐ │
-com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(true) | setl nomod
+com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(true) | &l:modified = false
 #                           ├────────┘              │
 #                           │                       └ but write in the current file
 #                           │
@@ -253,7 +253,8 @@ def MaybeReadTemplate() #{{{2
 
     elseif expand('<afile>:p') =~ '.*/compiler/[^/]*\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/compiler.txt')
-        setline(1, ['let current_compiler = ' .. expand('<afile>:p:t:r')->string(), ''])
+        ['let current_compiler = ' .. expand('<afile>:p:t:r')->string(), '']
+            ->setline(1)
         exe 'keepalt :2read ' .. TEMPLATE_DIR .. 'byName/compiler.txt'
         # If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         # compilers in `$VIMRUNTIME/compiler`.
@@ -293,10 +294,11 @@ def MaybeReadTemplate() #{{{2
             bind C-p paste-buffer -p
             bind p choose-buffer -Z "paste-buffer -p -b '%%'"
         END
-        setline(1, lines)
+        lines->setline(1)
 
     elseif expand('<afile>:p:h') == '' .. $HOME .. '/.zsh/my-completions'
-        setline(1, ['#compdef ' .. expand('<afile>:t')[1 :], '', ''])
+        ['#compdef ' .. expand('<afile>:t')[1 :], '', '']
+            ->setline(1)
     endif
 enddef
 

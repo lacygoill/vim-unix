@@ -176,8 +176,8 @@ def unix#cloc#countLinesInFunc() #{{{1
     # Try to avoid using a variable name matching `fu\%[nction]`.
     # Otherwise, you'll have to just accept that it's not 100% reliable.
     #}}}
-    var ft: string = get({vim: 'vim script', sh: 'Bourne Shell'}, &filetype, '')
-    if ft == ''
+    var filetype: string = get({vim: 'vim script', sh: 'Bourne Shell'}, &filetype, '')
+    if filetype == ''
         echo 'non supported filetype'
         return
     endif
@@ -215,9 +215,9 @@ def unix#cloc#countLinesInFunc() #{{{1
     --lnum2
     sil unix#cloc#main(lnum1, lnum2, '')
     if exists('g:cloc_results')
-        var blank_cnt: number = get(g:cloc_results, ft, {})->get('blank', 0)
-        var comment_cnt: number = get(g:cloc_results, ft, {})->get('comment', 0)
-        var code_cnt: number = get(g:cloc_results, ft, {})->get('code', 0)
+        var blank_cnt: number = get(g:cloc_results, filetype, {})->get('blank', 0)
+        var comment_cnt: number = get(g:cloc_results, filetype, {})->get('comment', 0)
+        var code_cnt: number = get(g:cloc_results, filetype, {})->get('code', 0)
         echo printf('blank: %s   comment: %s   code: %s', blank_cnt, comment_cnt, code_cnt)
     endif
     winrestview(view)

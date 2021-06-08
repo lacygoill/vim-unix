@@ -15,7 +15,7 @@ def unix#sudo#edit(arg_file: string, bang: bool) #{{{2
     endif
 
     if empty(arg_file) || expand('%:p') == arg_file->fnamemodify(':p')
-        set noreadonly
+        &readonly = false
     endif
 enddef
 
@@ -24,7 +24,7 @@ def unix#sudo#setup(file: string) #{{{2
         exe 'au BufReadCmd ' .. fnameescape(file) .. ' exe SudoReadCmd()'
     endif
     if !filewritable(file) && !exists('#BufWriteCmd#' .. fnameescape(file))
-        exe 'au BufReadPost ' .. fnameescape(file) .. ' set noreadonly'
+        exe 'au BufReadPost ' .. fnameescape(file) .. ' &readonly = false'
         exe 'au BufWriteCmd ' .. fnameescape(file) .. ' exe SudoWriteCmd()'
     endif
 enddef
@@ -83,7 +83,7 @@ def SudoReadCmd(): string #{{{2
     # reset `v:shell_error`
     system('')
     sil keepj :1d _
-    setl nomodified
+    &l:modified = false
     if exit_status
         return 'echoerr ' .. SudoError()->string()
     endif
@@ -101,7 +101,7 @@ def SudoWriteCmd(): string #{{{2
     if !empty(error)
         return 'echoerr ' .. string(error)
     else
-        setl nomodified
+        &l:modified = false
         return ''
     endif
 enddef

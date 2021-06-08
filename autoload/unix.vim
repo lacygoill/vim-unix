@@ -55,10 +55,13 @@ enddef
 
 def unix#grep(prg: string, args: string) #{{{1
     # TODO:
-    # Make `find(1)` ignore files matching 'wig'.
+    # Make `find(1)` ignore files matching 'wildignore'.
     # https://stackoverflow.com/a/22558474/9477010
     var cmd: string = prg .. ' ' .. args .. ' 2>/dev/null'
-    sil var items: list<dict<any>> = getqflist({lines: systemlist(cmd), efm: '%f'}).items
+    sil var items: list<dict<any>> = getqflist({
+        lines: systemlist(cmd),
+        efm: '%f'
+    }).items
     if empty(items)
         return
     endif
@@ -80,15 +83,15 @@ def unix#grep(prg: string, args: string) #{{{1
     #
     #     try
     #         # TODO:
-    #         # Make `find(1)` ignore files matching 'wig'.
+    #         # Make `find(1)` ignore files matching 'wildignore'.
     #         # https://stackoverflow.com/a/22558474/9477010
     #         &l:grepprg = prg
-    #         #                ┌ the output of `find(1)` and `locate(1)` will just contain file names
-    #         #                │
-    #         setl grepformat=%f
-    #         # The default value of 'sp' ('2>&1| tee') causes the error messages
-    #         # (ex: “permission denied“) to be included in the output of `:grep`.
-    #         # It's noise, so we get rid of them by temporarily tweaking 'sp'.
+    #         #              ┌ the output of `find(1)` and `locate(1)` will just contain file names
+    #         #              │
+    #         &l:grepformat=%f
+    #         # The default value of 'shellpipe' ('2>&1| tee') causes the error messages
+    #         # (e.g.: “permission denied“) to be included in the output of `:grep`.
+    #         # It's noise, so we get rid of them by temporarily tweaking 'shellpipe'.
     #         &shellpipe = '| tee'
     #         # FIXME:
     #         # Don't use `:grep`, it makes the screen flicker.  Use `cgetexpr` instead.
@@ -147,10 +150,10 @@ def unix#grep(prg: string, args: string) #{{{1
     # Remember that `:grep`  is shitty because it causes the  screen to flicker,
     # due to the combination of `:silent` and `:redraw`:
     #
-    #     nno cd <cmd>exe 'sil grep! foobar' <bar> redraw!<cr>
-    #                      │                       │
-    #                      │                       └ needed to redraw screen
-    #                      └ needed to avoid seeing the terminal screen
+    #     nno <F3> <cmd>exe 'sil grep! foobar' <bar> redraw!<cr>
+    #                        │                       │
+    #                        │                       └ needed to redraw screen
+    #                        └ needed to avoid seeing the terminal screen
     #
     # ---
     #
@@ -244,7 +247,7 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         #
         # FIXME:
         # Why set the buffer as modified?
-        setl modified
+        &l:modified = true
         # FIXME:
         # Why this command? Maybe to trigger one (some?, all?) of those events:
         #
