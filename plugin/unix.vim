@@ -176,7 +176,7 @@ com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(true) | &
 # Mappings {{{1
 
 nno <unique> g<c-l> <cmd>Cloc<cr>
-xno <unique> g<c-l> <c-\><c-n><cmd>*Cloc<cr>
+xno <unique> g<c-l> <c-\><c-n><cmd>* Cloc<cr>
 nno <unique> gl <cmd>call unix#cloc#countLinesInFunc()<cr>
 
 # Functions {{{1
@@ -249,13 +249,13 @@ def MaybeReadTemplate() #{{{2
         #    │ external command (`:r !cmd`).
         #    │}}}
         exe 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')
-        keepj :1d _
+        keepj :1 d _
 
     elseif expand('<afile>:p') =~ '.*/compiler/[^/]*\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/compiler.txt')
         ['let current_compiler = ' .. expand('<afile>:p:t:r')->string(), '']
             ->setline(1)
-        exe 'keepalt :2read ' .. TEMPLATE_DIR .. 'byName/compiler.txt'
+        exe 'keepalt :2 read ' .. TEMPLATE_DIR .. 'byName/compiler.txt'
         # If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         # compilers in `$VIMRUNTIME/compiler`.
         # In this case, we need 'current_compiler' to be set.
@@ -263,12 +263,12 @@ def MaybeReadTemplate() #{{{2
     elseif expand('<afile>:p') =~ '.*/filetype\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/filetype.txt')
         exe 'keepalt read ' .. TEMPLATE_DIR .. 'byName/filetype.txt'
-        keepj :1d _
+        keepj :1 d _
 
     elseif expand('<afile>:p') =~ '.*/scripts\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/scripts.txt')
         exe 'keepalt read ' .. TEMPLATE_DIR .. 'byName/scripts.txt'
-        keepj :1d _
+        keepj :1 d _
 
     # useful to get a mini `tmux.conf` when debugging tmux
     elseif expand('<afile>:t') == 'tmux.conf'

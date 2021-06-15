@@ -65,7 +65,15 @@ def unix#trash#put(bang: bool) #{{{2
 enddef
 
 def unix#trash#restore() #{{{2
-    !rlwrap trash-restore
+    # Simpler alternative:{{{
+    #
+    #     term /bin/sh -c "sleep .1 && rlwrap trash-restore"
+    #
+    # The `sleep(1)` might be necessary  to avoid the listing of `trash-restore`
+    # to be slightly messed up.
+    #}}}
+    var buf: number = terminal#togglePopup#main()
+    term_sendkeys(buf, "rlwrap trash-restore\r")
 enddef
 #}}}1
 # Utilities {{{1

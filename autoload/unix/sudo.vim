@@ -74,7 +74,7 @@ def SudoError(): string #{{{2
 enddef
 
 def SudoReadCmd(): string #{{{2
-    sil keepj :%d _
+    sil keepj :% d _
     var silent: string
     var cmd: string
     [silent, cmd] = SilentSudoCmd('cat')
@@ -82,7 +82,7 @@ def SudoReadCmd(): string #{{{2
     var exit_status: number = v:shell_error
     # reset `v:shell_error`
     system('')
-    sil keepj :1d _
+    sil keepj :1 d _
     &l:modified = false
     if exit_status
         return 'echoerr ' .. SudoError()->string()

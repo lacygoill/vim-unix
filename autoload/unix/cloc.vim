@@ -105,7 +105,7 @@ def unix#cloc#main( #{{{1
         # In a file, to  go the 120 000th byte, use the  normal `go` command and
         # hit `120000go`.  Or the Ex version:
         #
-        #     :120000go
+        #     :120000 go
         #}}}
     endif
 
