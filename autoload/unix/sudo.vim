@@ -48,7 +48,7 @@ def SilentSudoCmd(editor: string): list<string> #{{{2
 enddef
 
 def SudoEditInit() #{{{2
-    let files = split($SUDO_COMMAND, ' ')[1 : -1]
+    var files: list<string> = split($SUDO_COMMAND, ' ')[1 : -1]
     if len(files) == argc()
         for i in argc()->range()
             exe 'autocmd BufEnter ' .. argv(i)->fnameescape()
