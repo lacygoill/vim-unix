@@ -27,7 +27,7 @@ var loaded = true
 # If you're only interested in the variable  and don't want to see the output of
 # `cloc`, execute the command silently:
 #
-#     :sil Cloc [/path]
+#     :silent Cloc [/path]
 
 
 # FIXME:
@@ -44,7 +44,7 @@ def unix#cloc#main( #{{{1
 )
     if !executable('cloc')
         # We need `:unsilent` because we may call this function with `:silent`.
-        unsilent echom '`cloc` is not installed, or it''s not in the $PATH of the current user'
+        unsilent echomsg '`cloc` is not installed, or it''s not in the $PATH of the current user'
         return
     endif
     var to_scan: string
@@ -52,7 +52,7 @@ def unix#cloc#main( #{{{1
         if path =~ '^http'
             var tempdir: string = tempname()
             var cmd: string = path =~ 'bitbucket' ? 'hg' : 'git'
-            sil var git_output: string = system(cmd .. ' clone ' .. path .. ' ' .. tempdir)
+            silent var git_output: string = system(cmd .. ' clone ' .. path .. ' ' .. tempdir)
             to_scan = tempdir
         else
             to_scan = path
@@ -90,7 +90,7 @@ def unix#cloc#main( #{{{1
         # We could use this code instead:
         #
         #     var lines: string = getline(lnum1, lnum2)->join("\n")->shellescape()
-        #     sil var out: string = system('echo ' .. lines .. ' | cloc --stdin-name=foo.' .. &filetype .. ' -')
+        #     silent var out: string = system('echo ' .. lines .. ' | cloc --stdin-name=foo.' .. &filetype .. ' -')
         #     echo out
         #
         # But because of the previous limit:
@@ -110,7 +110,7 @@ def unix#cloc#main( #{{{1
     endif
 
     var cmd: string = 'cloc --exclude-lang=Markdown --exclude-dir=.cache,t,test ' .. to_scan
-    sil var output_cloc: list<string> = system(cmd)
+    silent var output_cloc: list<string> = system(cmd)
         # remove the header
         ->matchstr('\zs-\+.*')
         ->split('\n')
@@ -170,7 +170,7 @@ enddef
 def unix#cloc#countLinesInFunc() #{{{1
     # Sometimes, when I press `gl` in a function, the command-line displays that it contains 0 lines of code!{{{
     #
-    # That's probably because `%` fails to jump on `endfu` when the cursor is on `fu`.
+    # That's probably because `%` fails to jump on `endfunction` when the cursor is on `function`.
     # See: https://github.com/andymass/vim-matchup/issues/54
     #
     # Try to avoid using a variable name matching `fu\%[nction]`.
@@ -202,18 +202,18 @@ def unix#cloc#countLinesInFunc() #{{{1
         # if there is a nested function
         if g != 0
             # move just above (to ignore it next time we search for the body of the current function)
-            norm %
-            norm! k
+            normal %
+            normal! k
         endif
-        norm [m
+        normal [m
         lnum1 = line('.')
-        norm g%
+        normal g%
         lnum2 = line('.')
         ++g
     endwhile
     ++lnum1
     --lnum2
-    sil unix#cloc#main(lnum1, lnum2, '')
+    silent unix#cloc#main(lnum1, lnum2, '')
     if exists('g:cloc_results')
         var blank_cnt: number = get(g:cloc_results, filetype, {})->get('blank', 0)
         var comment_cnt: number = get(g:cloc_results, filetype, {})->get('comment', 0)

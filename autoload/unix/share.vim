@@ -13,7 +13,7 @@ def unix#share#main(lnum1: number, lnum2: number)
     #}}}
 
     var lines: list<string> = getline(lnum1, lnum2)
-    sil var url: string = system(
+    silent var url: string = system(
         "curl -F'file=@-' https://0x0.st", lines)->split('\n')->get(-1, '')
     #          │      ││{{{
     #          │      │└ standard input
@@ -24,7 +24,7 @@ def unix#share#main(lnum1: number, lnum2: number)
     #            in which a user has pressed the submit button.
     #            This enables uploading of files.
     #}}}
-    echom url
-    sil system('xdg-open ' .. shellescape(url))
+    echomsg url
+    silent system('xdg-open ' .. shellescape(url))
 enddef
 

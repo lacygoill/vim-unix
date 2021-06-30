@@ -17,14 +17,14 @@ const TEMPLATE_DIR: string = $HOME .. '/.vim/template/'
 
 # Autocmds {{{1
 
-augroup MyUnix | au!
-    au BufNewFile * MaybeReadTemplate()
+augroup MyUnix | autocmd!
+    autocmd BufNewFile * MaybeReadTemplate()
                   | MaybeMakeExecutable()
 augroup END
 
 # Commands {{{1
 
-com -bar -nargs=1 Chmod unix#chmod(<q-args>)
+command -bar -nargs=1 Chmod unix#chmod(<q-args>)
 
 # Do not give the `-complete=[file|dir]` attribute to any command.{{{
 #
@@ -33,10 +33,10 @@ com -bar -nargs=1 Chmod unix#chmod(<q-args>)
 #
 # MWE:
 #
-#     com -complete=file -nargs=1 Cmd call Func(<args>)
-#     fu Func(arg)
+#     command -complete=file -nargs=1 Cmd call Func(<args>)
+#     function Func(arg)
 #         echo a:arg
-#     endfu
+#     endfunction
 #     Cmd 'A%B'
 #     Aunix.vimB˜
 #
@@ -67,12 +67,12 @@ com -bar -nargs=1 Chmod unix#chmod(<q-args>)
 #}}}
 # TODO: Should we give it to harmless commands (i.e. commands which don't rename/(re)move/copy files)?
 # Update: I gave it back to `:SudoEdit`; I think it should be harmless there (plus it's really useful).
-com -bar -range=% -nargs=? Cloc unix#cloc#main(<line1>, <line2>, <q-args>)
+command -bar -range=% -nargs=? Cloc unix#cloc#main(<line1>, <line2>, <q-args>)
 
-com -bang -bar -nargs=1 Cp unix#cp(<q-args>, <bang>0)
+command -bang -bar -nargs=1 Cp unix#cp(<q-args>, <bang>0)
 
-com -bar -nargs=+ Find unix#grep('find', <q-args>)
-# Why the bang after `com`?{{{
+command -bar -nargs=+ Find unix#grep('find', <q-args>)
+# Why the bang after `command`?{{{
 #
 # fzf.vim installs a `:Locate` command.
 #
@@ -85,27 +85,27 @@ com -bar -nargs=+ Find unix#grep('find', <q-args>)
 #
 #     E174: Command already exists: add ! to replace it˜
 #}}}
-com! -bar -nargs=+ Locate unix#grep('locate', <q-args>)
+command! -bar -nargs=+ Locate unix#grep('locate', <q-args>)
 
-com -bang -bar -nargs=? Mkdir unix#mkdir(<q-args>, <bang>0)
+command -bang -bar -nargs=? Mkdir unix#mkdir(<q-args>, <bang>0)
 
 # `:Mv` lets us move the current file to any location.
 # `:Rename` lets us rename the current file inside the current directory.
-com -bang -bar -nargs=1 -complete=file Mv unix#move(<q-args>, <bang>0)
-com -bang -bar -nargs=1 -complete=custom,unix#renameComplete Rename Mv<bang> %:h/<args>
-#                                                                            └─┤ └────┤
-#                                                    directory of current file ┘      │
-#                                                                     new chosen name ┘
+command -bang -bar -nargs=1 -complete=file Mv unix#move(<q-args>, <bang>0)
+command -bang -bar -nargs=1 -complete=custom,unix#renameComplete Rename Mv<bang> %:h/<args>
+#                                                                                └─┤ └────┤
+#                                                        directory of current file ┘      │
+#                                                                         new chosen name ┘
 
 # Usage:
 # Select  some  text, and  execute  `:'<,'>Share`  to  upload the  selection  on
 # `0x0.st`, or just execute `:Share` to upload the whole current file.
 # TODO: Consider using this alternative site: http://ix.io/
 # It seems to offer more features.
-com -bar -range=% Share unix#share#main(<line1>, <line2>)
+command -bar -range=% Share unix#share#main(<line1>, <line2>)
 
-com -bang -bar -nargs=? -complete=file SudoEdit unix#sudo#edit(<q-args>, <bang>0)
-com -bar SudoWrite expand('%:p')->unix#sudo#setup() | w!
+command -bang -bar -nargs=? -complete=file SudoEdit unix#sudo#edit(<q-args>, <bang>0)
+command -bar SudoWrite expand('%:p')->unix#sudo#setup() | write!
 
 # TODO:
 # Are `:SudoWrite` and `:W` doing the same thing?
@@ -120,17 +120,17 @@ com -bar SudoWrite expand('%:p')->unix#sudo#setup() | w!
 # `:Tp!` deletes the current file and RELOADS the buffer.
 # As a result, we can restart the creation of a new file with the same name.
 #}}}
-com -bar -bang Tp unix#trash#put(<bang>0)
-com -bar       Tl unix#trash#list()
-#              └ Warning:{{{
+command -bar -bang Tp unix#trash#put(<bang>0)
+command -bar       Tl unix#trash#list()
+#                  └ Warning:{{{
 #
-#               It could conflict with the default `:tl[ast]` command.
-#               In practice, I don't think it will, because we'll use `]T` instead.
+#                   It could conflict with the default `:tl[ast]` command.
+#                   In practice, I don't think it will, because we'll use `]T` instead.
 #}}}
 
-com -bar -nargs=0 Trr unix#trash#restore()
+command -bar -nargs=0 Trr unix#trash#restore()
 
-com -bar Wall unix#wall()
+command -bar Wall unix#wall()
 
 # What's the purpose of `:W`?{{{
 #
@@ -161,23 +161,23 @@ com -bar Wall unix#wall()
 # it bypasses the W12 warning.
 #}}}
 
-#               ┌ write the buffer on the standard input of a shell command (`:h w_c`)
-#               │ and execute the latter
-#               │
-#               │   ┌ raise the rights of the `tee(1)` process so that it can write in
-#               │   │ a file owned by any user
-#               ├─┐ │
-com -bar W exe 'w !sudo tee >/dev/null ' .. expand('%:p')->shellescape(true) | &l:modified = false
-#                           ├────────┘              │
-#                           │                       └ but write in the current file
-#                           │
-#                           └ don't write in the terminal
+#                       ┌ write the buffer on the standard input of a shell command (`:help w_c`)
+#                       │ and execute the latter
+#                       │
+#                       │       ┌ raise the rights of the `tee(1)` process so that it can write in
+#                       │       │ a file owned by any user
+#                       ├─────┐ │
+command -bar W execute 'write !sudo tee >/dev/null ' .. expand('%:p')->shellescape(true) | &l:modified = false
+#                                       ├────────┘              │
+#                                       │                       └ but write in the current file
+#                                       │
+#                                       └ don't write in the terminal
 
 # Mappings {{{1
 
-nno <unique> g<c-l> <cmd>Cloc<cr>
-xno <unique> g<c-l> <c-\><c-n><cmd>* Cloc<cr>
-nno <unique> gl <cmd>call unix#cloc#countLinesInFunc()<cr>
+nnoremap <unique> g<C-L> <Cmd>Cloc<CR>
+xnoremap <unique> g<C-L> <C-\><C-N><Cmd>:* Cloc<CR>
+nnoremap <unique> gl <Cmd>call unix#cloc#countLinesInFunc()<CR>
 
 # Functions {{{1
 def MakeExecutable() #{{{2
@@ -185,14 +185,14 @@ def MakeExecutable() #{{{2
     if empty(shebang) || !executable('chmod')
         return
     endif
-    sil system('chmod +x ' .. expand('<afile>:p:S'))
+    silent system('chmod +x ' .. expand('<afile>:p:S'))
     if v:shell_error == 0
         return
     endif
     echohl ErrorMsg
     # FIXME:
     # Why is `:unsilent` needed?
-    unsilent echom 'Cannot make file executable: ' .. v:shell_error
+    unsilent echomsg 'Cannot make file executable: ' .. v:shell_error
     echohl None
 
     # Why?{{{
@@ -218,7 +218,7 @@ def MakeExecutable() #{{{2
     #
     # But, better be safe than sorry.
     #
-    # Also, have a look at `:h todo`, and search for `v:shell_error`.
+    # Also, have a look at `:help todo`, and search for `v:shell_error`.
     # A patch was submitted in 2016 to make the variable writable.
     # So, I'm not alone thinking it would  be useful to be able to write
     # this variable.
@@ -227,7 +227,7 @@ def MakeExecutable() #{{{2
 enddef
 
 def MaybeMakeExecutable() #{{{2
-    au BufWritePost <buffer> ++once MakeExecutable()
+    autocmd BufWritePost <buffer> ++once MakeExecutable()
 enddef
 
 def MaybeReadTemplate() #{{{2
@@ -242,33 +242,33 @@ def MaybeReadTemplate() #{{{2
 
     if index(filetypes, &filetype) >= 0
     && filereadable(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')
-        #    ┌ don't use the template file as the alternate file for the current window{{{
-        #    │ keep the current one
-        #    │
-        #    │ Note that `:keepalt` is not useful when you read the output of an
-        #    │ external command (`:r !cmd`).
-        #    │}}}
-        exe 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')
-        keepj :1 d _
+        #        ┌ don't use the template file as the alternate file for the current window{{{
+        #        │ keep the current one
+        #        │
+        #        │ Note that `:keepalt` is not useful when you read the output of an
+        #        │ external command (`:read !cmd`).
+        #        │}}}
+        execute 'keepalt read ' .. fnameescape(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')
+        keepjumps :1 delete _
 
     elseif expand('<afile>:p') =~ '.*/compiler/[^/]*\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/compiler.txt')
         ['let current_compiler = ' .. expand('<afile>:p:t:r')->string(), '']
             ->setline(1)
-        exe 'keepalt :2 read ' .. TEMPLATE_DIR .. 'byName/compiler.txt'
+        execute 'keepalt :2 read ' .. TEMPLATE_DIR .. 'byName/compiler.txt'
         # If our compiler  is in `~/.vim/compiler`, we want to  skip the default
         # compilers in `$VIMRUNTIME/compiler`.
         # In this case, we need 'current_compiler' to be set.
 
     elseif expand('<afile>:p') =~ '.*/filetype\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/filetype.txt')
-        exe 'keepalt read ' .. TEMPLATE_DIR .. 'byName/filetype.txt'
-        keepj :1 d _
+        execute 'keepalt read ' .. TEMPLATE_DIR .. 'byName/filetype.txt'
+        keepjumps :1 delete _
 
     elseif expand('<afile>:p') =~ '.*/scripts\.vim'
     && filereadable(TEMPLATE_DIR .. 'byName/scripts.txt')
-        exe 'keepalt read ' .. TEMPLATE_DIR .. 'byName/scripts.txt'
-        keepj :1 d _
+        execute 'keepalt read ' .. TEMPLATE_DIR .. 'byName/scripts.txt'
+        keepjumps :1 delete _
 
     # useful to get a mini `tmux.conf` when debugging tmux
     elseif expand('<afile>:t') == 'tmux.conf'

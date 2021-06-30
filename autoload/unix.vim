@@ -7,10 +7,10 @@ import Catch from 'lg.vim'
 
 def unix#chmod(flags: string) #{{{1
     # TODO: Use `setfperm()` instead, and look at how tpope implemented this function.
-    sil var output: list<string> = systemlist('chmod ' .. flags .. ' ' .. expand('%:p:S'))
+    silent var output: list<string> = systemlist('chmod ' .. flags .. ' ' .. expand('%:p:S'))
 
     # reload buffer to avoid a (delayed) message such as: "/tmp/file 1L, 6C"
-    e
+    edit
 
     if !empty(output)
         output[0]->Error()
@@ -41,11 +41,14 @@ def unix#cp(arg_dst: string, bang: bool) #{{{1
         Error(string(dst) .. ' already exists; add a bang to overwrite it')
         return
     endif
-    sil system('cp -L' .. (bang ? '' : 'n') .. 'p ' .. shellescape(src) .. ' ' .. shellescape(dst))
-    #               │                   │       │
-    #               │                   │       └ same as --preserve=mode,ownership,timestamps
-    #               │                   └ do not overwrite an existing file
-    #               └ follow symbolic links
+    silent system('cp'
+        # follow symbolic links
+        .. ' -L'
+        # do not overwrite an existing file
+        .. (bang ? '' : 'n')
+        # same as --preserve=mode,ownership,timestamps
+        .. 'p'
+        .. ' ' .. shellescape(src) .. ' ' .. shellescape(dst))
 
     if v:shell_error
         system('')
@@ -58,7 +61,7 @@ def unix#grep(prg: string, args: string) #{{{1
     # Make `find(1)` ignore files matching 'wildignore'.
     # https://stackoverflow.com/a/22558474/9477010
     var cmd: string = prg .. ' ' .. args .. ' 2>/dev/null'
-    sil var items: list<dict<any>> = getqflist({
+    silent var items: list<dict<any>> = getqflist({
         lines: systemlist(cmd),
         efm: '%f'
     }).items
@@ -68,7 +71,7 @@ def unix#grep(prg: string, args: string) #{{{1
 
     setqflist([], ' ', {items: items, title: '$ ' .. cmd})
 
-    do <nomodeline> QuickFixCmdPost cwindow
+    doautocmd <nomodeline> QuickFixCmdPost cwindow
     if &buftype == 'quickfix'
         qf#setMatches('unix:grep', 'Conceal', 'double_bar')
         qf#createMatches()
@@ -97,19 +100,19 @@ def unix#grep(prg: string, args: string) #{{{1
     #         # Don't use `:grep`, it makes the screen flicker.  Use `cgetexpr` instead.
     #         # Look at what we did in `myfuncs#opGrep()`.
     #
-    #         #            ┌ don't jump to first match, we want to decide ourselves
-    #         #            │ whether to jump
-    #         #            │
-    #         exe 'sil grep! ' .. pat
-    #         #     │
-    #         #     └ bypass prompt “Press ENTER or type command to continue“
+    #         #                   ┌ don't jump to first match, we want to decide ourselves
+    #         #                   │ whether to jump
+    #         #                   │
+    #         execute 'silent grep! ' .. pat
+    #         #        │
+    #         #        └ bypass prompt “Press ENTER or type command to continue“
     #         # FIXME:
     #         redraw!
     #
     #         # No need to inform  our custom autocmds, responsible for dealing with
     #         # qf windows (opening, layout, ...), that we have just populated a qfl:
     #         #
-    #         #     do <nomodeline> QuickFixCmdPost cwindow
+    #         #     doautocmd <nomodeline> QuickFixCmdPost cwindow
     #         #
     #         # ... because `:vimgrep` has already triggered `QuickFixCmdPost`.
     #
@@ -150,10 +153,10 @@ def unix#grep(prg: string, args: string) #{{{1
     # Remember that `:grep`  is shitty because it causes the  screen to flicker,
     # due to the combination of `:silent` and `:redraw`:
     #
-    #     nno <F3> <cmd>exe 'sil grep! foobar' <bar> redraw!<cr>
-    #                        │                       │
-    #                        │                       └ needed to redraw screen
-    #                        └ needed to avoid seeing the terminal screen
+    #     nnoremap <F3> <Cmd>execute 'silent grep! foobar' <Bar> redraw!<CR>
+    #                                 │                          │
+    #                                 │                          └ needed to redraw screen
+    #                                 └ needed to avoid seeing the terminal screen
     #
     # ---
     #
@@ -226,11 +229,11 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         # It happens if  the name we pass  to `:Rename` matches a  file which is
         # loaded  in  the current  Vim  session.   For  example, we  could  make
         # `:Rename!` wipe this buffer...
-        exe 'keepalt saveas ' .. fnameescape(dst)
-        #    │
-        #    └ even though `:saveas` is going to fail, it will still
-        #      change the alternate file for the current window (`dst`);
-        #      we don't want that
+        execute 'keepalt saveas ' .. fnameescape(dst)
+        #        │
+        #        └ even though `:saveas` is going to fail, it will still
+        #          change the alternate file for the current window (`dst`);
+        #          we don't want that
         return
 
     # Try to rename current file.
@@ -259,7 +262,7 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         #     BufWrite
         #     BufWritePre
         #     BufWritePost
-        exe 'keepalt saveas! ' .. fnameescape(dst)
+        execute 'keepalt saveas! ' .. fnameescape(dst)
 
         # Get rid of old buffer (it's not linked to a file anymore).
         # But only if it's not the current one.
@@ -268,7 +271,7 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         #     :Mv     /path/to/current/file
         #     :Rename current_filename
         if src != expand('%:p')
-            exe 'sil! bw ' .. fnameescape(src)
+            execute 'silent! bwipeout ' .. fnameescape(src)
         endif
 
         # Rationale:{{{
@@ -278,7 +281,7 @@ def unix#move(arg_dst: string, bang: bool) #{{{1
         #}}}
         filetype detect
         # re-apply fold settings
-        do <nomodeline> BufWinEnter
+        doautocmd <nomodeline> BufWinEnter
     endif
 enddef
 
@@ -328,7 +331,7 @@ var seen: dict<bool>
 
 def Error(msg: string) #{{{2
     echohl ErrorMsg
-    echom msg
+    echomsg msg
     echohl NONE
 enddef
 

@@ -10,7 +10,7 @@ def unix#trash#list() #{{{2
         return
     endif
 
-    sil var listing: string = system('trash-list')
+    silent var listing: string = system('trash-list')
     if v:shell_error
         system('')
         Error('Failed to list the contents of the trash can')
@@ -39,10 +39,10 @@ def unix#trash#put(bang: bool) #{{{2
         #   │
         #   └ Why not `filereadable()`?
         #     Because the alternate “file” could be a buffer.
-            exe 'e ' .. alternate_file
-            bd! %%
+            execute 'edit ' .. alternate_file
+            bdelete! %%
         else
-            bd!
+            bdelete!
         endif
 
         # if it's still loaded, stop
@@ -52,7 +52,7 @@ def unix#trash#put(bang: bool) #{{{2
     endif
 
     # now, try to put the file in a trash can
-    sil system('trash-put ' .. shellescape(file))
+    silent system('trash-put ' .. shellescape(file))
     if v:shell_error
         system('')
         Error('Failed to delete ' .. file)
@@ -60,26 +60,26 @@ def unix#trash#put(bang: bool) #{{{2
     endif
 
     if bang
-        e
+        edit
     endif
 enddef
 
 def unix#trash#restore() #{{{2
     # Simpler alternative:{{{
     #
-    #     term /bin/sh -c "sleep .1 && rlwrap trash-restore"
+    #     :terminal /bin/sh -c "sleep .1 && rlwrap trash-restore"
     #
     # The `sleep(1)` might be necessary  to avoid the listing of `trash-restore`
     # to be slightly messed up.
     #}}}
     var buf: number = terminal#togglePopup#main()
-    term_sendkeys(buf, "rlwrap trash-restore\r")
+    term_sendkeys(buf, "rlwrap trash-restore\<CR>")
 enddef
 #}}}1
 # Utilities {{{1
 def Error(msg: string) #{{{2
     echohl ErrorMsg
-    echom msg
+    echomsg msg
     echohl NONE
 enddef
 

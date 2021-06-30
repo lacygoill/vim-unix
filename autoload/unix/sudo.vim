@@ -11,7 +11,7 @@ def unix#sudo#edit(arg_file: string, bang: bool) #{{{2
     unix#sudo#setup(file)
 
     if !&modified || !empty(arg_file)
-        exe 'e' .. (bang ? '!' : '') .. ' ' .. arg_file
+        execute 'edit' .. (bang ? '!' : '') .. ' ' .. arg_file
     endif
 
     if empty(arg_file) || expand('%:p') == arg_file->fnamemodify(':p')
@@ -21,11 +21,11 @@ enddef
 
 def unix#sudo#setup(file: string) #{{{2
     if !filereadable(file) && !exists('#BufReadCmd#' .. fnameescape(file))
-        exe 'au BufReadCmd ' .. fnameescape(file) .. ' exe SudoReadCmd()'
+        execute 'autocmd BufReadCmd ' .. fnameescape(file) .. ' execute SudoReadCmd()'
     endif
     if !filewritable(file) && !exists('#BufWriteCmd#' .. fnameescape(file))
-        exe 'au BufReadPost ' .. fnameescape(file) .. ' &readonly = false'
-        exe 'au BufWriteCmd ' .. fnameescape(file) .. ' exe SudoWriteCmd()'
+        execute 'autocmd BufReadPost ' .. fnameescape(file) .. ' &readonly = false'
+        execute 'autocmd BufWriteCmd ' .. fnameescape(file) .. ' execute SudoWriteCmd()'
     endif
 enddef
 #}}}1
@@ -51,9 +51,9 @@ def SudoEditInit() #{{{2
     var files: list<string> = split($SUDO_COMMAND, ' ')[1 : -1]
     if len(files) == argc()
         for i in argc()->range()
-            exe 'autocmd BufEnter ' .. argv(i)->fnameescape()
+            execute 'autocmd BufEnter ' .. argv(i)->fnameescape()
                 .. ' if empty(&filetype) || &filetype == "conf"'
-                .. ' |     do filetypedetect BufReadPost ' .. files[i]->fnameescape()
+                .. ' |     doautocmd filetypedetect BufReadPost ' .. files[i]->fnameescape()
                 .. ' | endif'
         endfor
     endif
@@ -74,15 +74,15 @@ def SudoError(): string #{{{2
 enddef
 
 def SudoReadCmd(): string #{{{2
-    sil keepj :% d _
+    silent keepjumps :% delete _
     var silent: string
     var cmd: string
     [silent, cmd] = SilentSudoCmd('cat')
-    exe printf('sil read !%s %%:p:S 2>%s', cmd, ERROR_FILE)
+    execute printf('silent read !%s %%:p:S 2>%s', cmd, ERROR_FILE)
     var exit_status: number = v:shell_error
     # reset `v:shell_error`
     system('')
-    sil keepj :1 d _
+    silent keepjumps :1 delete _
     &l:modified = false
     if exit_status
         return 'echoerr ' .. SudoError()->string()
@@ -96,7 +96,7 @@ def SudoWriteCmd(): string #{{{2
     [silent, cmd] = SilentSudoCmd('tee')
     cmd ..= ' %:p:S >/dev/null'
     cmd ..= ' 2> ' .. ERROR_FILE
-    exe silent 'write !' .. cmd
+    execute silent 'write !' .. cmd
     var error: string = SudoError()
     if !empty(error)
         return 'echoerr ' .. string(error)
