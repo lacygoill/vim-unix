@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 const ERROR_FILE: string = tempname()
 
 # Interface {{{1

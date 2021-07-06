@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # Purpose:{{{
 #
 # Populate the global variable `g:cloc_results` with a dictionary.
@@ -76,7 +73,7 @@ def unix#cloc#main( #{{{1
         #}}}
         if b:current_syntax == 'vim9'
             getline(lnum1, lnum2)
-                ->map((_, v: string): string => v->substitute('^\s*\zs#', '"', ''))
+                ->map((_, v: string) => v->substitute('^\s*\zs#', '"', ''))
                 ->writefile(to_scan)
         else
             getline(lnum1, lnum2)->writefile(to_scan)
@@ -168,14 +165,6 @@ def unix#cloc#main( #{{{1
 enddef
 
 def unix#cloc#countLinesInFunc() #{{{1
-    # Sometimes, when I press `gl` in a function, the command-line displays that it contains 0 lines of code!{{{
-    #
-    # That's probably because `%` fails to jump on `endfunction` when the cursor is on `function`.
-    # See: https://github.com/andymass/vim-matchup/issues/54
-    #
-    # Try to avoid using a variable name matching `fu\%[nction]`.
-    # Otherwise, you'll have to just accept that it's not 100% reliable.
-    #}}}
     var filetype: string = get({vim: 'vim script', sh: 'Bourne Shell'}, &filetype, '')
     if filetype == ''
         echo 'non supported filetype'

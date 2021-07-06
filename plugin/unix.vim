@@ -33,12 +33,13 @@ command -bar -nargs=1 Chmod unix#chmod(<q-args>)
 #
 # MWE:
 #
-#     command -complete=file -nargs=1 Cmd call Func(<args>)
-#     function Func(arg)
-#         echo a:arg
-#     endfunction
+#     edit /tmp/file
+#     command -complete=file -nargs=1 Cmd Func(<args>)
+#     def Func(arg: any)
+#         echo arg
+#     enddef
 #     Cmd 'A%B'
-#     Aunix.vimB˜
+#     A/tmp/fileB˜
 #
 # ---
 #
@@ -238,7 +239,7 @@ def MaybeReadTemplate() #{{{2
     # Get all the filetypes for which we have a template.
     var filetypes: list<string> = (TEMPLATE_DIR .. 'byFiletype')
         ->readdir(true, {sort: 'none'})
-        ->map((_, v: string): string => v->fnamemodify(':r'))
+        ->map((_, v: string) => v->fnamemodify(':r'))
 
     if index(filetypes, &filetype) >= 0
     && filereadable(TEMPLATE_DIR .. 'byFiletype/' .. &filetype .. '.txt')

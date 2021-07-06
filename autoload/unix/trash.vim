@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 # Interface {{{1
 def unix#trash#list() #{{{2
     if !executable('trash-list')

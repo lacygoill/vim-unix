@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 import Catch from 'lg.vim'
 
 def unix#chmod(flags: string) #{{{1
@@ -288,7 +285,7 @@ enddef
 def unix#renameComplete(arglead: string, _, _): string #{{{1
     var prefix: string = expand('%:p:h') .. '/'
     var files: list<string> = glob(prefix .. arglead .. '*', false, true)
-        ->map((_, v: string): string => v[strcharlen(prefix) :] .. (isdirectory(v) ? '/' : ''))
+        ->map((_, v: string) => v[strcharlen(prefix) :] .. (isdirectory(v) ? '/' : ''))
     return (files + ['../'])->join("\n")
     #                ^---^
     # TODO: How does Vim handle that?

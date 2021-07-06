@@ -1,8 +1,5 @@
 vim9script noclear
 
-if exists('loaded') | finish | endif
-var loaded = true
-
 def unix#share#main(lnum1: number, lnum2: number)
     # For more info on how the web service `0x0` works, see:{{{
     #
