@@ -147,13 +147,13 @@ def unix#cloc#main( #{{{1
         code
     END
 
-    for values_on_line in stats
+    for values_on_line: list<string> in stats
         # `i` is going to index the `keys` list.
         # `dict` is going to store a dictionary containing the numbers of lines for a given language.
         var i: number = 0
         var dict: dict<number>
 
-        for value in values_on_line[1 :]
+        for value: string in values_on_line[1 :]
             dict[keys[i]] = eval(value)
             ++i
         endfor

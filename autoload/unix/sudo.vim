@@ -47,7 +47,7 @@ enddef
 def SudoEditInit() #{{{2
     var files: list<string> = split($SUDO_COMMAND, ' ')[1 : -1]
     if len(files) == argc()
-        for i in argc()->range()
+        for i: number in argc()->range()
             execute 'autocmd BufEnter ' .. argv(i)->fnameescape()
                 .. ' if empty(&filetype) || &filetype == "conf"'
                 .. ' |     doautocmd filetypedetect BufReadPost ' .. files[i]->fnameescape()
