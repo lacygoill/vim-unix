@@ -194,7 +194,9 @@ def unix#cloc#countLinesInFunc() #{{{1
             normal %
             normal! k
         endif
-        normal [m
+        # Don't write `normal [m`; later, the message could be erased because of
+        # `vim-submode`.
+        search('^\C\s*\%(fu\%[nction]\|\%(export\s*\)\=def\)!\=\s\+', 'bW')
         lnum1 = line('.')
         normal g%
         lnum2 = line('.')
